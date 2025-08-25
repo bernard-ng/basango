@@ -1,0 +1,38 @@
+services:
+  basango:
+    build: .
+    container_name: basango-app
+    restart: unless-stopped
+    networks:
+      - basango-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: basango-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/redis
+    command: redis-server --appendonly yes
+    networks:
+      - basango-network
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: basango-redis-commander
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - basango-network
+
+networks:
+  basango-network:
+
+volumes:
+  redis_data:

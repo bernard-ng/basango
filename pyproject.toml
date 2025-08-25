@@ -1,12 +1,13 @@
 [project]
 name = "basango"
 version = "0.1.0"
-description = "Basango : Distrubted Web Scrapper for DRC News"
+description = "Basango : Web Scrapper for DRC News"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
+    "rq>=2.5.0",
     "typer>=0.16.1",
     "uv-build>=0.8.12,<0.9.0",
 ]

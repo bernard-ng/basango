@@ -3,6 +3,7 @@
 .ipynb_checkpoints/
 *.pyc
 .env.local
+.env.*.local
 var/
 .DS_Store
 
@@ -16,3 +17,4 @@ wheels/
 
 # Virtual environments
 .venv
+

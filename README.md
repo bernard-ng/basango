@@ -1,4 +1,4 @@
-# Basango : Distributed Web Scrapper for DRC News
+# Basango : Web Scrapper for DRC News
 
 [![Lint](https://github.com/bernard-ng/basango/actions/workflows/lint.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/lint.yml)
 [![Security](https://github.com/bernard-ng/basango/actions/workflows/security.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/security.yml)
