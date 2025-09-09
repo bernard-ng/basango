@@ -32,7 +32,7 @@ class ClientConfig(BaseModel):
 
 
 class CrawlerConfig(BaseModel):
-    source: Optional[Union[HtmlSourceConfig | WordPressSourceConfig]] = Field(
+    source: Optional[Union[HtmlSourceConfig, WordPressSourceConfig]] = Field(
         default=None, description="Source configuration to crawl"
     )
     page_range: Optional[PageRange] = Field(
@@ -59,8 +59,8 @@ class CrawlerConfig(BaseModel):
     max_workers: int = Field(
         default=5, description="Maximum number of concurrent crawling workers"
     )
-    direction: Optional[UpdateDirection] = Field(
-        UpdateDirection.FORWARD, description="Crawling direction"
+    direction: UpdateDirection = Field(
+        default=UpdateDirection.FORWARD, description="Crawling direction"
     )
 
 

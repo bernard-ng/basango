@@ -34,14 +34,14 @@ class HttpClient:
 
     def _retry_delay(
         self, attempt: int, response: Optional[httpx.Response] = None
-    ) -> Optional[float]:
-        retry_after = response.headers.get("Retry-After")
+    ) -> float:
         delay = 0.0
 
-        if response is not None:
-            if self.client_config.respect_retry_after:
-                if not retry_after:
-                    pass
+        if response is not None and self.client_config.respect_retry_after:
+            retry_after = (
+                response.headers.get("Retry-After") if response.headers else None
+            )
+            if retry_after:
                 try:
                     delay = max(0.0, float(int(retry_after)))
                 except ValueError:
@@ -53,19 +53,28 @@ class HttpClient:
                         delay = max(0.0, (dt - now).total_seconds())
                     except Exception:  # noqa: BLE001
                         pass
+
         if delay == 0.0:
             delay = self._compute_backoff(attempt)
 
         return delay
 
     def __post_init__(self) -> None:
-        self._user_agent = (
-            self.user_agent_provider.get()
-            or UserAgentProvider(
+        if self.user_agent_provider is not None:
+            user_agent = self.user_agent_provider.get()
+            self._user_agent = (
+                user_agent if user_agent else self.client_config.user_agent
+            )
+        else:
+            provider = UserAgentProvider(
                 rotate=self.client_config.rotate_user_agent,
                 fallback=self.client_config.user_agent,
-            ).get()
-        )
+            )
+            user_agent = provider.get()
+            self._user_agent = (
+                user_agent if user_agent else self.client_config.user_agent
+            )
+
         headers = {"User-Agent": self._user_agent}
 
         if self.default_headers:

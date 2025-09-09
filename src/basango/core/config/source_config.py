@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Union
 
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -30,16 +30,20 @@ class SourceConfigBase(BaseModel):
 
 
 class WordPressSourceConfig(SourceConfigBase):
-    source_kind: Literal["wordpress"] = SourceKind.WORDPRESS
+    source_kind: SourceKind = Field(
+        default=SourceKind.WORDPRESS, description="Type of the source"
+    )
     source_date: SourceDate = SourceDate(
         format="%Y-%m-%dT%H:%M:%S", pattern=None, replacement=None
     )
 
 
 class HtmlSourceConfig(SourceConfigBase):
-    source_kind: Literal["html"] = SourceKind.HTML
+    source_kind: SourceKind = Field(
+        default=SourceKind.HTML, description="Type of the source"
+    )
     source_selectors: SourceSelectors = Field(
-        default_factory=SourceSelectors,
+        default_factory=lambda: SourceSelectors(),
         description="CSS selectors for extracting articles",
     )
     pagination_template: str = Field(
@@ -55,8 +59,8 @@ class SourcesConfig(BaseModel):
         default_factory=list, description="List of source configurations"
     )
 
-    def find(self, source_id: str) -> SourceConfigBase | None:
+    def find(self, source_id: str) -> Union[HtmlSourceConfig, WordPressSourceConfig]:
         for source in self.html + self.wordpress:
             if source.source_id == source_id:
                 return source
-        return None
+        raise ValueError(f"Source with id '{source_id}' not found")

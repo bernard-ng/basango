@@ -16,19 +16,26 @@ class SourceDate(BaseModel):
 
 
 class SourceSelectors(BaseModel):
-    articles: str = Field(
-        ..., description="CSS selector for the list of articles within a page"
+    articles: Optional[str] = Field(
+        default=None, description="CSS selector for the list of articles within a page"
     )
-    article_title: str = Field(..., description="CSS selector for the article title")
-    article_link: str = Field(..., description="CSS selector for the article link")
-    article_body: str = Field(
-        ..., description="CSS selector for the article body/content"
+    article_title: Optional[str] = Field(
+        default=None, description="CSS selector for the article title"
     )
-    article_date: str = Field(..., description="CSS selector for the article date")
+    article_link: Optional[str] = Field(
+        default=None, description="CSS selector for the article link"
+    )
+    article_body: Optional[str] = Field(
+        default=None, description="CSS selector for the article body/content"
+    )
+    article_date: Optional[str] = Field(
+        default=None, description="CSS selector for the article date"
+    )
     article_categories: Optional[str] = Field(
         default=None, description="CSS selector for the article categories"
     )
 
     pagination: str = Field(
-        "ul.pagination > li a", description="CSS selector for the pagination links"
+        default="ul.pagination > li a",
+        description="CSS selector for the pagination links",
     )
