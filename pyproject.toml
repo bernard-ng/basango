@@ -10,6 +10,12 @@ dependencies = [
     "rq>=2.5.0",
     "typer>=0.16.1",
     "uv-build>=0.8.12,<0.9.0",
+    "pyyaml>=6.0.2",
+    "httpx>=0.27.2",
+    "trafilatura>=1.7.0",
+    "selectolax>=0.3.20",
+    "markdownify>=0.13.1",
+    "readability-lxml>=0.8.1",
 ]
 
 [dependency-groups]

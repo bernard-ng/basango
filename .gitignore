@@ -18,3 +18,4 @@ wheels/
 # Virtual environments
 .venv
 
+data/

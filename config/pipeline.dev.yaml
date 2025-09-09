@@ -1,0 +1,97 @@
+# Fetching and crawling configuration
+fetch:
+  client:
+    timeout: 20
+    user_agent: Basango/0.1 (+https://github.com/bernard-ng/basango)
+    follow_redirects: true
+    verify_ssl: true
+    rotate_user_agent: true
+    max_retries: 3
+    backoff_initial: 1.0
+    backoff_multiplier: 2.0
+    backoff_max: 30.0
+    respect_retry_after: true
+  crawler:
+    notify: false
+    use_multi_threading: false
+    max_workers: 5
+
+# Source configurations
+sources:
+  html:
+    - source_id: radiookapi.net
+      source_url: https://www.radiookapi.net
+      source_date:
+        pattern: "/(\\d{2})\/(\\d{2})\/(\\d{4}) - (\\d{2}:\\d{2})/"
+        replacement: "$3-$2-$1 $4"
+      source_selectors:
+        articles: ".view-content > .views-row.content-row"
+        article_title: ".views-field-title a"
+        article_link: ".views-field-title a"
+        article_body: ".field-name-body"
+        article_date: ".views-field-created"
+        article_categories: ".views-field-field-cat-gorie a"
+        pagination: "ul.pagination > li a(:last-child)"
+      pagination_template: "/actualite?page={page}"
+      supports_categories: false
+      requires_details: false
+      requires_rate_limit: false
+
+    - source_id: 7sur7.cd
+      source_url: https://7sur7.cd
+      source_date:
+        pattern: "/\\w{3} (\\d{2})\/(\\d{2})\/(\\d{4}) - (\\d{2}:\\d{2})/"
+        replacement: "$3-$2-$1 $4"
+      categories: [ "politique", "economie", "culture", "sport", "societe" ]
+      source_selectors:
+        articles: ".view-content > .row.views-row"
+        article_title: ".views-field-title a"
+        article_link: ".views-field-title a"
+        article_body: ".field.field--name-body"
+        article_date: ".views-field-created"
+        pagination: "ul.pagination > li a(:last-child)"
+      pagination_template: "/index.php/category/{category}?page={page}"
+      supports_categories: true
+      requires_details: false
+      requires_rate_limit: false
+
+    - source_id: mediacongo.net
+      source_url: https://mediacongo.net
+      source_date:
+        format: "%d.%m.%Y %H:%M"
+      source_selectors:
+        articles: ".for_aitems > .article_other_item"
+        article_title: "img"
+        article_link: "a(:first-child)"
+        article_categories: "a.color_link"
+        article_body: ".article_ttext"
+        article_date: ".article_other_about"
+        pagination: ".nav > a(:last-child)"
+      pagination_template: "/articles.html?page={page}"
+      supports_categories: false
+      requires_details: true
+      requires_rate_limit: false
+
+    - source_id: actualite.cd
+      source_url: https://actualite.cd
+      source_date:
+        pattern: "/(\\d{1}) (\\d{1,2}) (\\d{2}) (\\d{4}) - (\\d{2}:\\d{2})/"
+        replacement: "$4-$3-$2 $5"
+      source_selectors:
+        articles: "#views-bootstrap-taxonomy-term-page-2 > div > div"
+        article_title: "#actu-titre a"
+        article_link: "#actu-titre a"
+        article_categories: "#actu-cat a"
+        article_body: ".views-field.views-field-body"
+        article_date: "#p-date"
+      pagination_template: "/actualite?page={page}"
+      supports_categories: false
+      requires_details: true
+      requires_rate_limit: false
+
+  wordpress:
+    - source_id: beto.cd
+      source_url: https://beto.cd
+      requires_rate_limit: true
+    - source_id: newscd.net
+      source_url: https://newscd.net

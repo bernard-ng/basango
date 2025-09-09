@@ -21,3 +21,19 @@
 ### Introduction
 
 The **"DRC News Corpus"** is a structured and scalable dataset of news articles sourced from major media outlets covering diverse aspects of the Democratic Republic of Congo (DRC). Designed for efficiency, this system enables the automated collection, processing, and organization of news stories spanning politics, economy, society, culture, environment, and international affairs.
+
+## Basango Crawler (this repo)
+
+- Queue-based pipeline built with Redis + RQ
+- YAML-configurable steps and sources
+- Step 1: load URLs (direct list or RSS) and enqueue
+- Step 2: extract article text using `trafilatura`
+
+### Quick start
+
+- Run Redis (via Docker): `docker run -p 6379:6379 redis:7-alpine`
+- Create a config: `basango init-config --path basango.yaml` and edit it
+- Crawl + enqueue: `basango crawl -c basango.yaml`
+- Start a worker: `basango worker -c basango.yaml`
+
+Extracted articles are appended to `data/articles.jsonl` by default. You can later swap the storage to a database-backed sink.
