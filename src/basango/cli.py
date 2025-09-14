@@ -3,6 +3,8 @@ import typer
 from basango.core.config import CrawlerConfig
 from basango.core.config_manager import ConfigManager
 from basango.domain import PageRange, DateRange, UpdateDirection
+from basango.services.crawler.html_crawler import HtmlCrawler
+from basango.services.crawler.wordpress_crawler import WordpressCrawler
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
@@ -37,6 +39,12 @@ def crawl_cmd(
         direction=UpdateDirection.FORWARD,
     )
 
-    # use the crawler runner to start crawling with this config
-    print(crawler_config)
-    pass
+    crawlers = [
+        HtmlCrawler(crawler_config, pipeline.fetch.client),
+        WordpressCrawler(crawler_config, pipeline.fetch.client),
+    ]
+
+    for crawler in crawlers:
+        if crawler.supports(source.source_kind):
+            crawler.fetch()
+            break

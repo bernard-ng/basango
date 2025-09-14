@@ -13,9 +13,7 @@ class ClientConfig(BaseModel):
     )
     follow_redirects: bool = Field(default=True, description="Follow HTTP redirects")
     verify_ssl: bool = Field(default=True, description="Verify SSL certificates")
-    rotate_user_agent: bool = Field(
-        default=True, description="Rotate User-Agent header"
-    )
+    rotate: bool = Field(default=True, description="Rotate User-Agent header")
     max_retries: int = Field(
         default=3, description="Maximum number of retries on failure"
     )

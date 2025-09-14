@@ -16,6 +16,7 @@ dependencies = [
     "selectolax>=0.3.20",
     "markdownify>=0.13.1",
     "readability-lxml>=0.8.1",
+    "beautifulsoup4>=4.13.5",
 ]
 
 [dependency-groups]

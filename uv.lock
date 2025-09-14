@@ -53,6 +53,7 @@ name = "basango"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "beautifulsoup4" },
     { name = "httpx" },
     { name = "markdownify" },
     { name = "pydantic" },
@@ -76,6 +77,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.13.5" },
     { name = "httpx", specifier = ">=0.27.2" },
     { name = "markdownify", specifier = ">=0.13.1" },
     { name = "pydantic", specifier = ">=2.11.7" },

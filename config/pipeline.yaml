@@ -5,7 +5,7 @@ fetch:
     user_agent: Basango/0.1 (+https://github.com/bernard-ng/basango)
     follow_redirects: true
     verify_ssl: true
-    rotate_user_agent: true
+    rotate: true
     max_retries: 3
     backoff_initial: 1.0
     backoff_multiplier: 2.0
@@ -42,8 +42,8 @@ sources:
         article_body: ".field-name-body"
         article_date: ".views-field-created"
         article_categories: ".views-field-field-cat-gorie a"
-        pagination: "ul.pagination > li a(:last-child)"
-      pagination_template: "/actualite?page={page}"
+        pagination: "ul.pagination > li.pager-last > a"
+      pagination_template: "actualite"
       supports_categories: false
       requires_details: false
       requires_rate_limit: false
@@ -60,14 +60,14 @@ sources:
         article_link: ".views-field-title a"
         article_body: ".field.field--name-body"
         article_date: ".views-field-created"
-        pagination: "ul.pagination > li a(:last-child)"
-      pagination_template: "/index.php/category/{category}?page={page}"
+        pagination: "ul.pagination > li.pager__item.pager__item--last > a"
+      pagination_template: "index.php/category/{category}"
       supports_categories: true
       requires_details: false
       requires_rate_limit: false
 
     - source_id: mediacongo.net
-      source_url: https://mediacongo.net
+      source_url: https://www.mediacongo.net
       source_date:
         format: "%d.%m.%Y %H:%M"
       source_selectors:
@@ -77,8 +77,8 @@ sources:
         article_categories: "a.color_link"
         article_body: ".article_ttext"
         article_date: ".article_other_about"
-        pagination: ".nav > a(:last-child)"
-      pagination_template: "/articles.html?page={page}"
+        pagination: "div.pagination > div > a:last-child"
+      pagination_template: "articles.html"
       supports_categories: false
       requires_details: true
       requires_rate_limit: false
@@ -95,7 +95,7 @@ sources:
         article_categories: "#actu-cat a"
         article_body: ".views-field.views-field-body"
         article_date: "#p-date"
-      pagination_template: "/actualite?page={page}"
+      pagination_template: "actualite"
       supports_categories: false
       requires_details: true
       requires_rate_limit: false

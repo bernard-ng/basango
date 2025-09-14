@@ -12,6 +12,9 @@ class PageRange:
         assert len(parts) == 2, f"[PageRange] Invalid page range: {spec}"
 
         start, end = int(parts[0]), int(parts[1])
-        assert start >= 1, f"[PageRange] Invalid page range: {spec}"
+        assert start >= 0, f"[PageRange] Invalid page range: {spec}"
         assert end >= start, f"[PageRange] Invalid page range: {spec}"
         return PageRange(start=start, end=end)
+
+    def __str__(self):
+        return f"{self.start}:{self.end}"

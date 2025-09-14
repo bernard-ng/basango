@@ -67,7 +67,7 @@ class HttpClient:
             )
         else:
             provider = UserAgentProvider(
-                rotate=self.client_config.rotate_user_agent,
+                rotate=self.client_config.rotate,
                 fallback=self.client_config.user_agent,
             )
             user_agent = provider.get()
