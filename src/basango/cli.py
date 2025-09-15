@@ -30,6 +30,8 @@ def crawl_cmd(
     manager.setup_logging(pipeline)
 
     source = pipeline.sources.find(source_id)
+    assert source is not None, f"Source '{source_id}' not found in config"
+
     crawler_config = CrawlerConfig(
         source=source,
         page_range=PageRange.create(page) if page else None,

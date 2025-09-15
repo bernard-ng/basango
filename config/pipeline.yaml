@@ -73,7 +73,7 @@ sources:
       source_selectors:
         articles: ".for_aitems > .article_other_item"
         article_title: "img"
-        article_link: "a(:first-child)"
+        article_link: "a:first-child"
         article_categories: "a.color_link"
         article_body: ".article_ttext"
         article_date: ".article_other_about"

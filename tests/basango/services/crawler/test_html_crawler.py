@@ -1,25 +1,25 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
 from bs4 import BeautifulSoup
 from pydantic import HttpUrl
 
-from basango.domain import SourceKind, PageRange
+from basango.core.config import WordPressSourceConfig
 from basango.core.config.fetch_config import CrawlerConfig, ClientConfig
 from basango.core.config.source_config import HtmlSourceConfig, SourceSelectors
+from basango.domain import SourceKind, PageRange
 from basango.services.crawler.html_crawler import HtmlCrawler
 
 
 class TestHtmlCrawler:
-    """Test suite for HtmlCrawler pagination methods."""
+    """Test suite for HtmlCrawler."""
 
     @pytest.fixture
     def mock_client_config(self):
-        """Create a mock ClientConfig for testing."""
         return ClientConfig()
 
     @pytest.fixture
     def mock_html_source_config(self):
-        """Create a mock HtmlSourceConfig for testing."""
         return HtmlSourceConfig(
             source_id="test_source",
             source_url=HttpUrl("https://example.com"),
@@ -30,13 +30,38 @@ class TestHtmlCrawler:
 
     @pytest.fixture
     def mock_crawler_config(self, mock_html_source_config):
-        """Create a mock CrawlerConfig for testing."""
         return CrawlerConfig(source=mock_html_source_config, category="tech")
 
     @pytest.fixture
     def html_crawler(self, mock_crawler_config, mock_client_config):
-        """Create an HtmlCrawler instance for testing."""
         return HtmlCrawler(mock_crawler_config, mock_client_config)
+
+    def test_with_valid_html_source(self, html_crawler):
+        """Test __init__ with valid HTML source config."""
+        assert html_crawler.source.source_kind == SourceKind.HTML
+        assert isinstance(html_crawler.source, HtmlSourceConfig)
+
+    def test_with_invalid_source_kind_raises_error(self, mock_client_config):
+        """Test __init__ raises ValueError when source kind is not HTML."""
+        wordpress_source = WordPressSourceConfig(
+            source_id="test_wordpress",
+            source_url=HttpUrl("https://example.com"),
+        )
+        config = CrawlerConfig(source=wordpress_source)
+
+        with pytest.raises(
+            ValueError, match="HtmlCrawler requires a source of kind HTML"
+        ):
+            HtmlCrawler(config, mock_client_config)
+
+    def test_with_no_source_raises_error(self, mock_client_config):
+        """Test __init__ raises ValueError when no source is provided."""
+        config = CrawlerConfig(source=None)
+
+        with pytest.raises(
+            ValueError, match="HtmlCrawler requires a source of kind HTML"
+        ):
+            HtmlCrawler(config, mock_client_config)
 
     def test_get_pagination_returns_valid_page_range(self, html_crawler):
         """Test that get_pagination returns a valid PageRange."""
@@ -46,14 +71,7 @@ class TestHtmlCrawler:
             assert isinstance(result, PageRange)
             assert result.start == 0
             assert result.end == 5
-
-    def test_get_last_page_with_no_source_returns_1(self, mock_client_config):
-        """Test get_last_page returns 1 when source is None."""
-        config = CrawlerConfig(source=None)
-        crawler = HtmlCrawler(config, mock_client_config)
-
-        result = crawler.get_last_page()
-        assert result == 1
+            assert str(result) == "0:5"
 
     def test_get_last_page_with_valid_pagination_links(self, html_crawler):
         """Test get_last_page extracts page number from pagination links."""

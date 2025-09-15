@@ -1,41 +1,51 @@
 import re
-from typing import Optional, cast
+from typing import Optional, cast, override
 from urllib.parse import urlparse, parse_qs
 
-from basango.domain import PageRange, SourceKind, DateRange
+from basango.core.config import CrawlerConfig, ClientConfig
 from basango.core.config.source_config import HtmlSourceConfig
+from basango.domain import PageRange, SourceKind, DateRange
 from basango.services.crawler.base_crawler import BaseCrawler
 
 
 class HtmlCrawler(BaseCrawler):
+    def __init__(
+        self, crawler_config: CrawlerConfig, client_config: ClientConfig
+    ) -> None:
+        super().__init__(crawler_config, client_config)
+        if not self.source or self.source.source_kind != SourceKind.HTML:
+            raise ValueError("HtmlCrawler requires a source of kind HTML")
+
+        self.source = cast(HtmlSourceConfig, self.source)
+
+    @override
     def fetch(self) -> None:
         self.initialize()
         page = self.config.page_range or self.get_pagination()
-
         print(page)
 
+    @override
     def fetch_one(self, html: str, date_range: Optional[DateRange] = None) -> None:
         pass
 
+    @override
     def get_pagination(self) -> PageRange:
         return PageRange.create(f"0:{self.get_last_page()}")
 
+    @override
     def get_last_page(self) -> int:
         if not self.source:
             return 1
 
-        # Type cast to ensure we have the right source type
-        html_source = cast(HtmlSourceConfig, self.source)
-
-        if html_source.supports_categories and self.config.category:
-            path = html_source.pagination_template.replace(
+        if self.source.supports_categories and self.config.category:
+            path = self.source.pagination_template.replace(
                 "{category}", self.config.category
             )
         else:
-            path = html_source.pagination_template
+            path = self.source.pagination_template
 
-        links = self.crawl(f"{html_source.source_url}{path}").select(
-            html_source.source_selectors.pagination
+        links = self.crawl(f"{self.source.source_url}{path}").select(
+            self.source.source_selectors.pagination
         )
         if not links:
             return 1
@@ -57,5 +67,6 @@ class HtmlCrawler(BaseCrawler):
                 return 1
         return 1
 
+    @override
     def supports(self, source_kind: SourceKind) -> bool:
         return source_kind == SourceKind.HTML
