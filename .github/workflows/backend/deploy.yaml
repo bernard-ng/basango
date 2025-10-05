@@ -1,0 +1,40 @@
+name: deploy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/backend/**"
+      - ".github/workflows/backend/**"
+jobs:
+  audit:
+    uses: ./.github/workflows/backend/audit.yaml
+  quality:
+    uses: ./.github/workflows/backend/quality.yaml
+  tests:
+    uses: ./.github/workflows/backend/tests.yaml
+    needs: [audit, quality]
+
+  deploy:
+    name: Deploy
+    needs: [tests]
+    runs-on: ubuntu-latest
+    steps:
+      -   name: execute ssh command
+          uses: appleboy/ssh-action@v1.2.0
+          with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USER }}
+            key: ${{ secrets.SSH_KEY }}
+            port: ${{ secrets.SSH_PORT }}
+            script: |
+              cd /var/www/html/news.devscast.tech
+              git pull origin main --rebase
+              make deploy
+              curl -X POST "https://api.telegram.org/bot${{ secrets.DEVY_TOKEN }}/sendMessage" \
+                  -H "Content-Type: application/json" \
+                  -d '{
+                    "chat_id": "${{ secrets.DEVY_CHAT_ID }}",
+                    "text": "news.devscast.tech : `'"$(git rev-parse --short HEAD)"'` has been deployed! 🎉",
+                    "parse_mode": "Markdown"
+                  }'

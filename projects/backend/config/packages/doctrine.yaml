@@ -1,0 +1,86 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '16'
+
+        profiling_collect_backtrace: false
+        use_savepoints: true
+        result_cache: 'cache.dbal'
+        types:
+            # Shared Kernel
+            email: App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Types\EmailType
+
+            # Aggregator
+            article_id: App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\ArticleIdType
+            source_id: App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\SourceIdType
+            open_graph: App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\OpenGraphType
+
+            # Identity and Access
+            user_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\UserIdType
+            login_attempt_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\LoginAttemptIdType
+            login_history_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\LoginHistoryIdType
+            verification_token_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\VerificationTokenIdType
+
+            # FeedManagement
+            bookmark_id: App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\BookmarkIdType
+            followed_source_id: App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\FollowedSourceIdType
+            comment_id: App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\CommentIdType
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: false
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            Aggregator:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/Aggregator'
+                prefix: 'App\Aggregator\Domain\Model'
+            IdentityAndAccess:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/IdentityAndAccess'
+                prefix: 'App\IdentityAndAccess\Domain\Model'
+            FeedManagement:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/FeedManagement'
+                prefix: 'App\FeedManagement\Domain\Model'
+            SharedKernel:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/SharedKernel'
+                prefix: 'App\SharedKernel\Domain\Model'
+        controller_resolver:
+            auto_mapping: false
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

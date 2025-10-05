@@ -1,0 +1,19 @@
+meta {
+  name: unfollow-source
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/feed/sources/:sourceId/unfollow
+  body: none
+  auth: bearer
+}
+
+params:path {
+  sourceId: 01970f05-a945-7ef0-bfe3-4583491d58d2
+}
+
+auth:bearer {
+  token: {{token}}
+}

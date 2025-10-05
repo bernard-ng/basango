@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity
+            name="App\Aggregator\Domain\Model\Entity\Source"
+            repository-class="App\Aggregator\Infrastructure\Persistence\Doctrine\ORM\SourceOrmRepository"
+            table="source"
+    >
+        <id name="id" type="source_id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="url" />
+        <field name="name" unique="true" />
+
+        <embedded name="credibility" class="App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility" use-column-prefix="false" />
+        <field name="displayName" nullable="true" />
+        <field name="description" length="1024" nullable="true" />
+
+        <field name="updatedAt" type="datetime_immutable" nullable="true"/>
+    </entity>
+</doctrine-mapping>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity
+            name="App\Aggregator\Domain\Model\Entity\Article"
+            repository-class="App\Aggregator\Infrastructure\Persistence\Doctrine\ORM\ArticleOrmRepository"
+            table="article"
+    >
+        <id name="id" type="article_id">
+            <generator strategy="NONE" />
+        </id>
+        <indexes>
+            <index fields="hash" />
+            <index fields="publishedAt" />
+            <index name="IDX_PUBLISHED_AT_ID" fields="publishedAt, id" />
+        </indexes>
+
+        <field name="title" length="1024" />
+        <field name="body" type="text" />
+        <embedded name="link" class="App\Aggregator\Domain\Model\ValueObject\Link" use-column-prefix="false" />
+        <field name="hash" length="32" />
+        <field name="categories" nullable="true" />
+
+        <many-to-one field="source" target-entity="App\Aggregator\Domain\Model\Entity\Source">
+            <join-column nullable="false" on-delete="CASCADE" />
+        </many-to-one>
+
+        <embedded name="credibility" class="App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility" use-column-prefix="false" />
+        <field name="sentiment" enum-type="App\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment" length="30">
+            <options>
+                <option name="default">neutral</option>
+            </options>
+        </field>
+        <field name="metadata" type="open_graph" nullable="true" />
+        <embedded name="readingTime" class="App\Aggregator\Domain\Model\ValueObject\ReadingTime" use-column-prefix="false" />
+
+        <field name="image"
+               insertable="false"
+               updatable="false"
+               column-definition="VARCHAR(1024) GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.image'))) STORED"
+        />
+        <field
+                name="excerpt"
+                insertable="false"
+                updatable="false"
+                column-definition="VARCHAR(255) GENERATED ALWAYS AS (CONCAT(LEFT(body, 200), '...')) STORED"
+        />
+
+        <field name="publishedAt" type="datetime_immutable" />
+        <field name="crawledAt" type="datetime_immutable" />
+        <field name="updatedAt" type="datetime_immutable" nullable="true" />
+    </entity>
+</doctrine-mapping>

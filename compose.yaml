@@ -1,0 +1,123 @@
+services:
+  mariadb:
+    image: mariadb:10.11.11
+    environment:
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: app
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'no'
+    volumes:
+      - ./var/volumes/mariadb:/var/lib/mysql:rw
+      - ./var/volumes/backend-var:/var/www/var
+    networks:
+      - basango_network
+  
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./var/volumes/postgres:/var/lib/postgresql/data
+    networks:
+      - basango_network
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./var/volumes/redis:/data
+    networks:
+      - basango_network
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - basango_network
+
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./projects/backend/public:/var/www/public:delegated
+    depends_on:
+      - php
+    networks:
+      - basango_network
+
+  php:
+    user: '${USER_ID:-1000}:${GROUP_ID:-1000}'
+    build: ./docker/php
+    volumes:
+      - ./projects/backend:/var/www:delegated
+    depends_on:
+      - mariadb
+      - postgres
+      - redis
+    networks:
+      - basango_network
+
+  adminer:
+    image: adminer:latest
+    depends_on:
+      - mariadb
+    environment:
+      APP_ENV: dev
+      ADMINER_DESIGN: pepa-linha
+      ADMINER_DEFAULT_SERVER: mariadb
+    ports:
+      - "8082:8080"
+    networks:
+      - basango_network
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - basango_network
+
+networks:
+  basango_network:
+
+volumes:
+  database_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./var/volumes/mariadb
+  backend_var:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./var/volumes/backend-var
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./var/volumes/redis
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./var/volumes/postgres

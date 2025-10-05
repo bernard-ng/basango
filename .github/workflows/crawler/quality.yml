@@ -1,0 +1,49 @@
+name: quality
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/crawler/**"
+      - ".github/workflows/crawler/**"
+  pull_request:
+    paths:
+      - "projects/crawler/**"
+      - ".github/workflows/crawler/**"
+
+defaults:
+  run:
+    working-directory: projects/crawler
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            projects/crawler/.venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('projects/crawler/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Sync dependencies (with dev tools)
+        run: uv sync --dev
+
+      - name: Run Ruff (lint + format checks)
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Run Pyright (type checks)
+        run: uv run pyright

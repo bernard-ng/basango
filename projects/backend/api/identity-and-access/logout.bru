@@ -1,0 +1,15 @@
+meta {
+  name: logout
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/token/invalidate
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: 
+}
