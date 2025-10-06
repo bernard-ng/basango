@@ -1,4 +1,7 @@
-name: quality
+name: crawler audit
+defaults:
+  run:
+    working-directory: projects/crawler
 
 on:
   push:
@@ -6,18 +9,15 @@ on:
       - main
     paths:
       - "projects/crawler/**"
-      - ".github/workflows/crawler/**"
+      - ".github/workflows/crawler_*.yml"
   pull_request:
     paths:
       - "projects/crawler/**"
-      - ".github/workflows/crawler/**"
-
-defaults:
-  run:
-    working-directory: projects/crawler
+      - ".github/workflows/crawler_*.yml"
 
 jobs:
-  lint:
+  bandit:
+    name: bandit
     runs-on: ubuntu-latest
 
     steps:
@@ -32,18 +32,14 @@ jobs:
         with:
           path: |
             ~/.cache/uv
-            projects/crawler/.venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('projects/crawler/uv.lock') }}
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-uv-
 
       - name: Sync dependencies (with dev tools)
         run: uv sync --dev
 
-      - name: Run Ruff (lint + format checks)
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
+      - name: Run Bandit (security linter)
+        run: uv run bandit -r . -c pyproject.toml || true
 
-      - name: Run Pyright (type checks)
-        run: uv run pyright

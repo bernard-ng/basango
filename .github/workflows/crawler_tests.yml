@@ -1,4 +1,7 @@
-name: audit
+name: crawler tests
+defaults:
+  run:
+    working-directory: projects/crawler
 
 on:
   push:
@@ -6,14 +9,15 @@ on:
       - main
     paths:
       - "projects/crawler/**"
-      - ".github/workflows/crawler/**"
+      - ".github/workflows/crawler_*.yml"
   pull_request:
     paths:
       - "projects/crawler/**"
-      - ".github/workflows/crawler/**"
+      - ".github/workflows/crawler_*.yml"
 
 jobs:
-  bandit:
+  test:
+    name: pytest
     runs-on: ubuntu-latest
 
     steps:
@@ -28,13 +32,13 @@ jobs:
         with:
           path: |
             ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+            projects/crawler/.venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('projects/crawler/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-uv-
 
       - name: Sync dependencies (with dev tools)
         run: uv sync --dev
 
-      - name: Run Bandit (security linter)
-        run: uv run bandit -r . -c pyproject.toml || true
+      - name: Run Pytest
+        run: uv run pytest

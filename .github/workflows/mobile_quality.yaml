@@ -1,22 +1,21 @@
-name: quality
+name: mobile quality
+defaults:
+  run:
+    working-directory: projects/mobile
 
 on:
   push:
     paths:
       - "projects/mobile/**"
-      - ".github/workflows/mobile/**"
+      - ".github/workflows/mobile_*.yaml"
   pull_request:
     paths:
       - "projects/mobile/**"
-      - ".github/workflows/mobile/**"
-
-defaults:
-  run:
-    working-directory: projects/mobile
+      - ".github/workflows/mobile_*.yaml"
 
 jobs:
   quality:
-    name: Quality
+    name: eslint and prettier
     runs-on: ubuntu-latest
 
     steps:
@@ -49,3 +48,4 @@ jobs:
           bun run check-types
           bun run check
           bun run lint:check
+
