@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\CommandHandler;
+namespace Basango\Aggregator\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Application\UseCase\Command\CreateSource;
-use App\Aggregator\Domain\Model\Entity\Source;
-use App\Aggregator\Domain\Model\Repository\SourceRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\Aggregator\Application\UseCase\Command\CreateSource;
+use Basango\Aggregator\Domain\Model\Entity\Source;
+use Basango\Aggregator\Domain\Model\Repository\SourceRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class AddSourceHandler.

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\IdentityAndAccess\Domain\Exception\UserNotFound;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\IdentityAndAccess\Domain\Exception\UserNotFound;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

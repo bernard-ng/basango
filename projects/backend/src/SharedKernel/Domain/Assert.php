@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain;
+namespace Basango\SharedKernel\Domain;
 
-use App\SharedKernel\Domain\Exception\InvalidArgument;
+use Basango\SharedKernel\Domain\Exception\InvalidArgument;
 
 /**
  * Class Assert.

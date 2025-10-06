@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\CommandHandler;
+namespace Basango\FeedManagement\Application\UseCase\CommandHandler;
 
-use App\FeedManagement\Application\UseCase\Command\CreateBookmark;
-use App\FeedManagement\Domain\Model\Entity\Bookmark;
-use App\FeedManagement\Domain\Model\Repository\BookmarkRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\FeedManagement\Application\UseCase\Command\CreateBookmark;
+use Basango\FeedManagement\Domain\Model\Entity\Bookmark;
+use Basango\FeedManagement\Domain\Model\Repository\BookmarkRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class CreateBookHandler.

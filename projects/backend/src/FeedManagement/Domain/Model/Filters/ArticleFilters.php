@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Model\Filters;
+namespace Basango\FeedManagement\Domain\Model\Filters;
 
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
-use App\SharedKernel\Domain\Model\ValueObject\SortDirection;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\SharedKernel\Domain\Model\ValueObject\SortDirection;
 
 /**
  * Class ArticleFilters.

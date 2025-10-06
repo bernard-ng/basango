@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\QueryHandler;
+namespace Basango\FeedManagement\Application\UseCase\QueryHandler;
 
-use App\FeedManagement\Application\ReadModel\SourceDetails;
-use App\FeedManagement\Application\UseCase\Query\GetSourceDetails;
-use App\SharedKernel\Application\Messaging\QueryHandler;
+use Basango\FeedManagement\Application\ReadModel\SourceDetails;
+use Basango\FeedManagement\Application\UseCase\Query\GetSourceDetails;
+use Basango\SharedKernel\Application\Messaging\QueryHandler;
 
 /**
  * Interface GetSourceDetailsHandler.

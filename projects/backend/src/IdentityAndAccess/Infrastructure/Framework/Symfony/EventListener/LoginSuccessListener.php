@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Framework\Symfony\EventListener;
+namespace Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\EventListener;
 
-use App\IdentityAndAccess\Application\UseCase\Command\RegisterLoginSuccess;
-use App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\SecurityUser;
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
+use Basango\IdentityAndAccess\Application\UseCase\Command\RegisterLoginSuccess;
+use Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\SecurityUser;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;

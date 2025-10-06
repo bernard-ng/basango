@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Presentation\Web\Controller;
+namespace Basango\IdentityAndAccess\Presentation\Web\Controller;
 
-use App\IdentityAndAccess\Application\UseCase\Command\RequestPassword;
-use App\IdentityAndAccess\Presentation\WriteModel\RequestPasswordModel;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
-use App\SharedKernel\Presentation\Web\Controller\AbstractController;
+use Basango\IdentityAndAccess\Application\UseCase\Command\RequestPassword;
+use Basango\IdentityAndAccess\Presentation\WriteModel\RequestPasswordModel;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries;
 
-use App\FeedManagement\Domain\Model\Filters\ArticleFilters;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\FeedManagement\Domain\Model\Filters\ArticleFilters;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 

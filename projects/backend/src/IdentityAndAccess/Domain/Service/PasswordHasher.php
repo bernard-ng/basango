@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Service;
+namespace Basango\IdentityAndAccess\Domain\Service;
 
-use App\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
 
 /**
  * Interface PasswordHasher.

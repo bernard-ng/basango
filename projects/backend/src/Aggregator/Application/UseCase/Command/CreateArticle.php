@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\Command;
+namespace Basango\Aggregator\Application\UseCase\Command;
 
-use App\Aggregator\Domain\Model\ValueObject\Link;
-use App\Aggregator\Domain\Service\Crawling\OpenGraph\OpenGraphObject;
+use Basango\Aggregator\Domain\Model\ValueObject\Link;
+use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
 
 /**
  * Class Save.
@@ -21,7 +21,7 @@ final readonly class CreateArticle
         public string $body,
         public string $source,
         public int $timestamp,
-        public ?OpenGraphObject $metadata = null
+        public ?OpenGraph $metadata = null
     ) {
     }
 }

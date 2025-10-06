@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\Aggregator\Domain\Exception\SourceNotFound;
-use App\FeedManagement\Application\Cache\SourceCacheAttributes;
-use App\FeedManagement\Application\ReadModel\CategoryShare;
-use App\FeedManagement\Application\ReadModel\CategoryShares;
-use App\FeedManagement\Application\ReadModel\PublicationEntry;
-use App\FeedManagement\Application\ReadModel\PublicationGraph;
-use App\FeedManagement\Application\ReadModel\SourceDetails;
-use App\FeedManagement\Application\UseCase\Query\GetSourceDetails;
-use App\FeedManagement\Application\UseCase\QueryHandler\GetSourceDetailsHandler;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\Aggregator\Domain\Exception\SourceNotFound;
+use Basango\FeedManagement\Application\Cache\SourceCacheAttributes;
+use Basango\FeedManagement\Application\ReadModel\CategoryShare;
+use Basango\FeedManagement\Application\ReadModel\CategoryShares;
+use Basango\FeedManagement\Application\ReadModel\PublicationEntry;
+use Basango\FeedManagement\Application\ReadModel\PublicationGraph;
+use Basango\FeedManagement\Application\ReadModel\SourceDetails;
+use Basango\FeedManagement\Application\UseCase\Query\GetSourceDetails;
+use Basango\FeedManagement\Application\UseCase\QueryHandler\GetSourceDetailsHandler;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;

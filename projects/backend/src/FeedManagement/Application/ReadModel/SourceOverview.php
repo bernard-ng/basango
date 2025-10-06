@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 
 /**
  * Class SourceOverview.

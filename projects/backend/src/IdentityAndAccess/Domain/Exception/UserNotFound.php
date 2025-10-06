@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Exception;
+namespace Basango\IdentityAndAccess\Domain\Exception;
 
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\Exception\UserFacingError;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class UserNotFound.

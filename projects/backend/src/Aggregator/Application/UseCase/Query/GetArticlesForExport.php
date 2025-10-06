@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\Query;
+namespace Basango\Aggregator\Application\UseCase\Query;
 
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 
 /**
  * Class GetArticlesForExport.

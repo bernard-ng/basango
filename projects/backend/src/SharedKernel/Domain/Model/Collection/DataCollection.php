@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Model\Collection;
+namespace Basango\SharedKernel\Domain\Model\Collection;
 
 use Doctrine\Common\Collections\ArrayCollection as DoctrineArrayCollection;
 

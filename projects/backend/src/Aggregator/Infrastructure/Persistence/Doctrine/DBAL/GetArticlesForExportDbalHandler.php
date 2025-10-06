@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\Aggregator\Application\ReadModel\ArticleForExport;
-use App\Aggregator\Application\UseCase\Query\GetArticlesForExport;
-use App\Aggregator\Application\UseCase\QueryHandler\GetArticlesForExportHandler;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\Aggregator\Application\ReadModel\ArticleForExport;
+use Basango\Aggregator\Application\UseCase\Query\GetArticlesForExport;
+use Basango\Aggregator\Application\UseCase\QueryHandler\GetArticlesForExportHandler;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 use Doctrine\DBAL\Connection;
 
 /**

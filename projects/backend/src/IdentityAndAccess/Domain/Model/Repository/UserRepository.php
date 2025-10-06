@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\Repository;
+namespace Basango\IdentityAndAccess\Domain\Model\Repository;
 
-use App\IdentityAndAccess\Domain\Model\Entity\User;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Interface UserRepository.

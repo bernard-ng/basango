@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Persistence\Filesystem;
+namespace Basango\SharedKernel\Infrastructure\Persistence\Filesystem;
 
-use App\SharedKernel\Domain\Assert;
-use App\SharedKernel\Domain\DataTransfert\DataExporter;
-use App\SharedKernel\Domain\DataTransfert\DataImporter;
-use App\SharedKernel\Domain\DataTransfert\TransfertSetting;
+use Basango\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\DataTransfert\DataExporter;
+use Basango\SharedKernel\Domain\DataTransfert\DataImporter;
+use Basango\SharedKernel\Domain\DataTransfert\TransfertSetting;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\SerializerInterface;
 

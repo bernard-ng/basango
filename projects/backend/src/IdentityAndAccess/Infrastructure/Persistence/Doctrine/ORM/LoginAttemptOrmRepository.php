@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\IdentityAndAccess\Domain\Model\Entity\LoginAttempt;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
-use App\IdentityAndAccess\Domain\Model\Repository\LoginAttemptRepository;
+use Basango\IdentityAndAccess\Domain\Model\Entity\LoginAttempt;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Model\Repository\LoginAttemptRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

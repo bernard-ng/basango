@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\Repository;
+namespace Basango\Aggregator\Domain\Model\Repository;
 
-use App\Aggregator\Domain\Model\Entity\Source;
-use App\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\Aggregator\Domain\Model\Entity\Source;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
 
 /**
  * Interface SourceRepository.

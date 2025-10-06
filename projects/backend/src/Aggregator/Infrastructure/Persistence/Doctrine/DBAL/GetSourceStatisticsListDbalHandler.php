@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\Aggregator\Application\ReadModel\SourceStatisticsList;
-use App\Aggregator\Application\UseCase\Query\GetSourceStatisticsList;
-use App\Aggregator\Application\UseCase\QueryHandler\GetSourceStatisticsListHandler;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\Aggregator\Application\ReadModel\SourceStatisticsList;
+use Basango\Aggregator\Application\UseCase\Query\GetSourceStatisticsList;
+use Basango\Aggregator\Application\UseCase\QueryHandler\GetSourceStatisticsListHandler;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
 
 /**

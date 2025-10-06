@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\Aggregator\Domain\Exception\ArticleNotFound;
-use App\Aggregator\Domain\Model\Entity\Article;
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\Aggregator\Domain\Model\Repository\ArticleRepository;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\Aggregator\Domain\Exception\ArticleNotFound;
+use Basango\Aggregator\Domain\Model\Entity\Article;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\Aggregator\Domain\Model\Repository\ArticleRepository;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

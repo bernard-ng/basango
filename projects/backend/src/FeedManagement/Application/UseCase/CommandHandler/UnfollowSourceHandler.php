@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\CommandHandler;
+namespace Basango\FeedManagement\Application\UseCase\CommandHandler;
 
-use App\FeedManagement\Application\UseCase\Command\UnfollowSource;
-use App\FeedManagement\Domain\Exception\FollowedSourceNotFound;
-use App\FeedManagement\Domain\Model\Entity\FollowedSource;
-use App\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\FeedManagement\Application\UseCase\Command\UnfollowSource;
+use Basango\FeedManagement\Domain\Exception\FollowedSourceNotFound;
+use Basango\FeedManagement\Domain\Model\Entity\FollowedSource;
+use Basango\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class UnfollowSourceHandler.

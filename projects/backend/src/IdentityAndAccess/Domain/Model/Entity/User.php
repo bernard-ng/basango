@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\Entity;
+namespace Basango\IdentityAndAccess\Domain\Model\Entity;
 
-use App\IdentityAndAccess\Domain\Event\AccountConfirmed;
-use App\IdentityAndAccess\Domain\Event\AccountLocked;
-use App\IdentityAndAccess\Domain\Event\AccountUnlocked;
-use App\IdentityAndAccess\Domain\Event\ConfirmationRequested;
-use App\IdentityAndAccess\Domain\Event\EmailUpdated;
-use App\IdentityAndAccess\Domain\Event\PasswordCreated;
-use App\IdentityAndAccess\Domain\Event\PasswordForgotten;
-use App\IdentityAndAccess\Domain\Event\PasswordReset;
-use App\IdentityAndAccess\Domain\Event\PasswordUpdated;
-use App\IdentityAndAccess\Domain\Exception\InvalidCurrentPassword;
-use App\IdentityAndAccess\Domain\Exception\PasswordAlreadyDefined;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Roles;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedCode;
-use App\IdentityAndAccess\Domain\Service\PasswordHasher;
-use App\SharedKernel\Domain\EventDispatcher\EventEmitterTrait;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\IdentityAndAccess\Domain\Event\AccountConfirmed;
+use Basango\IdentityAndAccess\Domain\Event\AccountLocked;
+use Basango\IdentityAndAccess\Domain\Event\AccountUnlocked;
+use Basango\IdentityAndAccess\Domain\Event\ConfirmationRequested;
+use Basango\IdentityAndAccess\Domain\Event\EmailUpdated;
+use Basango\IdentityAndAccess\Domain\Event\PasswordCreated;
+use Basango\IdentityAndAccess\Domain\Event\PasswordForgotten;
+use Basango\IdentityAndAccess\Domain\Event\PasswordReset;
+use Basango\IdentityAndAccess\Domain\Event\PasswordUpdated;
+use Basango\IdentityAndAccess\Domain\Exception\InvalidCurrentPassword;
+use Basango\IdentityAndAccess\Domain\Exception\PasswordAlreadyDefined;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Roles;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedCode;
+use Basango\IdentityAndAccess\Domain\Service\PasswordHasher;
+use Basango\SharedKernel\Domain\EventDispatcher\EventEmitterTrait;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class User.

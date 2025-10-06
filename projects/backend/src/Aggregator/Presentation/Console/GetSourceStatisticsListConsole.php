@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Presentation\Console;
+namespace Basango\Aggregator\Presentation\Console;
 
-use App\Aggregator\Application\ReadModel\SourceStatistics;
-use App\Aggregator\Application\ReadModel\SourceStatisticsList;
-use App\Aggregator\Application\UseCase\Query\GetSourceStatisticsList;
-use App\SharedKernel\Application\Messaging\QueryBus;
+use Basango\Aggregator\Application\ReadModel\SourceStatistics;
+use Basango\Aggregator\Application\ReadModel\SourceStatisticsList;
+use Basango\Aggregator\Application\UseCase\Query\GetSourceStatisticsList;
+use Basango\SharedKernel\Application\Messaging\QueryBus;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

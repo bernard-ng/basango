@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\FeedManagement\Domain\Model\Entity\FollowedSource;
-use App\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\FeedManagement\Domain\Model\Entity\FollowedSource;
+use Basango\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\Persistence\ManagerRegistry;

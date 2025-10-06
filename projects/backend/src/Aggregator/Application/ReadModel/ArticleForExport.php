@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\ReadModel;
+namespace Basango\Aggregator\Application\ReadModel;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 
 /**
  * Class ExportedArticle.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\Cache;
+namespace Basango\FeedManagement\Application\Cache;
 
 /**
  * Enum SourceCacheAttributes.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\Command;
+namespace Basango\IdentityAndAccess\Application\UseCase\Command;
 
-use App\IdentityAndAccess\Domain\Model\ValueObject\Roles;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Roles;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class Register.

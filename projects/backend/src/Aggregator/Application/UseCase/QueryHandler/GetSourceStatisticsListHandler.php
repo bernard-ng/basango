@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\QueryHandler;
+namespace Basango\Aggregator\Application\UseCase\QueryHandler;
 
-use App\Aggregator\Application\ReadModel\SourceStatisticsList;
-use App\Aggregator\Application\UseCase\Query\GetSourceStatisticsList;
-use App\SharedKernel\Application\Messaging\QueryHandler;
+use Basango\Aggregator\Application\ReadModel\SourceStatisticsList;
+use Basango\Aggregator\Application\UseCase\Query\GetSourceStatisticsList;
+use Basango\SharedKernel\Application\Messaging\QueryHandler;
 
 /**
  * Interface GetSourceStatisticsListHandler.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Application\Asset;
+namespace Basango\SharedKernel\Application\Asset;
 
 /**
  * Class AssetUrlProvider.

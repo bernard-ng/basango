@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Framework\Symfony\Mailing;
+namespace Basango\SharedKernel\Infrastructure\Framework\Symfony\Mailing;
 
-use App\SharedKernel\Application\Mailing\EmailDefinition;
-use App\SharedKernel\Application\Mailing\Mailer;
-use App\SharedKernel\Domain\Application;
+use Basango\SharedKernel\Application\Mailing\EmailDefinition;
+use Basango\SharedKernel\Application\Mailing\Mailer;
+use Basango\SharedKernel\Domain\Application;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;

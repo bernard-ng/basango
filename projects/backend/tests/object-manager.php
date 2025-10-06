@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\SharedKernel\Infrastructure\Framework\Symfony\Kernel;
+use Basango\SharedKernel\Infrastructure\Framework\Symfony\Kernel;
 use Symfony\Component\Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\CommandHandler;
+namespace Basango\IdentityAndAccess\Application\UseCase\CommandHandler;
 
-use App\IdentityAndAccess\Application\UseCase\Command\RegisterLoginSuccess;
-use App\IdentityAndAccess\Domain\Model\Entity\LoginHistory;
-use App\IdentityAndAccess\Domain\Model\Repository\LoginAttemptRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\LoginHistoryRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
-use App\SharedKernel\Domain\EventDispatcher\EventDispatcher;
-use App\SharedKernel\Domain\Tracking\ClientProfiler;
+use Basango\IdentityAndAccess\Application\UseCase\Command\RegisterLoginSuccess;
+use Basango\IdentityAndAccess\Domain\Model\Entity\LoginHistory;
+use Basango\IdentityAndAccess\Domain\Model\Repository\LoginAttemptRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\LoginHistoryRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\SharedKernel\Domain\EventDispatcher\EventDispatcher;
+use Basango\SharedKernel\Domain\Tracking\ClientProfiler;
 
 /**
  * Class RegisterLoginSuccessHandler.

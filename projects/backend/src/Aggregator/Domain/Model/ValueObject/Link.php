@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\ValueObject;
+namespace Basango\Aggregator\Domain\Model\ValueObject;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 
 /**
  * Class Link.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL;
 
 /**
  * Class NoResult.

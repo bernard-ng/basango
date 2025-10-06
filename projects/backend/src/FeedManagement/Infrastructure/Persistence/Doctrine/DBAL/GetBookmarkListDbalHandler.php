@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\FeedManagement\Application\ReadModel\BookmarkList;
-use App\FeedManagement\Application\UseCase\Query\GetBookmarkList;
-use App\FeedManagement\Application\UseCase\QueryHandler\GetBookmarkListHandler;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\BookmarkQuery;
-use App\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\FeedManagement\Application\ReadModel\BookmarkList;
+use Basango\FeedManagement\Application\UseCase\Query\GetBookmarkList;
+use Basango\FeedManagement\Application\UseCase\QueryHandler\GetBookmarkListHandler;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\BookmarkQuery;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 

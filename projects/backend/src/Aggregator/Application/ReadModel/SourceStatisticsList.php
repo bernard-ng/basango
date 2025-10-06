@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\ReadModel;
+namespace Basango\Aggregator\Application\ReadModel;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 
 /**
  * Class SourceStatisticsList.

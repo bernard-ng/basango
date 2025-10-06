@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Tracking;
+namespace Basango\SharedKernel\Domain\Tracking;
 
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
 
 /**
  * Class ClientProfiler.

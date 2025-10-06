@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\EventListener;
+namespace Basango\Aggregator\Application\EventListener;
 
-use App\Aggregator\Application\Mailing\SourceCrawledEmail;
-use App\Aggregator\Domain\Event\SourceCrawled;
-use App\SharedKernel\Application\Mailing\Mailer;
-use App\SharedKernel\Domain\EventListener\EventListener;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\Aggregator\Application\Mailing\SourceCrawledEmail;
+use Basango\Aggregator\Domain\Event\SourceCrawled;
+use Basango\SharedKernel\Application\Mailing\Mailer;
+use Basango\SharedKernel\Domain\EventListener\EventListener;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class SourceFetchedListener.

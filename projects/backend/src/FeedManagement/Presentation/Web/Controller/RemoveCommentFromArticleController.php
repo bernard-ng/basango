@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Presentation\Web\Controller;
+namespace Basango\FeedManagement\Presentation\Web\Controller;
 
-use App\FeedManagement\Application\UseCase\Command\RemoveCommentFromArticle;
-use App\FeedManagement\Domain\Model\Identity\CommentId;
-use App\SharedKernel\Presentation\Web\Controller\AbstractController;
+use Basango\FeedManagement\Application\UseCase\Command\RemoveCommentFromArticle;
+use Basango\FeedManagement\Domain\Model\Identity\CommentId;
+use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

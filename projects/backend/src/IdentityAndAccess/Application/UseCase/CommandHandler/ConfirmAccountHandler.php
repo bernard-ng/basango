@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\CommandHandler;
+namespace Basango\IdentityAndAccess\Application\UseCase\CommandHandler;
 
-use App\IdentityAndAccess\Application\UseCase\Command\ConfirmAccount;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\VerificationTokenRepository;
-use App\IdentityAndAccess\Domain\Model\ValueObject\TokenPurpose;
-use App\SharedKernel\Application\Messaging\CommandHandler;
-use App\SharedKernel\Domain\EventDispatcher\EventDispatcher;
+use Basango\IdentityAndAccess\Application\UseCase\Command\ConfirmAccount;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\VerificationTokenRepository;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\TokenPurpose;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\SharedKernel\Domain\EventDispatcher\EventDispatcher;
 
 /**
  * Class ConfirmRegistrationHandler.

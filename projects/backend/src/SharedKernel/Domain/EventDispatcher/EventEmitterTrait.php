@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\EventDispatcher;
+namespace Basango\SharedKernel\Domain\EventDispatcher;
 
 /**
  * Trait EventEmitterTrait.

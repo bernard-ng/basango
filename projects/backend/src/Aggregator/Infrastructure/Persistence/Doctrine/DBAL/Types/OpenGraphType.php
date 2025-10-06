@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types;
 
-use App\Aggregator\Domain\Model\ValueObject\Crawling\OpenGraph;
+use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;

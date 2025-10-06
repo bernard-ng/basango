@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\Aggregator\Domain\Exception\SourceNotFound;
-use App\Aggregator\Domain\Model\Entity\Source;
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\Aggregator\Domain\Model\Repository\SourceRepository;
+use Basango\Aggregator\Domain\Exception\SourceNotFound;
+use Basango\Aggregator\Domain\Model\Entity\Source;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\Aggregator\Domain\Model\Repository\SourceRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

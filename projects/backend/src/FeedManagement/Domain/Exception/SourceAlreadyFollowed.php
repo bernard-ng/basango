@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Exception;
+namespace Basango\FeedManagement\Domain\Exception;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
 
 /**
  * Class SourceAlreadyFollowed.

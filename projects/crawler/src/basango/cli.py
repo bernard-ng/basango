@@ -26,7 +26,7 @@ import typer
 from basango.core.config import CrawlerConfig
 from basango.core.config_manager import ConfigManager
 from basango.domain import DateRange, PageRange, UpdateDirection
-from basango.services import CsvPersistor, JsonPersistor
+from basango.services import JsonPersistor
 from basango.services.crawler.async_api import (
     QueueSettings,
     schedule_async_crawl,
@@ -109,10 +109,6 @@ def crawl_cmd(
 
     source_identifier = getattr(source, "source_id", source_id) or source_id
     persistors = [
-        CsvPersistor(
-            data_dir=pipeline.paths.data,
-            source_id=str(source_identifier),
-        ),
         JsonPersistor(
             data_dir=pipeline.paths.data,
             source_id=str(source_identifier),

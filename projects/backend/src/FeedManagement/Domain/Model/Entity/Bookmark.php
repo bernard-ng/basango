@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Model\Entity;
+namespace Basango\FeedManagement\Domain\Model\Entity;
 
-use App\Aggregator\Domain\Model\Entity\Article;
-use App\FeedManagement\Domain\Exception\ArticleAlreadyBookmarked;
-use App\FeedManagement\Domain\Exception\BookmarkedArticleNotFound;
-use App\FeedManagement\Domain\Model\Identity\BookmarkId;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
-use App\SharedKernel\Domain\Model\Collection\DataCollection;
+use Basango\Aggregator\Domain\Model\Entity\Article;
+use Basango\FeedManagement\Domain\Exception\ArticleAlreadyBookmarked;
+use Basango\FeedManagement\Domain\Exception\BookmarkedArticleNotFound;
+use Basango\FeedManagement\Domain\Model\Identity\BookmarkId;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\SharedKernel\Domain\Model\Collection\DataCollection;
 
 /**
  * Class Bookmark.

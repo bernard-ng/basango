@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Exception;
+namespace Basango\FeedManagement\Domain\Exception;
 
-use App\FeedManagement\Domain\Model\Identity\BookmarkId;
-use App\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\FeedManagement\Domain\Model\Identity\BookmarkId;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
 
 /**
  * Class BookmarkNotFound.

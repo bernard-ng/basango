@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Model\Entity;
+namespace Basango\FeedManagement\Domain\Model\Entity;
 
-use App\Aggregator\Domain\Model\Entity\Source;
-use App\FeedManagement\Domain\Model\Identity\FollowedSourceId;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\Aggregator\Domain\Model\Entity\Source;
+use Basango\FeedManagement\Domain\Model\Identity\FollowedSourceId;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
 
 /**
  * Class FollowedSource.

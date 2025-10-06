@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features;
+namespace Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features;
 
-use App\SharedKernel\Domain\Model\Pagination\Page;
-use App\SharedKernel\Domain\Model\Pagination\PaginationCursor;
-use App\SharedKernel\Domain\Model\Pagination\PaginationInfo;
-use App\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
+use Basango\SharedKernel\Domain\Model\Pagination\Page;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginationCursor;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginationInfo;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 

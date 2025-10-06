@@ -11,23 +11,23 @@ doctrine:
         result_cache: 'cache.dbal'
         types:
             # Shared Kernel
-            email: App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Types\EmailType
+            email: Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Types\EmailType
 
             # Aggregator
-            article_id: App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\ArticleIdType
-            source_id: App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\SourceIdType
-            open_graph: App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\OpenGraphType
+            article_id: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\ArticleIdType
+            source_id: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\SourceIdType
+            open_graph: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\OpenGraphType
 
             # Identity and Access
-            user_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\UserIdType
-            login_attempt_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\LoginAttemptIdType
-            login_history_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\LoginHistoryIdType
-            verification_token_id: App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\VerificationTokenIdType
+            user_id: Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\UserIdType
+            login_attempt_id: Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\LoginAttemptIdType
+            login_history_id: Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\LoginHistoryIdType
+            verification_token_id: Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\VerificationTokenIdType
 
             # FeedManagement
-            bookmark_id: App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\BookmarkIdType
-            followed_source_id: App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\FollowedSourceIdType
-            comment_id: App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\CommentIdType
+            bookmark_id: Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\BookmarkIdType
+            followed_source_id: Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\FollowedSourceIdType
+            comment_id: Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types\CommentIdType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -40,22 +40,22 @@ doctrine:
                 is_bundle: false
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine/Aggregator'
-                prefix: 'App\Aggregator\Domain\Model'
+                prefix: 'Basango\Aggregator\Domain\Model'
             IdentityAndAccess:
                 is_bundle: false
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine/IdentityAndAccess'
-                prefix: 'App\IdentityAndAccess\Domain\Model'
+                prefix: 'Basango\IdentityAndAccess\Domain\Model'
             FeedManagement:
                 is_bundle: false
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine/FeedManagement'
-                prefix: 'App\FeedManagement\Domain\Model'
+                prefix: 'Basango\FeedManagement\Domain\Model'
             SharedKernel:
                 is_bundle: false
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine/SharedKernel'
-                prefix: 'App\SharedKernel\Domain\Model'
+                prefix: 'Basango\SharedKernel\Domain\Model'
         controller_resolver:
             auto_mapping: false
 

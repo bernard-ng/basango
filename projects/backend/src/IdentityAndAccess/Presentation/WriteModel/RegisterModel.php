@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Presentation\WriteModel;
+namespace Basango\IdentityAndAccess\Presentation\WriteModel;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

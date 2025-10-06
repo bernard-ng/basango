@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\Entity;
+namespace Basango\Aggregator\Domain\Model\Entity;
 
-use App\Aggregator\Domain\Model\Identity\CategoryId;
+use Basango\Aggregator\Domain\Model\Identity\CategoryId;
 
 /**
  * Class Category.

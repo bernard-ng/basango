@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Service;
+namespace Basango\IdentityAndAccess\Domain\Service;
 
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedCode;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedCode;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
 
 /**
  * Class SecretGenerator.

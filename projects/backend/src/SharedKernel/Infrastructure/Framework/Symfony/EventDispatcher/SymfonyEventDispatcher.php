@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Framework\Symfony\EventDispatcher;
+namespace Basango\SharedKernel\Infrastructure\Framework\Symfony\EventDispatcher;
 
-use App\SharedKernel\Domain\EventDispatcher\EventDispatcher;
+use Basango\SharedKernel\Domain\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**

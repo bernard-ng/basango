@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\CommandHandler;
+namespace Basango\FeedManagement\Application\UseCase\CommandHandler;
 
-use App\FeedManagement\Application\UseCase\Command\RemoveCommentFromArticle;
-use App\FeedManagement\Domain\Model\Repository\CommentRepository;
-use App\IdentityAndAccess\Domain\Exception\PermissionNotGranted;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\FeedManagement\Application\UseCase\Command\RemoveCommentFromArticle;
+use Basango\FeedManagement\Domain\Model\Repository\CommentRepository;
+use Basango\IdentityAndAccess\Domain\Exception\PermissionNotGranted;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class RemoveCommentFromArticleHandler.

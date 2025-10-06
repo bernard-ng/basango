@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Presentation\Web\Controller;
+namespace Basango\FeedManagement\Presentation\Web\Controller;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\FeedManagement\Application\ReadModel\CommentList;
-use App\FeedManagement\Application\UseCase\Query\GetArticleCommentList;
-use App\SharedKernel\Domain\Model\Pagination\Page;
-use App\SharedKernel\Presentation\Web\Controller\AbstractController;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\FeedManagement\Application\ReadModel\CommentList;
+use Basango\FeedManagement\Application\UseCase\Query\GetArticleCommentList;
+use Basango\SharedKernel\Domain\Model\Pagination\Page;
+use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;

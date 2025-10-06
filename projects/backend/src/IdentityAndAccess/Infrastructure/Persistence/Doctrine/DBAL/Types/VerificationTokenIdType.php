@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types;
+namespace Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types;
 
-use App\IdentityAndAccess\Domain\Model\Identity\VerificationTokenId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\VerificationTokenId;
 use Symfony\Bridge\Doctrine\Types\AbstractUidType;
 
 /**

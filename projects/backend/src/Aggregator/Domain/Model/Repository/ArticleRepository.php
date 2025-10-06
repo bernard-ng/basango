@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\Repository;
+namespace Basango\Aggregator\Domain\Model\Repository;
 
-use App\Aggregator\Domain\Model\Entity\Article;
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\Aggregator\Domain\Model\Entity\Article;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 
 /**
  * Interface ArticleRepository.

@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\Entity;
+namespace Basango\Aggregator\Domain\Model\Entity;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\Aggregator\Domain\Model\ValueObject\Crawling\OpenGraph;
-use App\Aggregator\Domain\Model\ValueObject\Link;
-use App\Aggregator\Domain\Model\ValueObject\ReadingTime;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
-use App\Aggregator\Domain\Service\Crawling\OpenGraph\OpenGraphObject;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\Aggregator\Domain\Model\ValueObject\Link;
+use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
+use Basango\Aggregator\Domain\Model\ValueObject\ReadingTime;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
 
 /**
  * Class Article.
@@ -73,22 +72,14 @@ class Article
         return $this;
     }
 
-    public function defineOpenGraph(?OpenGraphObject $object): self
+    public function defineOpenGraph(?OpenGraph $object): self
     {
-        if ($object instanceof OpenGraphObject) {
-            $image = $object->images[0] ?? null;
-            $video = $object->videos[0] ?? null;
-            $audio = $object->audios[0] ?? null;
-
-            $this->metadata = new OpenGraph(
-                title: $object->title,
-                description: $object->description,
-                image: $image->url ?? $image?->secureUrl,
-                video: $video->url ?? $video?->secureUrl,
-                audio: $audio->url ?? $audio?->secureUrl,
-                locale: $object->locale
-            );
-        }
+        $this->metadata = new OpenGraph(
+            title: $object->title,
+            description: $object->description,
+            image: $object->image,
+            locale: $object->locale ?? "fr"
+        );
 
         return $this;
     }

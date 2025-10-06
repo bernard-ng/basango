@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Types;
 
-use App\FeedManagement\Domain\Model\Identity\FollowedSourceId;
+use Basango\FeedManagement\Domain\Model\Identity\FollowedSourceId;
 use Symfony\Bridge\Doctrine\Types\AbstractUidType;
 
 /**

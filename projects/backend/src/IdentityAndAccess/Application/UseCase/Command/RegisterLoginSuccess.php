@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\Command;
+namespace Basango\IdentityAndAccess\Application\UseCase\Command;
 
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
 
 /**
  * Class RegisterLogin.

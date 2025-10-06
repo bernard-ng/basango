@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\Mailing;
+namespace Basango\IdentityAndAccess\Application\Mailing;
 
-use App\SharedKernel\Application\Mailing\EmailDefinition;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
+use Basango\SharedKernel\Application\Mailing\EmailDefinition;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
 
 /**
  * Class LoginProfileChangedEmail.

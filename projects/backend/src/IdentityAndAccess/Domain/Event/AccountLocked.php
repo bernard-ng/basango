@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Event;
+namespace Basango\IdentityAndAccess\Domain\Event;
 
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
 
 /**
  * Class AccountLocked.

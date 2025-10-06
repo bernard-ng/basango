@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\FeedManagement\Domain\Model\Identity\BookmarkId;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\FeedManagement\Domain\Model\Identity\BookmarkId;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 
 /**
  * Class Bookmark.

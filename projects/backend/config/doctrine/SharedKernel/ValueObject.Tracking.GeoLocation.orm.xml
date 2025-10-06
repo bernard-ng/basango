@@ -4,7 +4,7 @@
                   xsi:schemaLocation="https://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <embeddable name="App\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation">
+    <embeddable name="Basango\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation">
         <field name="timeZone" type="string" nullable="true"/>
         <field name="longitude" type="float" nullable="true"/>
         <field name="latitude" type="float" nullable="true" />

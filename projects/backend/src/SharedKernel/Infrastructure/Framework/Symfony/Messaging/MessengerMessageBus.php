@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Framework\Symfony\Messaging;
+namespace Basango\SharedKernel\Infrastructure\Framework\Symfony\Messaging;
 
-use App\SharedKernel\Application\Messaging\AsyncMessage;
-use App\SharedKernel\Application\Messaging\MessageBus;
+use Basango\SharedKernel\Application\Messaging\AsyncMessage;
+use Basango\SharedKernel\Application\Messaging\MessageBus;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 

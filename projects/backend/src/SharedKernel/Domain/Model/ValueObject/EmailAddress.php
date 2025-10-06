@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Model\ValueObject;
+namespace Basango\SharedKernel\Domain\Model\ValueObject;
 
-use App\SharedKernel\Domain\Assert;
-use App\SharedKernel\Domain\Exception\InvalidEmailAddress;
+use Basango\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Exception\InvalidEmailAddress;
 
 /**
  * Class EmailAddress.

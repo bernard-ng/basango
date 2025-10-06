@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\Command;
+namespace Basango\FeedManagement\Application\UseCase\Command;
 
-use App\FeedManagement\Domain\Model\Identity\CommentId;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\FeedManagement\Domain\Model\Identity\CommentId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 
 /**
  * Class RemoveCommentFromArticle.

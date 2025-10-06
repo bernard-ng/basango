@@ -5,7 +5,7 @@ security:
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         app_user_provider:
-            id: App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\SecurityUserProvider
+            id: Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\SecurityUserProvider
 
     firewalls:
         dev:
@@ -19,7 +19,7 @@ security:
                 check_path: /api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            user_checker: App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\UserChecker
+            user_checker: Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\UserChecker
 
         api:
             pattern: ^/api
@@ -30,12 +30,12 @@ security:
                 check_path: /api/token/refresh
             logout:
                 path: api_token_invalidate
-            user_checker: App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\UserChecker
+            user_checker: Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\UserChecker
 
         main:
             lazy: true
             provider: app_user_provider
-            user_checker: App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\UserChecker
+            user_checker: Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\UserChecker
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
@@ -45,6 +45,7 @@ security:
         - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/password/(request|reset), roles: PUBLIC_ACCESS }
         - { path: ^/api/account/(unlock|confirm), roles: PUBLIC_ACCESS }
+        - { path: ^/api/aggregator/articles, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

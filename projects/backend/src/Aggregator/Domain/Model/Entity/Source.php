@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\Entity;
+namespace Basango\Aggregator\Domain\Model\Entity;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
 
 /**
  * Class Source.

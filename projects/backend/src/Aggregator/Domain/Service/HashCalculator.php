@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Service;
+namespace Basango\Aggregator\Domain\Service;
 
 /**
  * Class HashCalculator.

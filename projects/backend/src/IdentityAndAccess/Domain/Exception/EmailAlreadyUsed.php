@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Exception;
+namespace Basango\IdentityAndAccess\Domain\Exception;
 
-use App\SharedKernel\Domain\Exception\UserFacingError;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class EmailAlreadyUsed.

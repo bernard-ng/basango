@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\CommandHandler;
+namespace Basango\IdentityAndAccess\Application\UseCase\CommandHandler;
 
-use App\IdentityAndAccess\Application\UseCase\Command\LockAccount;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
-use App\IdentityAndAccess\Domain\Model\Entity\VerificationToken;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\VerificationTokenRepository;
-use App\IdentityAndAccess\Domain\Model\ValueObject\TokenPurpose;
-use App\IdentityAndAccess\Domain\Service\SecretGenerator;
-use App\SharedKernel\Application\Messaging\CommandHandler;
-use App\SharedKernel\Domain\EventDispatcher\EventDispatcher;
+use Basango\IdentityAndAccess\Application\UseCase\Command\LockAccount;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Model\Entity\VerificationToken;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\VerificationTokenRepository;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\TokenPurpose;
+use Basango\IdentityAndAccess\Domain\Service\SecretGenerator;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\SharedKernel\Domain\EventDispatcher\EventDispatcher;
 
 /**
  * Class ResetPasswordHandler.

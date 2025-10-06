@@ -13,4 +13,4 @@ default:
     FriendsOfBehat\SymfonyExtension:
       bootstrap: tests/bootstrap.php
       kernel:
-        class: App\SharedKernel\Infrastructure\Framework\Symfony\Kernel
+        class: Basango\SharedKernel\Infrastructure\Framework\Symfony\Kernel

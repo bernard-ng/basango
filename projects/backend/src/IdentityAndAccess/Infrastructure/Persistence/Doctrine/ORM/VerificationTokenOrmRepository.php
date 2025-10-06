@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\IdentityAndAccess\Domain\Exception\InvalidVerificationToken;
-use App\IdentityAndAccess\Domain\Model\Entity\VerificationToken;
-use App\IdentityAndAccess\Domain\Model\Repository\VerificationTokenRepository;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
-use App\IdentityAndAccess\Domain\Model\ValueObject\TokenPurpose;
+use Basango\IdentityAndAccess\Domain\Exception\InvalidVerificationToken;
+use Basango\IdentityAndAccess\Domain\Model\Entity\VerificationToken;
+use Basango\IdentityAndAccess\Domain\Model\Repository\VerificationTokenRepository;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\TokenPurpose;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

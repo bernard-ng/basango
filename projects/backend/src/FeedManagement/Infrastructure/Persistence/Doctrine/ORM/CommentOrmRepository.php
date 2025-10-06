@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\FeedManagement\Domain\Exception\CommentNotFound;
-use App\FeedManagement\Domain\Model\Entity\Comment;
-use App\FeedManagement\Domain\Model\Identity\CommentId;
-use App\FeedManagement\Domain\Model\Repository\CommentRepository;
+use Basango\FeedManagement\Domain\Exception\CommentNotFound;
+use Basango\FeedManagement\Domain\Model\Entity\Comment;
+use Basango\FeedManagement\Domain\Model\Identity\CommentId;
+use Basango\FeedManagement\Domain\Model\Repository\CommentRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

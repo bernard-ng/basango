@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\CommandHandler;
+namespace Basango\Aggregator\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Application\UseCase\Command\DeleteArticles;
-use App\Aggregator\Domain\Model\Repository\ArticleRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\Aggregator\Application\UseCase\Command\DeleteArticles;
+use Basango\Aggregator\Domain\Model\Repository\ArticleRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class DeleteArticlesHandler.
