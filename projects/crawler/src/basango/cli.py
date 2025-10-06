@@ -1,8 +1,18 @@
+from __future__ import annotations
+
+from typing import List, Optional
+
 import typer
 
 from basango.core.config import CrawlerConfig
 from basango.core.config_manager import ConfigManager
-from basango.domain import PageRange, DateRange, UpdateDirection
+from basango.domain import DateRange, PageRange, UpdateDirection
+from basango.services import CsvPersistor
+from basango.services.crawler.async_api import (
+    QueueSettings,
+    schedule_async_crawl,
+    start_worker,
+)
 from basango.services.crawler.html_crawler import HtmlCrawler
 from basango.services.crawler.wordpress_crawler import WordpressCrawler
 
@@ -21,16 +31,34 @@ def crawl_cmd(
     category: str = typer.Option(None, "--category", "-g", help="Optional category"),
     notify: bool = typer.Option(False, "--notify", "-n", help="Enable notifications"),
     env: str = typer.Option("development", "--env", "-c", help="Environment"),
+    async_mode: bool = typer.Option(
+        False,
+        "--async/--no-async",
+        help="Schedule crawl through Redis queues instead of running synchronously.",
+    ),
 ) -> None:
-    """Crawl a single source based on CLI-provided settings."""
+    """Crawl a single source, either synchronously or via the async queue."""
     manager = ConfigManager()
-
     pipeline = manager.get(env)
     manager.ensure_directories(pipeline)
     manager.setup_logging(pipeline)
 
     source = pipeline.sources.find(source_id)
-    assert source is not None, f"Source '{source_id}' not found in config"
+    if source is None:
+        raise typer.BadParameter(f"Source '{source_id}' not found in config")
+
+    if async_mode:
+        job_id = schedule_async_crawl(
+            source_id=source_id,
+            env=env,
+            page_range=page,
+            date_range=date,
+            category=category,
+        )
+        typer.echo(
+            f"Scheduled async crawl job {job_id} for source '{source_id}' on queue"
+        )
+        return
 
     crawler_config = CrawlerConfig(
         source=source,
@@ -46,8 +74,56 @@ def crawl_cmd(
         WordpressCrawler,
     ]
 
+    source_identifier = getattr(source, "source_id", source_id) or source_id
+    persistors = [
+        CsvPersistor(
+            data_dir=pipeline.paths.data,
+            source_id=str(source_identifier),
+        )
+    ]
+
     for crawler in crawlers:
         if crawler.supports() == source.source_kind:
-            crawler = crawler(crawler_config, pipeline.fetch.client)
+            crawler = crawler(
+                crawler_config,
+                pipeline.fetch.client,
+                persistors=persistors,
+            )
             crawler.fetch()
             break
+
+
+@app.command("worker")
+def worker_cmd(
+    queue: Optional[List[str]] = typer.Option(
+        None,
+        "--queue",
+        "-q",
+        help="Queue name(s) (without prefix). Provide multiple times to listen to more than one queue.",
+    ),
+    burst: bool = typer.Option(
+        False,
+        "--burst",
+        help="Process available jobs and exit instead of running continuously.",
+    ),
+    redis_url: str = typer.Option(
+        None,
+        "--redis-url",
+        help="Redis connection URL. Defaults to BASANGO_REDIS_URL.",
+    ),
+    env: str = typer.Option(
+        "development",
+        "--env",
+        "-c",
+        help="Environment used to configure logging before starting the worker.",
+    ),
+) -> None:
+    """Run an RQ worker that consumes crawler queues."""
+    manager = ConfigManager()
+    pipeline = manager.get(env)
+    manager.ensure_directories(pipeline)
+    manager.setup_logging(pipeline)
+
+    settings = QueueSettings(redis_url=redis_url) if redis_url else QueueSettings()
+    queue_names = list(queue) if queue else None
+    start_worker(queue_names=queue_names, settings=settings, burst=burst)

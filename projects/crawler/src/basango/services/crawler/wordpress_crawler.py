@@ -1,7 +1,7 @@
 import json
 import logging
 from datetime import datetime, timezone
-from typing import Optional, override, cast, Final, Any
+from typing import Optional, override, cast, Final, Any, Sequence
 
 from bs4 import BeautifulSoup
 
@@ -9,13 +9,17 @@ from basango.core.config import WordPressSourceConfig, CrawlerConfig, ClientConf
 from basango.domain import SourceKind, PageRange, DateRange
 from basango.domain.exception import ArticleOutOfRange
 from basango.services.crawler.base_crawler import BaseCrawler
+from basango.services import BasePersistor
 
 
 class WordpressCrawler(BaseCrawler):
     def __init__(
-        self, crawler_config: CrawlerConfig, client_config: ClientConfig
+        self,
+        crawler_config: CrawlerConfig,
+        client_config: ClientConfig,
+        persistors: Sequence[BasePersistor] | None = None,
     ) -> None:
-        super().__init__(crawler_config, client_config)
+        super().__init__(crawler_config, client_config, persistors=persistors)
         if not self.source or self.source.source_kind != SourceKind.WORDPRESS:
             raise ValueError("WordpressCrawler requires a source of kind WORDPRESS")
 
@@ -163,8 +167,6 @@ class WordpressCrawler(BaseCrawler):
         return 1
 
     @staticmethod
-    @staticmethod
     @override
     def supports() -> SourceKind:
         return SourceKind.WORDPRESS
-
