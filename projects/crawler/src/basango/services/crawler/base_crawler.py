@@ -1,24 +1,27 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import asdict, is_dataclass
-from typing import Optional, Any, Dict, List
+from typing import Optional, Any, Dict, List, Sequence
 
 from bs4 import BeautifulSoup
 
 from basango.core.config import CrawlerConfig, ClientConfig
 from basango.domain import DateRange, SourceKind, PageRange
 from basango.domain.exception import ArticleOutOfRange
-from basango.services import HttpClient, DateParser, OpenGraphProvider
+from basango.services import HttpClient, DateParser, OpenGraphProvider, BasePersistor
 
 
 class BaseCrawler(ABC):
     def __init__(
-        self, crawler_config: CrawlerConfig, client_config: ClientConfig
+        self,
+        crawler_config: CrawlerConfig,
+        client_config: ClientConfig,
+        persistors: Sequence[BasePersistor] | None = None,
     ) -> None:
         self.config = crawler_config
         self.source = crawler_config.source
         self.client = HttpClient(client_config=client_config)
-        self.results: List[Dict[str, Any]] = []
+        self.persistors: list[BasePersistor] = list(persistors) if persistors else []
         self.date_parser = DateParser()
         self.open_graph = OpenGraphProvider()
 
@@ -49,6 +52,7 @@ class BaseCrawler(ABC):
             metadata_value = asdict(metadata)
         else:
             metadata_value = metadata
+
         article = {
             "title": title,
             "link": link,
@@ -58,7 +62,7 @@ class BaseCrawler(ABC):
             "timestamp": timestamp,
             "metadata": metadata_value,
         }
-        self.results.append(article)
+        self._persist(article)
         logging.info(f"> {title} [saved]")
 
     @abstractmethod
@@ -85,7 +89,8 @@ class BaseCrawler(ABC):
         logging.info("Crawling completed")
         if notify:
             logging.info("Sending notification about completion")
-            # Implement notification logic here
+            # TODO: Implement notification logic here
+        self._shutdown_persistors()
 
     @classmethod
     def skip(cls, date_range: DateRange, timestamp: str, title: str, date: str) -> None:
@@ -93,3 +98,25 @@ class BaseCrawler(ABC):
             raise ArticleOutOfRange.create(timestamp, date_range)
 
         logging.warning(f"> {title} [Skipped {date}]")
+
+    def _persist(self, article: Dict[str, Any]) -> None:
+        for persistor in self.persistors:
+            try:
+                persistor.persist(article)
+            except Exception as exc:  # noqa: BLE001
+                logging.exception(
+                    "Failed to persist article via %s: %s",
+                    persistor.__class__.__name__,
+                    exc,
+                )
+
+    def _shutdown_persistors(self) -> None:
+        for persistor in self.persistors:
+            try:
+                persistor.close()
+            except Exception as exc:  # noqa: BLE001
+                logging.exception(
+                    "Failed to close persistor %s: %s",
+                    persistor.__class__.__name__,
+                    exc,
+                )

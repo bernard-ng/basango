@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import datetime, timezone
-from typing import Optional, cast, override
+from typing import Optional, cast, override, Sequence
 from urllib.parse import parse_qs, urljoin, urlparse
 
 from bs4 import BeautifulSoup, Tag
@@ -11,13 +11,17 @@ from basango.core.config.source_config import HtmlSourceConfig
 from basango.domain import DateRange, PageRange, SourceKind
 from basango.domain.exception import ArticleOutOfRange
 from basango.services.crawler.base_crawler import BaseCrawler
+from basango.services import BasePersistor
 
 
 class HtmlCrawler(BaseCrawler):
     def __init__(
-        self, crawler_config: CrawlerConfig, client_config: ClientConfig
+        self,
+        crawler_config: CrawlerConfig,
+        client_config: ClientConfig,
+        persistors: Sequence[BasePersistor] | None = None,
     ) -> None:
-        super().__init__(crawler_config, client_config)
+        super().__init__(crawler_config, client_config, persistors=persistors)
         if not self.source or self.source.source_kind != SourceKind.HTML:
             raise ValueError("HtmlCrawler requires a source of kind HTML")
 

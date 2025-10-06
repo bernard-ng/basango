@@ -5,7 +5,7 @@ from typing import Optional
 import trafilatura
 
 from basango.core.config import ClientConfig
-from basango.services.http_client import HttpClient
+from basango.services.http_client import SyncHttpClient
 from basango.services.user_agents import UserAgentProvider
 
 
@@ -22,7 +22,7 @@ class OpenGraphProvider:
         self, user_agent_provider: UserAgentProvider = UserAgentProvider(rotate=False)
     ) -> None:
         self._user_agent = user_agent_provider.og()
-        self._http_client = HttpClient(
+        self._http_client = SyncHttpClient(
             client_config=ClientConfig(),
             default_headers={"User-Agent": self._user_agent},
         )
