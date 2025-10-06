@@ -1,3 +1,12 @@
+"""
+Lightweight task payload schemas.
+
+Notes
+- Use dataclasses with `slots=True` for low overhead and predictable fields.
+- `_coerce_kwargs` filters unknown keys so payloads are resilient to schema
+  changes when workers and producers are not updated in lockstep.
+"""
+
 from dataclasses import asdict, dataclass, fields
 from typing import Any, Mapping
 

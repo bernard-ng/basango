@@ -1,3 +1,12 @@
+"""
+Thin indirection layer around async components (queues, tasks, worker).
+
+We import symbols dynamically to avoid importing optional runtime dependencies
+like RQ and Redis at module import time. This keeps regular (sync) crawling
+usable even if async deps aren't installed, and avoids circular imports when
+RQ workers import task callables by string path.
+"""
+
 from importlib import import_module
 
 _async_queue = import_module("basango.services.crawler.async.queue")

@@ -13,6 +13,15 @@ from basango.services import BasePersistor
 
 
 class WordpressCrawler(BaseCrawler):
+    """
+    WordPress REST API crawler.
+
+    It uses the `/wp-json/wp/v2/posts` endpoints and limits fields to reduce
+    payload size. Pagination is driven by WordPress headers `x-wp-totalpages`
+    and `x-wp-total`. Category IDs are mapped to slugs via a secondary endpoint
+    and cached per run.
+    """
+
     def __init__(
         self,
         crawler_config: CrawlerConfig,
@@ -58,6 +67,7 @@ class WordpressCrawler(BaseCrawler):
                 try:
                     self.fetch_one(article, date_range)
                 except ArticleOutOfRange:
+                    # Same early-exit semantic as HtmlCrawler
                     logging.info("No more articles to fetch in this range.")
                     stop = True
                     break

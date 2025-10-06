@@ -1,3 +1,23 @@
+"""
+CLI entry points for crawling and worker management.
+
+Sync vs async usage
+- Synchronous crawl: runs the selected crawler in-process and writes results
+  via configured persistors (CSV/JSON). Suitable for local development or
+  small runs.
+- Asynchronous crawl: enqueues a listing job in Redis (RQ) and returns
+  immediately. One or more RQ workers must be running to process jobs.
+
+Examples
+- Sync: `basango crawl --source-id my-source --page 1:3`
+- Async: `basango crawl --source-id my-source --async`
+- Worker (macOS friendly): `basango worker --simple -q articles`
+
+Environment
+- `BASANGO_REDIS_URL` points the worker/queues to Redis.
+- `BASANGO_QUEUE_PREFIX` namespaces queues (default: `crawler`).
+"""
+
 from typing import List, Optional
 from enum import Enum
 
@@ -42,7 +62,15 @@ def crawl_cmd(
         help="Schedule crawl through Redis queues instead of running synchronously.",
     ),
 ) -> None:
-    """Crawl a single source, either synchronously or via the async queue."""
+    """Crawl a single source, either synchronously or via the async queue.
+
+    Technical notes
+    - When `--async` is set, we only enqueue a job (no crawling happens here).
+      This keeps the CLI responsive and leaves fault-tolerance to RQ workers.
+    - Persistors (CSV/JSON) are instantiated only for the sync path; the async
+      path assigns them inside worker tasks to avoid importing heavy deps in the
+      CLI process and to better isolate failures.
+    """
     manager = ConfigManager()
     pipeline = manager.get(env)
     manager.ensure_directories(pipeline)
@@ -138,7 +166,15 @@ def worker_cmd(
         help="Environment used to configure logging before starting the worker.",
     ),
 ) -> None:
-    """Run an RQ worker that consumes crawler queues."""
+    """Run an RQ worker that consumes crawler queues.
+
+    Notes
+    - By default the worker listens to the `articles` queue (detail jobs). Use
+      `-q listing -q articles -q processed` to listen to multiple.
+    - `--simple` uses RQ's SimpleWorker (no forking). On macOS this avoids
+      fork-related crashes when libraries aren't fork-safe.
+    - Use `--burst` to drain the queue and exit, useful for CI or one-off runs.
+    """
     manager = ConfigManager()
     pipeline = manager.get(env)
     manager.ensure_directories(pipeline)

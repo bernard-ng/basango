@@ -1,3 +1,15 @@
+"""
+RQ queue configuration and helpers.
+
+Design choices
+- Queue names are prefixed (e.g. `crawler:articles`) so multiple environments
+  can share the same Redis. Configure via `BASANGO_QUEUE_PREFIX`.
+- Job default timeouts and TTLs are centrally configured to avoid per-enqueue
+  tuning. Environment variables allow ops to adjust at runtime.
+- Task callables are referenced by dotted string path when enqueuing to ensure
+  RQ workers can import them without importing this module and creating cycles.
+"""
+
 import os
 from dataclasses import dataclass, field
 from typing import Iterable

@@ -12,6 +12,16 @@ from basango.services import HttpClient, DateParser, OpenGraphProvider, BasePers
 
 
 class BaseCrawler(ABC):
+    """
+    Base building blocks shared by concrete crawlers.
+
+    Notable conventions
+    - `skip`: raises `ArticleOutOfRange` when an item falls outside the desired
+      date range. Callers catch it to stop pagination early.
+    - `record_article`: normalises metadata (including dataclasses) before
+      handing off to persistors.
+    """
+
     def __init__(
         self,
         crawler_config: CrawlerConfig,
@@ -95,6 +105,8 @@ class BaseCrawler(ABC):
     @classmethod
     def skip(cls, date_range: DateRange, timestamp: str, title: str, date: str) -> None:
         if date_range.out_range(int(timestamp)):
+            # Use an exception to unwind to the crawl loop and stop as soon as
+            # we detect items beyond the configured range.
             raise ArticleOutOfRange.create(timestamp, date_range)
 
         logging.warning(f"> {title} [Skipped {date}]")
