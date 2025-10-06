@@ -1,5 +1,14 @@
 # Basango : Towards a scalable and intelligent system for Congolese News curation
 
+[![backend audit](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml)
+[![backend deploy](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml)
+[![backend quality](https://github.com/bernard-ng/basango/actions/workflows/backend_quality.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_quality.yaml)
+[![backend tests](https://github.com/bernard-ng/basango/actions/workflows/backend_tests.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_tests.yaml)
+[![crawler audit](https://github.com/bernard-ng/basango/actions/workflows/crawler_audit.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_audit.yml)
+[![crawler quality](https://github.com/bernard-ng/basango/actions/workflows/crawler_quality.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_quality.yml)
+[![crawler tests](https://github.com/bernard-ng/basango/actions/workflows/crawler_tests.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_tests.yml)
+[![mobile quality](https://github.com/bernard-ng/basango/actions/workflows/mobile_quality.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/mobile_quality.yaml)
+
 | Scope             | Link                                      |
 |-------------------|-------------------------------------------|
 | Crawler           | [README.md](./projects/crawler/README.md) |
