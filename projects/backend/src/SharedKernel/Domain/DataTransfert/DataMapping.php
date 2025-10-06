@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Basango\SharedKernel\Domain\DataTransfert;
 
 use Basango\SharedKernel\Domain\Assert;
-use BackedEnum as T;
 use Symfony\Component\Uid\UuidV7;
 
 /**

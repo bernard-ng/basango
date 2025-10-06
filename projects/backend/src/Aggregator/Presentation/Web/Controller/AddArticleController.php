@@ -6,7 +6,6 @@ namespace Basango\Aggregator\Presentation\Web\Controller;
 
 use Basango\Aggregator\Application\UseCase\Command\CreateArticle;
 use Basango\Aggregator\Domain\Model\ValueObject\Link;
-use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
 use Basango\Aggregator\Presentation\WriteModel\AddArticleModel;
 use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -25,7 +24,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 final class AddArticleController extends AbstractController
 {
     public function __construct(
-        #[Autowire(env: "BASANGO_CRAWLER_TOKEN")] private string $token
+        #[Autowire(env: 'BASANGO_CRAWLER_TOKEN')] private readonly string $token
     ) {
     }
 
@@ -33,12 +32,12 @@ final class AddArticleController extends AbstractController
         path: '/api/aggregator/articles',
         name: 'aggregator_add_article',
         requirements: [
-            'token' => Requirement::ASCII_SLUG
+            'token' => Requirement::ASCII_SLUG,
         ],
         methods: ['POST']
     )]
     public function __invoke(
-        #[MapQueryParameter] string $token, 
+        #[MapQueryParameter] string $token,
         #[MapRequestPayload] AddArticleModel $model
     ): JsonResponse {
         if ($token !== $this->token) {
@@ -48,13 +47,12 @@ final class AddArticleController extends AbstractController
         $this->handleCommand(new CreateArticle(
             $model->title,
             Link::from($model->link),
-            join(', ', $model->categories),
+            implode(', ', $model->categories),
             $model->body,
             $model->source,
             $model->timestamp,
             $model->metadata,
         ));
-
 
         return new JsonResponse(status: Response::HTTP_CREATED);
     }

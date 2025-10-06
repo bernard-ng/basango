@@ -23,7 +23,7 @@ class Bookmark
     /**
      * @var DataCollection<int, Article>
      */
-    private(set) public iterable $articles;
+    public private(set) iterable $articles;
 
     private function __construct(
         public readonly User $user,

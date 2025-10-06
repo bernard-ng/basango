@@ -75,10 +75,10 @@ class Article
     public function defineOpenGraph(?OpenGraph $object): self
     {
         $this->metadata = new OpenGraph(
-            title: $object->title,
-            description: $object->description,
-            image: $object->image,
-            locale: $object->locale ?? "fr"
+            title: $object?->title,
+            description: $object?->description,
+            image: $object?->image,
+            locale: $object->locale ?? 'fr'
         );
 
         return $this;
