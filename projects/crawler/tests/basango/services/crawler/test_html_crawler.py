@@ -251,10 +251,9 @@ class TestHtmlCrawler:
             # Should extract the first number found (2024)
             assert result == 2024
 
-    def test_supports_html_source_kind(self, html_crawler):
+    def test_supports_html_source_kind(self):
         """Test that supports method returns True for HTML source kind."""
-        assert html_crawler.supports(SourceKind.HTML) is True
-        assert html_crawler.supports(SourceKind.WORDPRESS) is False
+        assert HtmlCrawler.supports() is SourceKind.HTML
 
     def test_get_pagination_integration(self, html_crawler):
         """Integration test for get_pagination calling get_last_page."""

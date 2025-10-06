@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from importlib import import_module
 
 _async_queue = import_module("basango.services.crawler.async.queue")
