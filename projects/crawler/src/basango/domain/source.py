@@ -10,7 +10,7 @@ class SourceKind(StrEnum):
 
 
 class SourceDate(BaseModel):
-    format: str = "%Y-%m-%dT%H:%M:%S"
+    format: str = "%Y-%m-%d %H:%M"
     pattern: Optional[str] = None
     replacement: Optional[str] = None
 

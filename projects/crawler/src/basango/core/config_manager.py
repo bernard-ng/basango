@@ -1,4 +1,5 @@
 import logging
+import sys
 from pathlib import Path
 from typing import Optional, Union, Dict
 
@@ -6,6 +7,15 @@ import yaml
 
 from basango.core.config import PipelineConfig
 from basango.core.project_paths import ProjectPaths
+
+
+def _ensure_utf8_stream(stream):
+    try:
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        return stream
+    return stream
 
 
 class ConfigManager:
@@ -78,9 +88,13 @@ class ConfigManager:
         # Clear existing handlers
         root_logger.handlers.clear()
 
+        _ensure_utf8_stream(sys.stdout)
+        _ensure_utf8_stream(sys.stderr)
         # Console handler
         if cfg.logging.console_logging:
-            console_handler = logging.StreamHandler()
+            console_handler = logging.StreamHandler(
+                stream=_ensure_utf8_stream(sys.stderr)
+            )
             console_handler.setFormatter(formatter)
             root_logger.addHandler(console_handler)
 
@@ -93,6 +107,7 @@ class ConfigManager:
                 log_file_path,
                 maxBytes=cfg.logging.max_log_size,
                 backupCount=cfg.logging.backup_count,
+                encoding="utf-8",
             )
             file_handler.setFormatter(formatter)
             root_logger.addHandler(file_handler)
