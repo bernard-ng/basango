@@ -1,12 +1,10 @@
-from __future__ import annotations
-
 import logging
 from typing import Any
 
 from basango.core.config import CrawlerConfig
 from basango.core.config_manager import ConfigManager
 from basango.domain import DateRange, PageRange, SourceKind, UpdateDirection
-from basango.services import CsvPersistor
+from basango.services import CsvPersistor, JsonPersistor, ApiPersistor
 from basango.services.crawler.html_crawler import HtmlCrawler
 from basango.services.crawler.wordpress_crawler import WordpressCrawler
 
@@ -101,7 +99,11 @@ def collect_article(payload: dict[str, Any]) -> dict[str, Any] | None:
         CsvPersistor(
             data_dir=pipeline.paths.data,
             source_id=str(source_identifier),
-        )
+        ),
+        JsonPersistor(
+            data_dir=pipeline.paths.data,
+            source_id=str(source_identifier),
+        ),
     ]
 
     queue_manager = QueueManager()
@@ -124,24 +126,29 @@ def collect_article(payload: dict[str, Any]) -> dict[str, Any] | None:
         )
         article = None
 
-    if article:
-        queue_manager.enqueue_processed(
-            ProcessedTaskPayload(
-                source_id=data.source_id,
-                env=data.env,
-                article=article,
-            )
+    queue_manager.enqueue_processed(
+        ProcessedTaskPayload(
+            source_id=data.source_id,
+            env=data.env,
+            article=article,
         )
+    )
+    if article:
         logger.info(
             "Persisted article %s and forwarded to processed queue",
             article.get("link"),
         )
+    else:
+        logger.info("Persisted article and forwarded to processed queue")
 
     return article
 
 
 def forward_for_processing(payload: dict[str, Any]) -> dict[str, Any] | None:
     data = ProcessedTaskPayload.from_dict(payload)
+    manager = ConfigManager()
+    pipeline = manager.get(data.env)
+
     article = dict(data.article) if data.article is not None else None
     if article is None:
         logger.info(
@@ -153,7 +160,13 @@ def forward_for_processing(payload: dict[str, Any]) -> dict[str, Any] | None:
         data.source_id,
         article.get("link"),
     )
-    return article
+
+    persistor = ApiPersistor(
+        endpoint="http://localhost:8000/api/articles",
+        client_config=pipeline.fetch.client,
+    )
+    persistor.persist(article)
+    logger.info("Forwarded article %s to API", article.get("link"))
 
 
 def _collect_html_listing(

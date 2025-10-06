@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import logging
 from typing import Sequence
 
-from rq import Queue, Worker
+from rq import Queue, Worker, SimpleWorker
 
 from .queue import QueueManager, QueueSettings
 
@@ -16,6 +14,7 @@ def start_worker(
     *,
     settings: QueueSettings | None = None,
     burst: bool = False,
+    simple: bool = False,
 ) -> None:
     manager = QueueManager(settings=settings)
     if queue_names is None or not list(queue_names):
@@ -24,6 +23,11 @@ def start_worker(
     resolved = [manager.queue_name(name) for name in queue_names]
     queues = [Queue(name, connection=manager.connection) for name in resolved]
 
-    logger.info("Starting RQ worker for queues %s", ", ".join(resolved))
-    worker = Worker(queues, connection=manager.connection)
+    worker_cls = SimpleWorker if simple else Worker
+    logger.info(
+        "Starting RQ %s for queues %s",
+        worker_cls.__name__,
+        ", ".join(resolved),
+    )
+    worker = worker_cls(queues, connection=manager.connection)
     worker.work(burst=burst)

@@ -210,10 +210,9 @@ class TestWordPressCrawler:
         # Should be sorted by ID: 1, 2, 3
         assert result == "alpha,beta,charlie"
 
-    def test_supports_wordpress_source_kind(self, wordpress_crawler):
+    def test_supports_wordpress_source_kind(self):
         """Test supports method returns True for WordPress source kind."""
-        assert wordpress_crawler.supports(SourceKind.WORDPRESS) is True
-        assert wordpress_crawler.supports(SourceKind.HTML) is False
+        assert WordpressCrawler.supports() is SourceKind.WORDPRESS
 
     @pytest.mark.parametrize(
         "pages,posts,expected_start,expected_end",

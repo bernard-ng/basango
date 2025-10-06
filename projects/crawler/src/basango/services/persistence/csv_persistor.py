@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import csv
 import json
 from dataclasses import dataclass, field
@@ -44,7 +42,12 @@ class CsvPersistor(BasePersistor):
             with self._file_path.open(
                 "a", newline="", encoding=self.encoding
             ) as handle:
-                writer = csv.DictWriter(handle, fieldnames=self.fieldnames)
+                writer = csv.DictWriter(
+                    handle,
+                    fieldnames=self.fieldnames,
+                    quoting=csv.QUOTE_ALL,
+                    lineterminator="\n",
+                )
                 if needs_header:
                     writer.writeheader()
                     self._header_written = True
@@ -61,7 +64,10 @@ class CsvPersistor(BasePersistor):
         if metadata is None or isinstance(metadata, str):
             serialised_metadata = metadata
         else:
-            serialised_metadata = json.dumps(metadata, ensure_ascii=False)
+            # JSON-encode metadata to a string that is CSV-safe; csv module will quote it
+            serialised_metadata = json.dumps(
+                metadata, ensure_ascii=True, separators=(",", ":"), sort_keys=True
+            )
 
         record = {field: article.get(field) for field in self.fieldnames}
         record["categories"] = serialised_categories

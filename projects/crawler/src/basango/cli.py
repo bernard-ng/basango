@@ -1,13 +1,12 @@
-from __future__ import annotations
-
 from typing import List, Optional
+from enum import Enum
 
 import typer
 
 from basango.core.config import CrawlerConfig
 from basango.core.config_manager import ConfigManager
 from basango.domain import DateRange, PageRange, UpdateDirection
-from basango.services import CsvPersistor
+from basango.services import CsvPersistor, JsonPersistor
 from basango.services.crawler.async_api import (
     QueueSettings,
     schedule_async_crawl,
@@ -17,6 +16,12 @@ from basango.services.crawler.html_crawler import HtmlCrawler
 from basango.services.crawler.wordpress_crawler import WordpressCrawler
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
+
+
+class QueueName(str, Enum):
+    listing = "listing"
+    articles = "articles"
+    processed = "processed"
 
 
 @app.command("crawl")
@@ -79,7 +84,11 @@ def crawl_cmd(
         CsvPersistor(
             data_dir=pipeline.paths.data,
             source_id=str(source_identifier),
-        )
+        ),
+        JsonPersistor(
+            data_dir=pipeline.paths.data,
+            source_id=str(source_identifier),
+        ),
     ]
 
     for crawler in crawlers:
@@ -95,11 +104,22 @@ def crawl_cmd(
 
 @app.command("worker")
 def worker_cmd(
-    queue: Optional[List[str]] = typer.Option(
+    queue: Optional[List[QueueName]] = typer.Option(
         None,
         "--queue",
         "-q",
-        help="Queue name(s) (without prefix). Provide multiple times to listen to more than one queue.",
+        help=(
+            "Queue name(s) (without prefix). Choices: listing, articles, processed. "
+            "Provide multiple times to listen to more than one queue."
+        ),
+    ),
+    simple: bool = typer.Option(
+        False,
+        "--simple/--no-simple",
+        help=(
+            "Run jobs in-process using RQ SimpleWorker (no forking). "
+            "Recommended on macOS to avoid fork-related crashes."
+        ),
     ),
     burst: bool = typer.Option(
         False,
@@ -125,5 +145,10 @@ def worker_cmd(
     manager.setup_logging(pipeline)
 
     settings = QueueSettings(redis_url=redis_url) if redis_url else QueueSettings()
-    queue_names = list(queue) if queue else None
-    start_worker(queue_names=queue_names, settings=settings, burst=burst)
+    queue_names = [q.value for q in queue] if queue else None
+    start_worker(
+        queue_names=queue_names,
+        settings=settings,
+        burst=burst,
+        simple=simple,
+    )
