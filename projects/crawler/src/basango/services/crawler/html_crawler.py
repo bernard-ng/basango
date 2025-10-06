@@ -15,6 +15,17 @@ from basango.services import BasePersistor
 
 
 class HtmlCrawler(BaseCrawler):
+    """
+    Generic HTML crawler driven by CSS selectors.
+
+    Strategy
+    - Listing pages are iterated to extract per-article links or blocks.
+    - When `requires_details` is set, a second request fetches the article page
+      to extract full content; otherwise the article block is parsed inline.
+    - Pagination is inferred from a template and last-page discovery heuristics
+      (regex or query string `page` fallback).
+    """
+
     def __init__(
         self,
         crawler_config: CrawlerConfig,
@@ -85,6 +96,8 @@ class HtmlCrawler(BaseCrawler):
 
                     self.fetch_one(target_html, date_range)
                 except ArticleOutOfRange:
+                    # Using an exception to short-circuit nested loops keeps the
+                    # happy path tidy (no extra flags at each extraction site).
                     logging.info("No more articles to fetch in this range.")
                     stop = True
                     break
@@ -161,7 +174,9 @@ class HtmlCrawler(BaseCrawler):
         if not href or not isinstance(href, str):
             return 1
 
-        # Extract number from href using regex or url parsing
+        # Heuristic: last pagination link either contains the page number
+        # directly or as a `page` query param. Prefer regex first to support
+        # path-style pagination (e.g., /page/4/).
         match = re.search(r"(\d+)", href)
         if match:
             return int(match.group(1))
@@ -207,6 +222,8 @@ class HtmlCrawler(BaseCrawler):
         if not target:
             return None
 
+        # Support a few common attributes for link-like elements (href,
+        # data-href, src) to tolerate variations in markup without custom code.
         raw_href = target.get("href") or target.get("data-href") or target.get("src")
         href: Optional[str]
         if isinstance(raw_href, str):
@@ -270,6 +287,8 @@ class HtmlCrawler(BaseCrawler):
                     if item.get_text(strip=True)
                 ]
                 if parts:
+                    # Join without separators: callers can post-process if
+                    # needed, but this preserves maximum fidelity.
                     return "".join(parts)
         return node.get_text(" ", strip=True)
 

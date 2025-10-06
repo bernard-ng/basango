@@ -1,3 +1,11 @@
+"""
+Worker bootstrap for RQ queues.
+
+Defaults to the `articles` queue to prioritise article detail processing.
+`SimpleWorker` is exposed for environments where forking is unstable (e.g.,
+some macOS setups). Use `burst=True` for CI or one-shot consumption.
+"""
+
 import logging
 from typing import Sequence
 

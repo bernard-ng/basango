@@ -1,3 +1,18 @@
+"""
+RQ task functions for the asynchronous crawl pipeline.
+
+Pipeline
+- schedule_async_crawl: seeds a listing job for a source
+- collect_listing: enumerates listing pages and enqueues detail jobs
+- collect_article: extracts and persists article data, then forwards
+- forward_for_processing: hands the record to downstream system (HTTP API)
+
+Rationale
+- Split listing vs article work to keep jobs small and retryable.
+- Use ConfigManager to reconstruct the same pipeline/env in workers.
+- Persist locally (CSV/JSON) before forwarding to decouple pipelines.
+"""
+
 import logging
 from typing import Any
 
@@ -28,6 +43,7 @@ def schedule_async_crawl(
     category: str | None = None,
     settings: QueueSettings | None = None,
 ):
+    # Keep payload serialisable and minimal; workers reconstruct config objects.
     payload = ListingTaskPayload(
         source_id=source_id,
         env=env,
@@ -61,6 +77,8 @@ def collect_listing(payload: dict[str, Any]) -> int:
     client_config = pipeline.fetch.client
     queue_manager = QueueManager()
 
+    # Branch by source kind to reuse the same high-level flow with different
+    # extraction strategies.
     if source.source_kind == SourceKind.HTML:
         crawler = HtmlCrawler(crawler_config, client_config)
         queued = _collect_html_listing(crawler, data, queue_manager)
@@ -95,6 +113,8 @@ def collect_article(payload: dict[str, Any]) -> dict[str, Any] | None:
     )
 
     source_identifier = getattr(source, "source_id", data.source_id) or data.source_id
+    # Persist locally first to keep an auditable trail and enable
+    # replay/recovery independent of downstream availability.
     persistors = [
         CsvPersistor(
             data_dir=pipeline.paths.data,
@@ -161,6 +181,7 @@ def forward_for_processing(payload: dict[str, Any]) -> dict[str, Any] | None:
         article.get("link"),
     )
 
+    # TODO: externalise endpoint into config; hardcoded for now during bring-up.
     persistor = ApiPersistor(
         endpoint="http://localhost:8000/api/articles",
         client_config=pipeline.fetch.client,

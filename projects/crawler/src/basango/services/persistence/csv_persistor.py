@@ -30,6 +30,8 @@ class CsvPersistor(BasePersistor):
     _header_written: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self) -> None:
+        # Pre-create output directory and detect existing header to avoid
+        # re-writing it across process restarts.
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self._file_path = self.data_dir / f"{self.source_id}.csv"
         if self._file_path.exists() and self._file_path.stat().st_size > 0:
@@ -37,6 +39,8 @@ class CsvPersistor(BasePersistor):
 
     def persist(self, article: Mapping[str, Any]) -> None:
         record = self._serialise(article)
+        # File writes are guarded by a process-local lock to tolerate threads
+        # sharing the same persistor instance.
         with self._lock:
             needs_header = not self._header_written or not self._file_path.exists()
             with self._file_path.open(
@@ -64,7 +68,7 @@ class CsvPersistor(BasePersistor):
         if metadata is None or isinstance(metadata, str):
             serialised_metadata = metadata
         else:
-            # JSON-encode metadata to a string that is CSV-safe; csv module will quote it
+            # JSON-encode metadata to a compact, CSV-safe string; csv will quote it.
             serialised_metadata = json.dumps(
                 metadata, ensure_ascii=True, separators=(",", ":"), sort_keys=True
             )
