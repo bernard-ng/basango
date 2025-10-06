@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from importlib import import_module
-from typing import Any, Sequence
 
 _async_queue = import_module("basango.services.crawler.async.queue")
 _async_tasks = import_module("basango.services.crawler.async.tasks")
