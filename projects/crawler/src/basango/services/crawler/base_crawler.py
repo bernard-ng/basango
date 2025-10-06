@@ -1,13 +1,14 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional
+from dataclasses import asdict, is_dataclass
+from typing import Optional, Any, Dict, List
 
 from bs4 import BeautifulSoup
 
 from basango.core.config import CrawlerConfig, ClientConfig
 from basango.domain import DateRange, SourceKind, PageRange
 from basango.domain.exception import ArticleOutOfRange
-from basango.services import HttpClient
+from basango.services import HttpClient, DateParser, OpenGraphProvider
 
 
 class BaseCrawler(ABC):
@@ -17,6 +18,9 @@ class BaseCrawler(ABC):
         self.config = crawler_config
         self.source = crawler_config.source
         self.client = HttpClient(client_config=client_config)
+        self.results: List[Dict[str, Any]] = []
+        self.date_parser = DateParser()
+        self.open_graph = OpenGraphProvider()
 
     @abstractmethod
     def fetch(self) -> None:
@@ -29,6 +33,34 @@ class BaseCrawler(ABC):
         response = self.client.get(url).text
         return BeautifulSoup(response, "html.parser")
 
+    def record_article(
+        self,
+        *,
+        title: str,
+        link: str,
+        body: str,
+        categories: List[str],
+        timestamp: int,
+        metadata: Any = None,
+    ) -> None:
+        if metadata is None:
+            metadata_value = None
+        elif is_dataclass(metadata) and not isinstance(metadata, type):
+            metadata_value = asdict(metadata)
+        else:
+            metadata_value = metadata
+        article = {
+            "title": title,
+            "link": link,
+            "body": body,
+            "categories": categories,
+            "source": getattr(self.source, "source_id", None),
+            "timestamp": timestamp,
+            "metadata": metadata_value,
+        }
+        self.results.append(article)
+        logging.info(f"> {title} [saved]")
+
     @abstractmethod
     def fetch_one(self, html: str, date_range: Optional[DateRange] = None) -> None:
         pass
@@ -40,8 +72,9 @@ class BaseCrawler(ABC):
     def get_last_page(self) -> int:
         return 1
 
+    @staticmethod
     @abstractmethod
-    def supports(self, source_kind: SourceKind) -> bool:
+    def supports() -> SourceKind:
         pass
 
     @classmethod

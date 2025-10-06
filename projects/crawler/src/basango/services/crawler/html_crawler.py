@@ -1,10 +1,15 @@
+import logging
 import re
+from datetime import datetime, timezone
 from typing import Optional, cast, override
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urljoin, urlparse
+
+from bs4 import BeautifulSoup, Tag
 
 from basango.core.config import CrawlerConfig, ClientConfig
 from basango.core.config.source_config import HtmlSourceConfig
-from basango.domain import PageRange, SourceKind, DateRange
+from basango.domain import DateRange, PageRange, SourceKind
+from basango.domain.exception import ArticleOutOfRange
 from basango.services.crawler.base_crawler import BaseCrawler
 
 
@@ -17,16 +22,114 @@ class HtmlCrawler(BaseCrawler):
             raise ValueError("HtmlCrawler requires a source of kind HTML")
 
         self.source = cast(HtmlSourceConfig, self.source)
+        self._current_article_url: Optional[str] = None
 
     @override
     def fetch(self) -> None:
         self.initialize()
-        page = self.config.page_range or self.get_pagination()
-        print(page)
+        page_range = self.config.page_range or self.get_pagination()
+        date_range = self.config.date_range
+
+        article_selector = self.source.source_selectors.articles
+        if not article_selector:
+            logging.error(
+                "No article selector configured for HTML source %s",
+                self.source.source_id,
+            )
+            return
+
+        stop = False
+        for page_number in range(page_range.start, page_range.end + 1):
+            page_url = self._build_page_url(page_number)
+            try:
+                soup = self.crawl(page_url, page_number)
+            except Exception as exc:  # noqa: BLE001
+                logging.error(
+                    "> page %s => %s [failed]",
+                    page_number,
+                    exc,
+                )
+                continue
+
+            articles = soup.select(article_selector)
+            if not articles:
+                logging.info("No articles found on page %s", page_number)
+                continue
+
+            for article in articles:
+                try:
+                    self._current_article_url = self._extract_link(article)
+                    target_html = str(article)
+
+                    if self.source.requires_details:
+                        if not self._current_article_url:
+                            logging.debug(
+                                "Skipping article without link for details on page %s",
+                                page_number,
+                            )
+                            continue
+                        try:
+                            detail_soup = self.crawl(self._current_article_url)
+                            target_html = str(detail_soup)
+                        except Exception as detail_exc:  # noqa: BLE001
+                            logging.error(
+                                "Failed to fetch detail page %s: %s",
+                                self._current_article_url,
+                                detail_exc,
+                            )
+                            continue
+
+                    self.fetch_one(target_html, date_range)
+                except ArticleOutOfRange:
+                    logging.info("No more articles to fetch in this range.")
+                    stop = True
+                    break
+                except Exception as exc:  # noqa: BLE001
+                    logging.error(
+                        "Failed to process article on %s: %s",
+                        page_url,
+                        exc,
+                    )
+                finally:
+                    self._current_article_url = None
+
+            if stop:
+                break
+
+        self.completed(self.config.notify)
 
     @override
     def fetch_one(self, html: str, date_range: Optional[DateRange] = None) -> None:
-        pass
+        soup = BeautifulSoup(html, "html.parser")
+        selectors = self.source.source_selectors
+
+        title = self._extract_text(soup, selectors.article_title) or "Untitled"
+        link = self._current_article_url or self._extract_link(soup)
+        if not link:
+            logging.warning("Skipping article '%s' without link", title)
+            return
+
+        body = self._extract_body(soup, selectors.article_body)
+        categories = self._extract_categories(soup, selectors.article_categories)
+        if not categories and self.config.category:
+            categories = [self.config.category]
+
+        raw_date = self._extract_text(soup, selectors.article_date)
+        timestamp = self._compute_timestamp(raw_date)
+
+        if date_range and not date_range.in_range(timestamp):
+            self.skip(date_range, str(timestamp), title, raw_date or "")
+
+        metadata = self.open_graph.consume_html(html)
+
+        self.record_article(
+            title=title,
+            link=link,
+            body=body,
+            categories=categories,
+            timestamp=timestamp,
+            metadata=metadata,
+        )
 
     @override
     def get_pagination(self) -> PageRange:
@@ -67,6 +170,128 @@ class HtmlCrawler(BaseCrawler):
                 return 1
         return 1
 
+    @staticmethod
     @override
-    def supports(self, source_kind: SourceKind) -> bool:
-        return source_kind == SourceKind.HTML
+    def supports() -> SourceKind:
+        return SourceKind.HTML
+
+    def _build_page_url(self, page: int) -> str:
+        template = self._apply_category(self.source.pagination_template)
+        if "{page}" in template:
+            template = template.format(page=page)
+        elif page > 0:
+            separator = "&" if "?" in template else "?"
+            template = f"{template}{separator}page={page}"
+
+        base = str(self.source.source_url)
+        if not base.endswith("/"):
+            base = f"{base}/"
+        return urljoin(base, template.lstrip("/"))
+
+    def _apply_category(self, template: str) -> str:
+        if "{category}" in template:
+            replacement = self.config.category or ""
+            return template.replace("{category}", replacement)
+        return template
+
+    def _extract_link(self, node: BeautifulSoup | Tag) -> Optional[str]:
+        selector = self.source.source_selectors.article_link
+        if not selector:
+            return None
+
+        target = node.select_one(selector)
+        if not target:
+            return None
+
+        raw_href = target.get("href") or target.get("data-href") or target.get("src")
+        href: Optional[str]
+        if isinstance(raw_href, str):
+            href = raw_href.strip() or None
+        elif isinstance(raw_href, list):
+            href = next(
+                (
+                    item.strip()
+                    for item in raw_href
+                    if isinstance(item, str) and item.strip()
+                ),
+                None,
+            )
+        else:
+            href = None
+        if not href:
+            return None
+        return self._to_absolute_url(href)
+
+    def _to_absolute_url(self, href: str) -> str:
+        base = str(self.source.source_url)
+        if not base.endswith("/"):
+            base = f"{base}/"
+        return urljoin(base, href)
+
+    @staticmethod
+    def _extract_text(
+        node: BeautifulSoup | Tag, selector: Optional[str]
+    ) -> Optional[str]:
+        if not selector:
+            return None
+        target = node.select_one(selector)
+        if not target:
+            return None
+
+        if target.name == "img":
+            for attr in ("alt", "title"):
+                value = target.get(attr)
+                if isinstance(value, str):
+                    stripped = value.strip()
+                    if stripped:
+                        return stripped
+                elif isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, str):
+                            stripped = item.strip()
+                            if stripped:
+                                return stripped
+
+        text = target.get_text(" ", strip=True)
+        return text or None
+
+    @staticmethod
+    def _extract_body(node: BeautifulSoup | Tag, selector: Optional[str]) -> str:
+        if selector:
+            matches = node.select(selector)
+            if matches:
+                parts = [
+                    item.get_text(" ", strip=True)
+                    for item in matches
+                    if item.get_text(strip=True)
+                ]
+                if parts:
+                    return "".join(parts)
+        return node.get_text(" ", strip=True)
+
+    @staticmethod
+    def _extract_categories(
+        node: BeautifulSoup | Tag, selector: Optional[str]
+    ) -> list[str]:
+        if not selector:
+            return []
+
+        values: list[str] = []
+        for item in node.select(selector):
+            text = item.get_text(" ", strip=True)
+            if text:
+                lower = text.lower()
+                if lower not in values:
+                    values.append(lower)
+        return values
+
+    def _compute_timestamp(self, raw_date: Optional[str]) -> int:
+        if not raw_date:
+            return int(datetime.now(timezone.utc).timestamp())
+
+        return self.date_parser.create_timestamp(
+            raw_date.strip(),
+            fmt=self.source.source_date.format,
+            pattern=self.source.source_date.pattern,
+            replacement=self.source.source_date.replacement,
+        )

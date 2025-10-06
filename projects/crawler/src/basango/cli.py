@@ -42,11 +42,12 @@ def crawl_cmd(
     )
 
     crawlers = [
-        HtmlCrawler(crawler_config, pipeline.fetch.client),
-        WordpressCrawler(crawler_config, pipeline.fetch.client),
+        HtmlCrawler,
+        WordpressCrawler,
     ]
 
     for crawler in crawlers:
-        if crawler.supports(source.source_kind):
+        if crawler.supports() == source.source_kind:
+            crawler = crawler(crawler_config, pipeline.fetch.client)
             crawler.fetch()
             break
