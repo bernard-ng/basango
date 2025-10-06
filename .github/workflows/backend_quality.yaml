@@ -1,4 +1,8 @@
-name: quality
+name: backend quality
+defaults:
+  run:
+    working-directory: projects/backend
+
 on:
   workflow_call:
   push:
@@ -6,20 +10,17 @@ on:
       - main
     paths:
       - "projects/backend/**"
-      - ".github/workflows/backend/**"
+      - ".github/workflows/backend_*.yaml"
   pull_request:
     branches-ignore:
       - main
     paths:
       - "projects/backend/**"
-      - ".github/workflows/backend/**"
+      - ".github/workflows/backend_*.yaml"
 
-defaults:
-  run:
-    working-directory: projects/backend
 jobs:
   quality:
-    name: Quality
+    name: quality
     runs-on: ubuntu-latest
     steps:
       -   name: Checkout
@@ -38,9 +39,9 @@ jobs:
           uses: actions/cache@v4
           with:
             path: ${{ env.COMPOSER_CACHE_DIR }}
-            key: php8.3-composer-${{ hashFiles('projects/backend/composer.lock') }}
+            key: php8.4-composer-${{ hashFiles('projects/backend/composer.lock') }}
             restore-keys: |
-              php8.3-composer-latest-
+              php8.4-composer-latest-
       -   name: Update composer
           run: composer self-update
 
@@ -49,3 +50,4 @@ jobs:
 
       -   name: Run code quality analysis
           run: composer app:cs
+

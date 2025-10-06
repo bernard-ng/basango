@@ -1,4 +1,7 @@
-name: tests
+name: crawler quality
+defaults:
+  run:
+    working-directory: projects/crawler
 
 on:
   push:
@@ -6,18 +9,15 @@ on:
       - main
     paths:
       - "projects/crawler/**"
-      - ".github/workflows/crawler/**"
+      - ".github/workflows/crawler_*.yml"
   pull_request:
     paths:
       - "projects/crawler/**"
-      - ".github/workflows/crawler/**"
-
-defaults:
-  run:
-    working-directory: projects/crawler
+      - ".github/workflows/crawler_*.yml"
 
 jobs:
-  test:
+  lint:
+    name: ruff and pyright
     runs-on: ubuntu-latest
 
     steps:
@@ -40,5 +40,10 @@ jobs:
       - name: Sync dependencies (with dev tools)
         run: uv sync --dev
 
-      - name: Run Pytest
-        run: uv run pytest
+      - name: Run Ruff (lint + format checks)
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Run Pyright (type checks)
+        run: uv run pyright

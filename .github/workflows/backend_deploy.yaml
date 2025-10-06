@@ -1,22 +1,26 @@
-name: deploy
+name: backend deploy
+defaults:
+  run:
+    working-directory: projects/backend
+
 on:
   push:
     branches:
       - main
     paths:
       - "projects/backend/**"
-      - ".github/workflows/backend/**"
+      - ".github/workflows/backend_*.yaml"
 jobs:
   audit:
-    uses: ./.github/workflows/backend/audit.yaml
+    uses: ./.github/workflows/backend_audit.yaml
   quality:
-    uses: ./.github/workflows/backend/quality.yaml
+    uses: ./.github/workflows/backend_quality.yaml
   tests:
-    uses: ./.github/workflows/backend/tests.yaml
+    uses: ./.github/workflows/backend_tests.yaml
     needs: [audit, quality]
 
   deploy:
-    name: Deploy
+    name: deploy
     needs: [tests]
     runs-on: ubuntu-latest
     steps:
@@ -38,3 +42,4 @@ jobs:
                     "text": "news.devscast.tech : `'"$(git rev-parse --short HEAD)"'` has been deployed! 🎉",
                     "parse_mode": "Markdown"
                   }'
+

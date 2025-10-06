@@ -1,4 +1,8 @@
-name: tests
+name: backend tests
+defaults:
+  run:
+    working-directory: projects/backend
+
 on:
   workflow_call:
   push:
@@ -6,16 +10,16 @@ on:
       - main
     paths:
       - "projects/backend/**"
-      - ".github/workflows/backend/**"
+      - ".github/workflows/backend_*.yaml"
   pull_request:
     branches-ignore:
       - main
     paths:
       - "projects/backend/**"
-      - ".github/workflows/backend/**"
+      - ".github/workflows/backend_*.yaml"
 jobs:
   functional:
-    name: Functional Tests
+    name: phpunit
     runs-on: ubuntu-latest
 #    services:
 #      mysql:
