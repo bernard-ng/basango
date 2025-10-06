@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\CommandHandler;
+namespace Basango\FeedManagement\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Domain\Model\Repository\ArticleRepository;
-use App\FeedManagement\Application\UseCase\Command\AddArticleToBookmark;
-use App\FeedManagement\Domain\Model\Repository\BookmarkRepository;
-use App\IdentityAndAccess\Domain\Exception\PermissionNotGranted;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\Aggregator\Domain\Model\Repository\ArticleRepository;
+use Basango\FeedManagement\Application\UseCase\Command\AddArticleToBookmark;
+use Basango\FeedManagement\Domain\Model\Repository\BookmarkRepository;
+use Basango\IdentityAndAccess\Domain\Exception\PermissionNotGranted;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class AddArticleToBookmarkHandler.

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\EventListener;
+namespace Basango\IdentityAndAccess\Application\EventListener;
 
-use App\IdentityAndAccess\Application\Mailing\ConfirmationRequestedEmail;
-use App\IdentityAndAccess\Domain\Event\ConfirmationRequested;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Mailing\Mailer;
-use App\SharedKernel\Domain\EventListener\EventListener;
+use Basango\IdentityAndAccess\Application\Mailing\ConfirmationRequestedEmail;
+use Basango\IdentityAndAccess\Domain\Event\ConfirmationRequested;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Mailing\Mailer;
+use Basango\SharedKernel\Domain\EventListener\EventListener;
 
 /**
  * Class UserRegisteredListener.

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\CommandHandler;
+namespace Basango\IdentityAndAccess\Application\UseCase\CommandHandler;
 
-use App\IdentityAndAccess\Application\UseCase\Command\LockAccount;
-use App\IdentityAndAccess\Application\UseCase\Command\RegisterLoginAttempt;
-use App\IdentityAndAccess\Domain\Model\Entity\LoginAttempt;
-use App\IdentityAndAccess\Domain\Model\Repository\LoginAttemptRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\IdentityAndAccess\Application\UseCase\Command\LockAccount;
+use Basango\IdentityAndAccess\Application\UseCase\Command\RegisterLoginAttempt;
+use Basango\IdentityAndAccess\Domain\Model\Entity\LoginAttempt;
+use Basango\IdentityAndAccess\Domain\Model\Repository\LoginAttemptRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class RegisterLoginAttemptHandler.

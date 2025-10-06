@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\Command;
+namespace Basango\Aggregator\Application\UseCase\Command;
 
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 
 /**
  * Class Export.

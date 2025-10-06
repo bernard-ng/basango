@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app_crawling_notification_email: '%env(CRAWLING_NOTIFICATION_EMAIL)%'
+    basango_notification_email: '%env(BASANGO_NOTIFICATION_EMAIL)%'
 
 services:
     # default configuration for services in *this* file
@@ -13,19 +13,19 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $projectDir: '%kernel.project_dir%'
-            $crawlingNotificationEmail: '%app_crawling_notification_email%'
+            $crawlingNotificationEmail: '%basango_notification_email%'
 
     _instanceof:
-        App\SharedKernel\Application\Messaging\CommandHandler:
+        Basango\SharedKernel\Application\Messaging\CommandHandler:
             tags:
                 - { name: messenger.message_handler, bus: 'command.bus' }
-        App\SharedKernel\Application\Messaging\QueryHandler:
+        Basango\SharedKernel\Application\Messaging\QueryHandler:
             tags:
                 - { name: messenger.message_handler, bus: 'query.bus' }
-        App\SharedKernel\Application\Messaging\MessageHandler:
+        Basango\SharedKernel\Application\Messaging\MessageHandler:
             tags:
                 - { name: messenger.message_handler, bus: 'message.bus' }
-        App\SharedKernel\Domain\EventListener\EventListener:
+        Basango\SharedKernel\Domain\EventListener\EventListener:
             tags:
                 - { name: kernel.event_listener }
 
@@ -38,13 +38,13 @@ services:
     Symfony\Bridge\Monolog\Processor\TokenProcessor:
         tags:
             - { name: monolog.processor, channel: 'app' }
-    App\SharedKernel\Infrastructure\Framework\Symfony\Logging\TelegramFormatter:
+    Basango\SharedKernel\Infrastructure\Framework\Symfony\Logging\TelegramFormatter:
         tags:
             - { name: monolog.formatter }
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    App\:
+    Basango\:
         resource: '../src/'
         exclude:
             - '../src/SharedKernel/Infrastructure/Framework/Symfony/Kernel.php'

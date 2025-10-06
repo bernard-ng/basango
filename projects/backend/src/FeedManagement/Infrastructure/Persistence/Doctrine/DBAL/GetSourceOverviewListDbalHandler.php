@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\FeedManagement\Application\ReadModel\SourceOverviewList;
-use App\FeedManagement\Application\UseCase\Query\GetSourceOverviewList;
-use App\FeedManagement\Application\UseCase\QueryHandler\GetSourceOverviewListHandler;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
-use App\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\FeedManagement\Application\ReadModel\SourceOverviewList;
+use Basango\FeedManagement\Application\UseCase\Query\GetSourceOverviewList;
+use Basango\FeedManagement\Application\UseCase\QueryHandler\GetSourceOverviewListHandler;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 

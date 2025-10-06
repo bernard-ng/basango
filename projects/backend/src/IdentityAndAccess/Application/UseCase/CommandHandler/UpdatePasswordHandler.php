@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\CommandHandler;
+namespace Basango\IdentityAndAccess\Application\UseCase\CommandHandler;
 
-use App\IdentityAndAccess\Application\UseCase\Command\UpdatePassword;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\IdentityAndAccess\Domain\Service\PasswordHasher;
-use App\SharedKernel\Application\Messaging\CommandHandler;
-use App\SharedKernel\Domain\EventDispatcher\EventDispatcher;
+use Basango\IdentityAndAccess\Application\UseCase\Command\UpdatePassword;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\IdentityAndAccess\Domain\Service\PasswordHasher;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\SharedKernel\Domain\EventDispatcher\EventDispatcher;
 
 /**
  * Class UpdatePasswordHandler.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\Command;
+namespace Basango\Aggregator\Application\UseCase\Command;
 
 /**
  * Class DeleteArticles.

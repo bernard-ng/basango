@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 
 /**
  * Class PublicationGraph.

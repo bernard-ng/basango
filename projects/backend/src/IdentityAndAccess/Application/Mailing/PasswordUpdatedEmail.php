@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\Mailing;
+namespace Basango\IdentityAndAccess\Application\Mailing;
 
-use App\SharedKernel\Application\Mailing\EmailDefinition;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Application\Mailing\EmailDefinition;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class PasswordUpdatedEmail.

@@ -10,6 +10,8 @@ Notes
 from dataclasses import asdict, dataclass, fields
 from typing import Any, Mapping
 
+from basango.domain.article import Article
+
 
 def _coerce_kwargs(cls, data: Mapping[str, Any]) -> dict[str, Any]:
     return {field.name: data.get(field.name) for field in fields(cls)}
@@ -51,8 +53,8 @@ class ArticleTaskPayload:
 @dataclass(slots=True)
 class ProcessedTaskPayload:
     source_id: str
+    article: Article
     env: str = "development"
-    article: Mapping[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

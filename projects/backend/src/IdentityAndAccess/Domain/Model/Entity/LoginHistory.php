@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\Entity;
+namespace Basango\IdentityAndAccess\Domain\Model\Entity;
 
-use App\IdentityAndAccess\Domain\Event\LoginProfileChanged;
-use App\IdentityAndAccess\Domain\Model\Identity\LoginHistoryId;
-use App\SharedKernel\Domain\EventDispatcher\EventEmitterTrait;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
+use Basango\IdentityAndAccess\Domain\Event\LoginProfileChanged;
+use Basango\IdentityAndAccess\Domain\Model\Identity\LoginHistoryId;
+use Basango\SharedKernel\Domain\EventDispatcher\EventEmitterTrait;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
 
 /**
  * Class LoginHistory.

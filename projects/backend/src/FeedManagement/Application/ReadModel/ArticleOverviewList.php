@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\SharedKernel\Domain\Assert;
-use App\SharedKernel\Domain\Model\Pagination\PaginationInfo;
+use Basango\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginationInfo;
 
 /**
  * Class ArticleOverviewList.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Model\Repository;
+namespace Basango\FeedManagement\Domain\Model\Repository;
 
-use App\FeedManagement\Domain\Model\Entity\Bookmark;
-use App\FeedManagement\Domain\Model\Identity\BookmarkId;
+use Basango\FeedManagement\Domain\Model\Entity\Bookmark;
+use Basango\FeedManagement\Domain\Model\Identity\BookmarkId;
 
 /**
  * Interface BookmarkRepository.

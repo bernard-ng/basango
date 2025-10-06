@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Presentation\Console;
+namespace Basango\IdentityAndAccess\Presentation\Console;
 
-use App\IdentityAndAccess\Application\UseCase\Command\Register;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Roles;
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
-use App\SharedKernel\Presentation\Console\AskArgumentFeature;
+use Basango\IdentityAndAccess\Application\UseCase\Command\Register;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Roles;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Presentation\Console\AskArgumentFeature;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

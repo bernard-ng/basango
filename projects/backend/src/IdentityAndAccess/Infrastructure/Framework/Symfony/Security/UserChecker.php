@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security;
+namespace Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security;
 
-use App\IdentityAndAccess\Domain\Exception\AccountIsLocked;
-use App\IdentityAndAccess\Domain\Exception\AccountNotConfirmed;
+use Basango\IdentityAndAccess\Domain\Exception\AccountIsLocked;
+use Basango\IdentityAndAccess\Domain\Exception\AccountNotConfirmed;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 

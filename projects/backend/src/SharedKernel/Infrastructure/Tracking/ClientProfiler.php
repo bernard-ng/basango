@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Tracking;
+namespace Basango\SharedKernel\Infrastructure\Tracking;
 
-use App\SharedKernel\Domain\Assert;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
-use App\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
-use App\SharedKernel\Domain\Tracking\ClientProfiler as ClientProfilerInterface;
+use Basango\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\ClientProfile;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\Device;
+use Basango\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation;
+use Basango\SharedKernel\Domain\Tracking\ClientProfiler as ClientProfilerInterface;
 use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
 use DeviceDetector\Parser\Client\Browser;

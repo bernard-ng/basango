@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Application\Mailing;
+namespace Basango\SharedKernel\Application\Mailing;
 
 /**
  * Interface Mailer.

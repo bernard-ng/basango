@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\Entity;
+namespace Basango\IdentityAndAccess\Domain\Model\Entity;
 
-use App\IdentityAndAccess\Domain\Model\Identity\LoginAttemptId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\LoginAttemptId;
 
 /**
  * Class LoginAttempt.

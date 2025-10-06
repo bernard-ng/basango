@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import asdict, is_dataclass
 from typing import Optional, Any, Dict, List, Sequence
 
+from basango.domain.article import Article
 from bs4 import BeautifulSoup
 
 from basango.core.config import CrawlerConfig, ClientConfig
@@ -46,7 +47,7 @@ class BaseCrawler(ABC):
         response = self.client.get(url).text
         return BeautifulSoup(response, "html.parser")
 
-    def record_article(
+    def save_article(
         self,
         *,
         title: str,
@@ -55,7 +56,7 @@ class BaseCrawler(ABC):
         categories: List[str],
         timestamp: int,
         metadata: Any = None,
-    ) -> None:
+    ) -> Article:
         if metadata is None:
             metadata_value = None
         elif is_dataclass(metadata) and not isinstance(metadata, type):
@@ -72,11 +73,16 @@ class BaseCrawler(ABC):
             "timestamp": timestamp,
             "metadata": metadata_value,
         }
+
         self._persist(article)
-        logging.info(f"> {title} [saved]")
+        logging.info(f"> {article['title']} [saved]")
+
+        return Article(**article)
 
     @abstractmethod
-    def fetch_one(self, html: str, date_range: Optional[DateRange] = None) -> None:
+    def fetch_one(
+        self, html: str, date_range: Optional[DateRange] = None
+    ) -> Article | None:
         pass
 
     @abstractmethod

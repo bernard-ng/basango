@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\EventListener;
+namespace Basango\IdentityAndAccess\Application\EventListener;
 
-use App\IdentityAndAccess\Application\Mailing\AccountLockedEmail;
-use App\IdentityAndAccess\Domain\Event\AccountLocked;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Mailing\Mailer;
-use App\SharedKernel\Domain\EventListener\EventListener;
+use Basango\IdentityAndAccess\Application\Mailing\AccountLockedEmail;
+use Basango\IdentityAndAccess\Domain\Event\AccountLocked;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Mailing\Mailer;
+use Basango\SharedKernel\Domain\EventListener\EventListener;
 
 /**
  * Class AccountLockedListener.

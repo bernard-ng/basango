@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security;
+namespace Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security;
 
-use App\IdentityAndAccess\Domain\Model\Entity\User;
-use App\IdentityAndAccess\Domain\Service\PasswordHasher;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Service\PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**

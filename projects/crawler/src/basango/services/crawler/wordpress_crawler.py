@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional, override, cast, Final, Any, Sequence
 
+from basango.domain.article import Article
 from bs4 import BeautifulSoup
 
 from basango.core.config import WordPressSourceConfig, CrawlerConfig, ClientConfig
@@ -83,28 +84,27 @@ class WordpressCrawler(BaseCrawler):
         self.completed(self.config.notify)
 
     @override
-    def fetch_one(self, html: Any, date_range: Optional[DateRange] = None) -> None:
+    def fetch_one(self, html: Any, date_range: Optional[DateRange] = None) -> Article:
         try:
             data = json.loads(html) if isinstance(html, str) else html
         except json.JSONDecodeError as exc:
             logging.error("Failed to decode WordPress payload: %s", exc)
-            return
+            raise exc
 
         if not isinstance(data, dict):
             logging.error("Skipping unexpected WordPress payload: %s", type(data))
-            return
+            raise ValueError("Unexpected WordPress payload type")
 
         link = data.get("link")
         if not link:
             logging.error("Skipping WordPress article without link")
-            return
+            raise ValueError("WordPress article without link")
 
-        title = BeautifulSoup(
-            data.get("title", {}).get("rendered", ""), "html.parser"
-        ).get_text(" ", strip=True)
-        body = BeautifulSoup(
-            data.get("content", {}).get("rendered", ""), "html.parser"
-        ).get_text(" ", strip=True)
+        title_html = data.get("title", {}).get("rendered", "")
+        body_html = data.get("content", {}).get("rendered", "")
+
+        title = BeautifulSoup(title_html, "html.parser").get_text(" ", strip=True)
+        body = BeautifulSoup(body_html, "html.parser").get_text(" ", strip=True)
         timestamp = self._compute_timestamp(data.get("date"))
 
         categories_value = self._map_categories(data.get("categories", []))
@@ -115,7 +115,7 @@ class WordpressCrawler(BaseCrawler):
 
         metadata = self.open_graph.consume_url(link)
 
-        self.record_article(
+        return self.save_article(
             title=title or data.get("slug", "Untitled"),
             link=link,
             body=body,

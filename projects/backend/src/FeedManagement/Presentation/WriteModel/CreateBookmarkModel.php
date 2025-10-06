@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Presentation\WriteModel;
+namespace Basango\FeedManagement\Presentation\WriteModel;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

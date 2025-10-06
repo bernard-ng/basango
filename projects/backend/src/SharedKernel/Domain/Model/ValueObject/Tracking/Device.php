@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Model\ValueObject\Tracking;
+namespace Basango\SharedKernel\Domain\Model\ValueObject\Tracking;
 
 /**
  * Class Device.

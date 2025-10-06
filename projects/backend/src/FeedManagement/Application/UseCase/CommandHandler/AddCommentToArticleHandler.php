@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\CommandHandler;
+namespace Basango\FeedManagement\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Domain\Model\Repository\ArticleRepository;
-use App\FeedManagement\Application\UseCase\Command\AddCommentToArticle;
-use App\FeedManagement\Domain\Model\Entity\Comment;
-use App\FeedManagement\Domain\Model\Repository\CommentRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\Aggregator\Domain\Model\Repository\ArticleRepository;
+use Basango\FeedManagement\Application\UseCase\Command\AddCommentToArticle;
+use Basango\FeedManagement\Domain\Model\Entity\Comment;
+use Basango\FeedManagement\Domain\Model\Repository\CommentRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class AddCommentToArticleHandler.

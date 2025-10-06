@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Framework\Symfony\Logging;
+namespace Basango\SharedKernel\Infrastructure\Framework\Symfony\Logging;
 
 use Monolog\LogRecord;
 

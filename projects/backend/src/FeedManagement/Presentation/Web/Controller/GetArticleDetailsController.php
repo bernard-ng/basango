@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Presentation\Web\Controller;
+namespace Basango\FeedManagement\Presentation\Web\Controller;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\FeedManagement\Application\UseCase\Query\GetArticleDetails;
-use App\SharedKernel\Presentation\Web\Controller\AbstractController;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\FeedManagement\Application\UseCase\Query\GetArticleDetails;
+use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;

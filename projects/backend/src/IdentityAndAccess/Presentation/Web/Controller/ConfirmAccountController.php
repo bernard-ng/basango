@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Presentation\Web\Controller;
+namespace Basango\IdentityAndAccess\Presentation\Web\Controller;
 
-use App\IdentityAndAccess\Application\UseCase\Command\ConfirmAccount;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
-use App\SharedKernel\Presentation\Web\Controller\AbstractController;
+use Basango\IdentityAndAccess\Application\UseCase\Command\ConfirmAccount;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
+use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;

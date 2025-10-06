@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Presentation\Web\EventListener;
+namespace Basango\SharedKernel\Presentation\Web\EventListener;
 
-use App\Aggregator\Domain\Exception\ArticleNotFound;
-use App\Aggregator\Domain\Exception\SourceNotFound;
-use App\FeedManagement\Domain\Exception\BookmarkedArticleNotFound;
-use App\FeedManagement\Domain\Exception\BookmarkNotFound;
-use App\FeedManagement\Domain\Exception\CommentNotFound;
-use App\FeedManagement\Domain\Exception\FollowedSourceNotFound;
-use App\IdentityAndAccess\Domain\Exception\PermissionNotGranted;
-use App\IdentityAndAccess\Domain\Exception\UserNotFound;
-use App\SharedKernel\Domain\Exception\InvalidArgument;
-use App\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\Aggregator\Domain\Exception\ArticleNotFound;
+use Basango\Aggregator\Domain\Exception\DuplicatedArticle;
+use Basango\Aggregator\Domain\Exception\SourceNotFound;
+use Basango\FeedManagement\Domain\Exception\BookmarkedArticleNotFound;
+use Basango\FeedManagement\Domain\Exception\BookmarkNotFound;
+use Basango\FeedManagement\Domain\Exception\CommentNotFound;
+use Basango\FeedManagement\Domain\Exception\FollowedSourceNotFound;
+use Basango\IdentityAndAccess\Domain\Exception\PermissionNotGranted;
+use Basango\IdentityAndAccess\Domain\Exception\UserNotFound;
+use Basango\SharedKernel\Domain\Exception\InvalidArgument;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,6 +46,10 @@ final readonly class UserFacingErrorListener
 
     private const array FORBIDDEN_EXCEPTIONS = [
         PermissionNotGranted::class,
+    ];
+
+    private const array CONFLICT_EXCEPTIONS = [
+        DuplicatedArticle::class,
     ];
 
     public function __construct(
@@ -80,6 +85,7 @@ final readonly class UserFacingErrorListener
             in_array($exception::class, self::NOT_FOUND_EXCEPTIONS) => Response::HTTP_NOT_FOUND,
             in_array($exception::class, self::BAD_REQUEST_EXCEPTIONS) => Response::HTTP_BAD_REQUEST,
             in_array($exception::class, self::FORBIDDEN_EXCEPTIONS) => Response::HTTP_FORBIDDEN,
+            in_array($exception::class, self::CONFLICT_EXCEPTIONS) => Response::HTTP_CONFLICT,
             default => Response::HTTP_UNPROCESSABLE_ENTITY
         };
     }

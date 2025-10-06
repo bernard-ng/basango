@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Application\Mailing;
+namespace Basango\SharedKernel\Application\Mailing;
 
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Interface EmailDefinition.

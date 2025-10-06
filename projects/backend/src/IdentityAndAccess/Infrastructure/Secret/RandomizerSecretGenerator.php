@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Secret;
+namespace Basango\IdentityAndAccess\Infrastructure\Secret;
 
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedCode;
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
-use App\IdentityAndAccess\Domain\Service\SecretGenerator;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedCode;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
+use Basango\IdentityAndAccess\Domain\Service\SecretGenerator;
 use Random\Randomizer;
 
 /**

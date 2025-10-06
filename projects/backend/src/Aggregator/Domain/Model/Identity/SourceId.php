@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\Identity;
+namespace Basango\Aggregator\Domain\Model\Identity;
 
 use Symfony\Component\Uid\UuidV7;
 

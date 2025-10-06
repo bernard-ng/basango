@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Service\Scoring;
+namespace Basango\Aggregator\Domain\Service\Scoring;
 
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
 
 /**
  * Interface SentimentAnalyser.

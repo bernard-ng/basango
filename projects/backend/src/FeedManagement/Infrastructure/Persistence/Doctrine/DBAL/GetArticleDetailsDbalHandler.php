@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\Aggregator\Domain\Exception\ArticleNotFound;
-use App\FeedManagement\Application\ReadModel\ArticleDetails;
-use App\FeedManagement\Application\UseCase\Query\GetArticleDetails;
-use App\FeedManagement\Application\UseCase\QueryHandler\GetArticleDetailsHandler;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\ArticleQuery;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\BookmarkQuery;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\Aggregator\Domain\Exception\ArticleNotFound;
+use Basango\FeedManagement\Application\ReadModel\ArticleDetails;
+use Basango\FeedManagement\Application\UseCase\Query\GetArticleDetails;
+use Basango\FeedManagement\Application\UseCase\QueryHandler\GetArticleDetailsHandler;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\ArticleQuery;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\BookmarkQuery;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 
 /**
  * Class UserReference.

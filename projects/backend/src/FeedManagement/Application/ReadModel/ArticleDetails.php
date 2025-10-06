@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\Aggregator\Domain\Model\ValueObject\Crawling\OpenGraph;
-use App\Aggregator\Domain\Model\ValueObject\Link;
-use App\Aggregator\Domain\Model\ValueObject\ReadingTime;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Bias;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Reliability;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Transparency;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\Aggregator\Domain\Model\ValueObject\Link;
+use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
+use Basango\Aggregator\Domain\Model\ValueObject\ReadingTime;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Bias;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Reliability;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Transparency;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 
 /**
  * Class ArticleDetails.

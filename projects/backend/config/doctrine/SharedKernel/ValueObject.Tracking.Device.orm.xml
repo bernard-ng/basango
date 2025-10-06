@@ -4,7 +4,7 @@
                   xsi:schemaLocation="https://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <embeddable name="App\SharedKernel\Domain\Model\ValueObject\Tracking\Device">
+    <embeddable name="Basango\SharedKernel\Domain\Model\ValueObject\Tracking\Device">
         <field name="operatingSystem" type="string" nullable="true" />
         <field name="client" type="string" nullable="true" />
         <field name="device" type="string" nullable="true" />

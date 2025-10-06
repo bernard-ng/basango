@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\Command;
+namespace Basango\IdentityAndAccess\Application\UseCase\Command;
 
-use App\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
+use Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret\GeneratedToken;
 
 /**
  * Class UnlockAccount.

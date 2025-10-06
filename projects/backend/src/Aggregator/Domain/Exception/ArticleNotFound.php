@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Exception;
+namespace Basango\Aggregator\Domain\Exception;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
 
 /**
  * Class ArticleNotFound.

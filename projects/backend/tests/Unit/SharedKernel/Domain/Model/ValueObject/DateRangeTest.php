@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\SharedKernel\Domain\Model\ValueObject;
 
-use App\SharedKernel\Domain\Exception\InvalidArgument;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\SharedKernel\Domain\Exception\InvalidArgument;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 use PHPUnit\Framework\TestCase;
 
 /**

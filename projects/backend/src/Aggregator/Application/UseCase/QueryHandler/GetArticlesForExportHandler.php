@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\QueryHandler;
+namespace Basango\Aggregator\Application\UseCase\QueryHandler;
 
-use App\Aggregator\Application\ReadModel\ArticleForExport;
-use App\Aggregator\Application\UseCase\Query\GetArticlesForExport;
-use App\SharedKernel\Application\Messaging\QueryHandler;
+use Basango\Aggregator\Application\ReadModel\ArticleForExport;
+use Basango\Aggregator\Application\UseCase\Query\GetArticlesForExport;
+use Basango\SharedKernel\Application\Messaging\QueryHandler;
 
 /**
  * Class GetArticlesForExportHandler.

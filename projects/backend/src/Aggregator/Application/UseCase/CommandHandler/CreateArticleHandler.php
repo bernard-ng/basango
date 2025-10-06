@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\CommandHandler;
+namespace Basango\Aggregator\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Application\UseCase\Command\CreateArticle;
-use App\Aggregator\Domain\Exception\DuplicatedArticle;
-use App\Aggregator\Domain\Model\Entity\Article;
-use App\Aggregator\Domain\Model\Repository\ArticleRepository;
-use App\Aggregator\Domain\Model\Repository\SourceRepository;
-use App\Aggregator\Domain\Service\HashCalculator;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\Aggregator\Application\UseCase\Command\CreateArticle;
+use Basango\Aggregator\Domain\Exception\DuplicatedArticle;
+use Basango\Aggregator\Domain\Model\Entity\Article;
+use Basango\Aggregator\Domain\Model\Repository\ArticleRepository;
+use Basango\Aggregator\Domain\Model\Repository\SourceRepository;
+use Basango\Aggregator\Domain\Service\HashCalculator;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class CreateArticlesHandler.

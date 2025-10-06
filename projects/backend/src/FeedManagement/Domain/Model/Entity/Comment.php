@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Model\Entity;
+namespace Basango\FeedManagement\Domain\Model\Entity;
 
-use App\Aggregator\Domain\Model\Entity\Article;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
-use App\FeedManagement\Domain\Model\Identity\CommentId;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\Aggregator\Domain\Model\Entity\Article;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
+use Basango\FeedManagement\Domain\Model\Identity\CommentId;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
 
 /**
  * Class Comment.

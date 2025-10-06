@@ -9,7 +9,7 @@ twig:
         decimal_point: ','
         thousands_separator: '.'
     globals:
-        'application': '@App\SharedKernel\Domain\Application'
+        'application': '@Basango\SharedKernel\Domain\Application'
 
 when@test:
     twig:

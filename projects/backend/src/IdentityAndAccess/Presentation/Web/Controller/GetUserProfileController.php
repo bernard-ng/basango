@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Presentation\Web\Controller;
+namespace Basango\IdentityAndAccess\Presentation\Web\Controller;
 
-use App\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
-use App\SharedKernel\Presentation\Web\Controller\AbstractController;
+use Basango\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
+use Basango\SharedKernel\Presentation\Web\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 

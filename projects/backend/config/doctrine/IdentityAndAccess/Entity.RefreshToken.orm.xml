@@ -4,7 +4,7 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity
-            name="App\IdentityAndAccess\Domain\Model\Entity\RefreshToken"
+            name="Basango\IdentityAndAccess\Domain\Model\Entity\RefreshToken"
             repository-class="Gesdinet\JWTRefreshTokenBundle\Entity\RefreshTokenRepository"
             table="refresh_tokens"
     >

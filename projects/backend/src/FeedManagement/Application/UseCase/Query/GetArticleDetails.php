@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\Query;
+namespace Basango\FeedManagement\Application\UseCase\Query;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 
 /**
  * Class GetArticleDetails.

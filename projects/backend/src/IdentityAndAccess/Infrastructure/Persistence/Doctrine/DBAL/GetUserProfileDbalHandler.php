@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\IdentityAndAccess\Application\ReadModel\UserProfile;
-use App\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
-use App\IdentityAndAccess\Application\UseCase\QueryHandler\GetUserProfileHandler;
-use App\IdentityAndAccess\Domain\Exception\UserNotFound;
+use Basango\IdentityAndAccess\Application\ReadModel\UserProfile;
+use Basango\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
+use Basango\IdentityAndAccess\Application\UseCase\QueryHandler\GetUserProfileHandler;
+use Basango\IdentityAndAccess\Domain\Exception\UserNotFound;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 

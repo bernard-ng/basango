@@ -55,7 +55,7 @@ when@prod:
                 disable_webpage_preview: true
                 disable_notification: false
                 split_long_messages: false
-                formatter: App\SharedKernel\Infrastructure\Framework\Symfony\Logging\TelegramFormatter
+                formatter: Basango\SharedKernel\Infrastructure\Framework\Symfony\Logging\TelegramFormatter
             nested:
                 type: rotating_file
                 path: "%kernel.logs_dir%/%kernel.environment%.log"

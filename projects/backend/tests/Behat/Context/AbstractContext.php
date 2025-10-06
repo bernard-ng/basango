@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Behat\Context;
 
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Application\Messaging\QueryBus;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Application\Messaging\QueryBus;
 use Behat\Behat\Context\Context;
 use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;

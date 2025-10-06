@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\ValueObject\Secret;
+namespace Basango\IdentityAndAccess\Domain\Model\ValueObject\Secret;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 
 /**
  * Class GeneratedToken.

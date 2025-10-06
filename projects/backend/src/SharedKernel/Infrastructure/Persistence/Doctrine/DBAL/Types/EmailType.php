@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Types;
+namespace Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Types;
 
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;

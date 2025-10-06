@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Persistence\Filesystem\Asset;
+namespace Basango\SharedKernel\Infrastructure\Persistence\Filesystem\Asset;
 
-use App\SharedKernel\Application\Asset\AssetType;
-use App\SharedKernel\Application\Asset\AssetUrlProvider as AssetUrlProviderInterface;
+use Basango\SharedKernel\Application\Asset\AssetType;
+use Basango\SharedKernel\Application\Asset\AssetUrlProvider as AssetUrlProviderInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**

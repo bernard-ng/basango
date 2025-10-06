@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Exception;
+namespace Basango\IdentityAndAccess\Domain\Exception;
 
-use App\SharedKernel\Domain\Exception\UserFacingError;
+use Basango\SharedKernel\Domain\Exception\UserFacingError;
 
 /**
  * Class InvalidCurrentPassword.

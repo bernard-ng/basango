@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Presentation\Console;
+namespace Basango\Aggregator\Presentation\Console;
 
-use App\Aggregator\Application\UseCase\Command\CreateSource;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Bias;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Reliability;
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Transparency;
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Presentation\Console\AskArgumentFeature;
+use Basango\Aggregator\Application\UseCase\Command\CreateSource;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Bias;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Reliability;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Transparency;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Presentation\Console\AskArgumentFeature;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

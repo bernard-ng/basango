@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\Command;
+namespace Basango\FeedManagement\Application\UseCase\Command;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 
 /**
  * Class FollowSource.

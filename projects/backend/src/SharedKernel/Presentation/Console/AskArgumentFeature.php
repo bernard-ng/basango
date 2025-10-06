@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Presentation\Console;
+namespace Basango\SharedKernel\Presentation\Console;
 
 use Symfony\Component\Console\Input\InputInterface;
 

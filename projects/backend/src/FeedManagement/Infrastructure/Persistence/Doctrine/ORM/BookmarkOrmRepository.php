@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\ORM;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\ORM;
 
-use App\FeedManagement\Domain\Exception\BookmarkNotFound;
-use App\FeedManagement\Domain\Model\Entity\Bookmark;
-use App\FeedManagement\Domain\Model\Identity\BookmarkId;
-use App\FeedManagement\Domain\Model\Repository\BookmarkRepository;
+use Basango\FeedManagement\Domain\Exception\BookmarkNotFound;
+use Basango\FeedManagement\Domain\Model\Entity\Bookmark;
+use Basango\FeedManagement\Domain\Model\Identity\BookmarkId;
+use Basango\FeedManagement\Domain\Model\Repository\BookmarkRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

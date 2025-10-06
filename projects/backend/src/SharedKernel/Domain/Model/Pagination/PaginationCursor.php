@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Model\Pagination;
+namespace Basango\SharedKernel\Domain\Model\Pagination;
 
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 use Symfony\Component\Uid\UuidV7;
 
 /**

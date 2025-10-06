@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain;
+namespace Basango\SharedKernel\Domain;
 
 /**
  * Class Application.

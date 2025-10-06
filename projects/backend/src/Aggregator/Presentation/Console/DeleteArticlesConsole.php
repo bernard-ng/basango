@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Presentation\Console;
+namespace Basango\Aggregator\Presentation\Console;
 
-use App\Aggregator\Application\UseCase\Command\DeleteArticles;
-use App\SharedKernel\Application\Messaging\CommandBus;
+use Basango\Aggregator\Application\UseCase\Command\DeleteArticles;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

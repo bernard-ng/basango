@@ -1,6 +1,6 @@
 <?php
 
-use App\SharedKernel\Infrastructure\Framework\Symfony\Kernel;
+use Basango\SharedKernel\Infrastructure\Framework\Symfony\Kernel;
 
 require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
 

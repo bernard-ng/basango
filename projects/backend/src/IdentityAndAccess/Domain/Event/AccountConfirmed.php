@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Event;
+namespace Basango\IdentityAndAccess\Domain\Event;
 
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 
 /**
  * Class UserConfirmed.

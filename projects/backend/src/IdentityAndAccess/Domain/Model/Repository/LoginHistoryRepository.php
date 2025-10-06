@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\Repository;
+namespace Basango\IdentityAndAccess\Domain\Model\Repository;
 
-use App\IdentityAndAccess\Domain\Model\Entity\LoginHistory;
-use App\IdentityAndAccess\Domain\Model\Entity\User;
+use Basango\IdentityAndAccess\Domain\Model\Entity\LoginHistory;
+use Basango\IdentityAndAccess\Domain\Model\Entity\User;
 
 /**
  * Interface LoginHistoryRepository.

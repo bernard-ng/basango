@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Infrastructure\Framework\Symfony\Messaging;
+namespace Basango\SharedKernel\Infrastructure\Framework\Symfony\Messaging;
 
-use App\SharedKernel\Application\Messaging\QueryBus;
+use Basango\SharedKernel\Application\Messaging\QueryBus;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;

@@ -13,13 +13,16 @@ Rationale
 - Persist locally (CSV/JSON) before forwarding to decouple pipelines.
 """
 
+import os
 import logging
 from typing import Any
 
+from basango.domain.article import Article
+from basango.services import SyncHttpClient
 from basango.core.config import CrawlerConfig
 from basango.core.config_manager import ConfigManager
 from basango.domain import DateRange, PageRange, SourceKind, UpdateDirection
-from basango.services import CsvPersistor, JsonPersistor, ApiPersistor
+from basango.services import JsonPersistor
 from basango.services.crawler.html_crawler import HtmlCrawler
 from basango.services.crawler.wordpress_crawler import WordpressCrawler
 
@@ -95,7 +98,7 @@ def collect_listing(payload: dict[str, Any]) -> int:
     return queued
 
 
-def collect_article(payload: dict[str, Any]) -> dict[str, Any] | None:
+def collect_article(payload: dict[str, Any]) -> Article | None:
     data = ArticleTaskPayload.from_dict(payload)
     manager = ConfigManager()
     pipeline = manager.get(data.env)
@@ -112,82 +115,85 @@ def collect_article(payload: dict[str, Any]) -> dict[str, Any] | None:
         direction=UpdateDirection.FORWARD,
     )
 
-    source_identifier = getattr(source, "source_id", data.source_id) or data.source_id
     # Persist locally first to keep an auditable trail and enable
     # replay/recovery independent of downstream availability.
     persistors = [
-        CsvPersistor(
-            data_dir=pipeline.paths.data,
-            source_id=str(source_identifier),
-        ),
         JsonPersistor(
             data_dir=pipeline.paths.data,
-            source_id=str(source_identifier),
+            source_id=str(source.source_id),
         ),
     ]
 
-    queue_manager = QueueManager()
+    try:
+        if source.source_kind == SourceKind.HTML:
+            article = _collect_html_article(
+                HtmlCrawler(
+                    crawler_config, pipeline.fetch.client, persistors=persistors
+                ),
+                data,
+            )
+        else:
+            article = _collect_wordpress_article(
+                WordpressCrawler(
+                    crawler_config, pipeline.fetch.client, persistors=persistors
+                ),
+                data,
+            )
 
-    if source.source_kind == SourceKind.HTML:
-        article = _collect_html_article(
-            HtmlCrawler(crawler_config, pipeline.fetch.client, persistors=persistors),
-            data,
+        queue_manager = QueueManager()
+        queue_manager.enqueue_processed(
+            ProcessedTaskPayload(
+                source_id=data.source_id,
+                env=data.env,
+                article=article,
+            )
         )
-    elif source.source_kind == SourceKind.WORDPRESS:
-        article = _collect_wordpress_article(
-            WordpressCrawler(
-                crawler_config, pipeline.fetch.client, persistors=persistors
-            ),
-            data,
-        )
-    else:
-        logger.warning(
-            "Async crawling not supported for source kind %s", source.source_kind
-        )
-        article = None
 
-    queue_manager.enqueue_processed(
-        ProcessedTaskPayload(
-            source_id=data.source_id,
-            env=data.env,
-            article=article,
-        )
-    )
-    if article:
         logger.info(
-            "Persisted article %s and forwarded to processed queue",
-            article.get("link"),
+            "Persisted article %s and forwarded to processed queue", article.link
         )
-    else:
-        logger.info("Persisted article and forwarded to processed queue")
+        return article
+    except Exception as exc:  # noqa: BLE001
+        logger.error(
+            "Failed to collect article for source %s url %s: %s",
+            data.source_id,
+            data.url,
+            exc,
+        )
+        return None
 
-    return article
 
-
-def forward_for_processing(payload: dict[str, Any]) -> dict[str, Any] | None:
+def forward_for_processing(payload: dict[str, Any]) -> Article | None:
     data = ProcessedTaskPayload.from_dict(payload)
     manager = ConfigManager()
     pipeline = manager.get(data.env)
 
-    article = dict(data.article) if data.article is not None else None
-    if article is None:
-        logger.info(
-            "Ready for downstream processing: source=%s (no article)", data.source_id
-        )
-        return None
+    article = data.article
     logger.info(
         "Ready for downstream processing: source=%s link=%s",
         data.source_id,
-        article.get("link"),
+        article.link,
     )
 
-    # TODO: externalise endpoint into config; hardcoded for now during bring-up.
-    persistor = ApiPersistor(
-        endpoint="http://localhost:8000/api/articles",
-        client_config=pipeline.fetch.client,
-    )
-    persistor.persist(article)
-    logger.info("Forwarded article %s to API", article.get("link"))
+    try:
+        client = SyncHttpClient(client_config=pipeline.fetch.client)
+        client.post(
+            os.getenv(
+                "BASANGO_API_ENDPOINT",
+                "http://localhost:8000/api/aggregator/articles?token=dev",
+            ),
+            json=article.to_dict(),
+        )
+
+        logger.info("Forwarded article %s to API", article.link)
+        return article
+    except Exception as exc:  # noqa: BLE001
+        logger.error(
+            "Failed to forward article %s to API: %s",
+            article.link,
+            exc,
+        )
+        return None
 
 
 def _collect_html_listing(
@@ -273,31 +279,27 @@ def _collect_wordpress_listing(
 def _collect_html_article(
     crawler: HtmlCrawler,
     payload: ArticleTaskPayload,
-) -> dict[str, Any] | None:
+) -> Article:
     if not payload.url:
         logger.warning("Missing article url for HTML source %s", payload.source_id)
-        return None
+        raise ValueError("Missing article url")
 
     crawler._current_article_url = payload.url  # type: ignore[attr-defined]
     try:
         soup = crawler.crawl(payload.url)
     except Exception as exc:  # noqa: BLE001
         logger.exception("Failed to crawl article %s: %s", payload.url, exc)
-        return None
+        raise exc
 
-    crawler.fetch_one(str(soup), crawler.config.date_range)
-    crawler.completed(False)
-    return None
+    return crawler.fetch_one(str(soup), crawler.config.date_range)
 
 
 def _collect_wordpress_article(
     crawler: WordpressCrawler,
     payload: ArticleTaskPayload,
-) -> dict[str, Any] | None:
+) -> Article:
     if payload.data is None:
         logger.warning("Missing WordPress payload for source %s", payload.source_id)
-        return None
+        raise ValueError("Missing WordPress payload")
 
-    crawler.fetch_one(payload.data, crawler.config.date_range)
-    crawler.completed(False)
-    return None
+    return crawler.fetch_one(payload.data, crawler.config.date_range)

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Domain\Model\ValueObject\Crawling;
+namespace Basango\Aggregator\Domain\Model\ValueObject;
 
 /**
  * Class OpenGraphMeta.

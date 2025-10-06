@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\UseCase\QueryHandler;
+namespace Basango\IdentityAndAccess\Application\UseCase\QueryHandler;
 
-use App\IdentityAndAccess\Application\ReadModel\UserProfile;
-use App\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
-use App\SharedKernel\Application\Messaging\QueryHandler;
+use Basango\IdentityAndAccess\Application\ReadModel\UserProfile;
+use Basango\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
+use Basango\SharedKernel\Application\Messaging\QueryHandler;
 
 /**
  * Interface GetUserProfileHandler.

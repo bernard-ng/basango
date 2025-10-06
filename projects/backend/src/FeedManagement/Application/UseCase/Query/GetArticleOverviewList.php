@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\Query;
+namespace Basango\FeedManagement\Application\UseCase\Query;
 
-use App\FeedManagement\Domain\Model\Filters\ArticleFilters;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\Model\Pagination\Page;
+use Basango\FeedManagement\Domain\Model\Filters\ArticleFilters;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\Model\Pagination\Page;
 
 /**
  * Class GetArticleOverviewList.

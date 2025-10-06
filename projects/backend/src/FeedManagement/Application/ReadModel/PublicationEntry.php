@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
 /**
  * Class DallyEntry.

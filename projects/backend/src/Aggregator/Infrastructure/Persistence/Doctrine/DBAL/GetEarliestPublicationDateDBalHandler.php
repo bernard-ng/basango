@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\Aggregator\Application\UseCase\Query\GetEarliestPublicationDate;
-use App\Aggregator\Application\UseCase\QueryHandler\GetEarliestPublicationDateHandler;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\Aggregator\Application\UseCase\Query\GetEarliestPublicationDate;
+use Basango\Aggregator\Application\UseCase\QueryHandler\GetEarliestPublicationDateHandler;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 

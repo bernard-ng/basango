@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 

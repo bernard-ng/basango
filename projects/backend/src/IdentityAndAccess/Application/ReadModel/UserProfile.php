@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Application\ReadModel;
+namespace Basango\IdentityAndAccess\Application\ReadModel;
 
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
-use App\SharedKernel\Domain\Model\ValueObject\EmailAddress;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\SharedKernel\Domain\Model\ValueObject\EmailAddress;
 
 /**
  * Class UserProfile.

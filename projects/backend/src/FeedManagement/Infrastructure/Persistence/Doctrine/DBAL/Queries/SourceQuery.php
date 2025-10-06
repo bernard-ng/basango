@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 

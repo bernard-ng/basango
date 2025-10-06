@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\DataTransfert;
+namespace Basango\SharedKernel\Domain\DataTransfert;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 use BackedEnum as T;
 use Symfony\Component\Uid\UuidV7;
 

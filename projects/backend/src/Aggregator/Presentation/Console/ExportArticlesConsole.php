@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Presentation\Console;
+namespace Basango\Aggregator\Presentation\Console;
 
-use App\Aggregator\Application\UseCase\Command\ExportArticles;
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Domain\Model\ValueObject\DateRange;
+use Basango\Aggregator\Application\UseCase\Command\ExportArticles;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

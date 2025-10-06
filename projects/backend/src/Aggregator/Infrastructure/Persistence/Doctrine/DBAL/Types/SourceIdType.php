@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types;
+namespace Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
 use Symfony\Bridge\Doctrine\Types\AbstractUidType;
 
 /**

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\ValueObject;
+namespace Basango\IdentityAndAccess\Domain\Model\ValueObject;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 
 /**
  * @author bernard-ng <bernard@devscast.tech>

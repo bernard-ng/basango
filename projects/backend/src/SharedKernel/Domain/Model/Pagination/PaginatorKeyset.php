@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Model\Pagination;
+namespace Basango\SharedKernel\Domain\Model\Pagination;
 
 /**
  * Class PaginatorKeyset.

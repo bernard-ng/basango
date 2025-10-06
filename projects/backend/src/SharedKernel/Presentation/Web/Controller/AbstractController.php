@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Presentation\Web\Controller;
+namespace Basango\SharedKernel\Presentation\Web\Controller;
 
-use App\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\SecurityUser;
-use App\SharedKernel\Application\Messaging\CommandBus;
-use App\SharedKernel\Application\Messaging\QueryBus;
+use Basango\IdentityAndAccess\Infrastructure\Framework\Symfony\Security\SecurityUser;
+use Basango\SharedKernel\Application\Messaging\CommandBus;
+use Basango\SharedKernel\Application\Messaging\QueryBus;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
 use Symfony\Component\HttpFoundation\Response;

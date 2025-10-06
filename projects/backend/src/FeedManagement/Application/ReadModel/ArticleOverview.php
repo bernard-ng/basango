@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\ReadModel;
+namespace Basango\FeedManagement\Application\ReadModel;
 
-use App\Aggregator\Domain\Model\Identity\ArticleId;
-use App\Aggregator\Domain\Model\ValueObject\Link;
-use App\Aggregator\Domain\Model\ValueObject\ReadingTime;
-use App\SharedKernel\Domain\DataTransfert\DataMapping;
+use Basango\Aggregator\Domain\Model\Identity\ArticleId;
+use Basango\Aggregator\Domain\Model\ValueObject\Link;
+use Basango\Aggregator\Domain\Model\ValueObject\ReadingTime;
+use Basango\SharedKernel\Domain\DataTransfert\DataMapping;
 
 /**
  * Class ArticleOverview.

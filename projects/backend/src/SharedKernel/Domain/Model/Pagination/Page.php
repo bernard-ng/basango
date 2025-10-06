@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Domain\Model\Pagination;
+namespace Basango\SharedKernel\Domain\Model\Pagination;
 
-use App\SharedKernel\Domain\Assert;
+use Basango\SharedKernel\Domain\Assert;
 
 /**
  * Class Page.

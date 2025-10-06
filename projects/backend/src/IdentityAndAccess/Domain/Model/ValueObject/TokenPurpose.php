@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\IdentityAndAccess\Domain\Model\ValueObject;
+namespace Basango\IdentityAndAccess\Domain\Model\ValueObject;
 
 /**
  * Enum TokenPurpose.

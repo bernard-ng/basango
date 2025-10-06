@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
+namespace Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL;
 
-use App\FeedManagement\Application\ReadModel\ArticleOverviewList;
-use App\FeedManagement\Application\UseCase\Query\GetSourceArticleOverviewList;
-use App\FeedManagement\Application\UseCase\QueryHandler\GetSourceArticleOverviewListHandler;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\ArticleQuery;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\BookmarkQuery;
-use App\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
-use App\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
-use App\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
+use Basango\FeedManagement\Application\ReadModel\ArticleOverviewList;
+use Basango\FeedManagement\Application\UseCase\Query\GetSourceArticleOverviewList;
+use Basango\FeedManagement\Application\UseCase\QueryHandler\GetSourceArticleOverviewListHandler;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\ArticleQuery;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\BookmarkQuery;
+use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
+use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
+use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 

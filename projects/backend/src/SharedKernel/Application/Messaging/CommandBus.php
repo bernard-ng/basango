@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SharedKernel\Application\Messaging;
+namespace Basango\SharedKernel\Application\Messaging;
 
 /**
  * Interface CommandBus.

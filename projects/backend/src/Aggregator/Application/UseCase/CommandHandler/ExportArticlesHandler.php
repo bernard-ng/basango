@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\CommandHandler;
+namespace Basango\Aggregator\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Application\ReadModel\ArticleForExport;
-use App\Aggregator\Application\UseCase\Command\ExportArticles;
-use App\Aggregator\Application\UseCase\Query\GetArticlesForExport;
-use App\SharedKernel\Application\Messaging\CommandHandler;
-use App\SharedKernel\Application\Messaging\QueryBus;
-use App\SharedKernel\Domain\DataTransfert\DataExporter;
-use App\SharedKernel\Domain\DataTransfert\TransfertSetting;
+use Basango\Aggregator\Application\ReadModel\ArticleForExport;
+use Basango\Aggregator\Application\UseCase\Command\ExportArticles;
+use Basango\Aggregator\Application\UseCase\Query\GetArticlesForExport;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\SharedKernel\Application\Messaging\QueryBus;
+use Basango\SharedKernel\Domain\DataTransfert\DataExporter;
+use Basango\SharedKernel\Domain\DataTransfert\TransfertSetting;
 
 /**
  * Class GetArticlesForExportHandler.

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Optional, cast, override, Sequence
 from urllib.parse import parse_qs, urljoin, urlparse
 
+from basango.domain.article import Article
 from bs4 import BeautifulSoup, Tag
 
 from basango.core.config import CrawlerConfig, ClientConfig
@@ -116,7 +117,7 @@ class HtmlCrawler(BaseCrawler):
         self.completed(self.config.notify)
 
     @override
-    def fetch_one(self, html: str, date_range: Optional[DateRange] = None) -> None:
+    def fetch_one(self, html: str, date_range: Optional[DateRange] = None) -> Article:
         soup = BeautifulSoup(html, "html.parser")
         selectors = self.source.source_selectors
 
@@ -124,7 +125,7 @@ class HtmlCrawler(BaseCrawler):
         link = self._current_article_url or self._extract_link(soup)
         if not link:
             logging.warning("Skipping article '%s' without link", title)
-            return
+            raise ValueError("Missing article link")
 
         body = self._extract_body(soup, selectors.article_body)
         categories = self._extract_categories(soup, selectors.article_categories)
@@ -139,7 +140,7 @@ class HtmlCrawler(BaseCrawler):
 
         metadata = self.open_graph.consume_html(html)
 
-        self.record_article(
+        return self.save_article(
             title=title,
             link=link,
             body=body,

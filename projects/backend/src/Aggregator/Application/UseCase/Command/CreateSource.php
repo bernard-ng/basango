@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Aggregator\Application\UseCase\Command;
+namespace Basango\Aggregator\Application\UseCase\Command;
 
-use App\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
+use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
 
 /**
  * Class CreateSource.

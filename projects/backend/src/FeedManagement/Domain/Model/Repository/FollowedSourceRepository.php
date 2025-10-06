@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Domain\Model\Repository;
+namespace Basango\FeedManagement\Domain\Model\Repository;
 
-use App\Aggregator\Domain\Model\Identity\SourceId;
-use App\FeedManagement\Domain\Model\Entity\FollowedSource;
-use App\IdentityAndAccess\Domain\Model\Identity\UserId;
+use Basango\Aggregator\Domain\Model\Identity\SourceId;
+use Basango\FeedManagement\Domain\Model\Entity\FollowedSource;
+use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 
 /**
  * Interface FollowedSourceRepository.

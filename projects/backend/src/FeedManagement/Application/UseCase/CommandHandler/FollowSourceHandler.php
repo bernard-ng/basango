@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\FeedManagement\Application\UseCase\CommandHandler;
+namespace Basango\FeedManagement\Application\UseCase\CommandHandler;
 
-use App\Aggregator\Domain\Model\Repository\SourceRepository;
-use App\FeedManagement\Application\UseCase\Command\FollowSource;
-use App\FeedManagement\Domain\Exception\SourceAlreadyFollowed;
-use App\FeedManagement\Domain\Model\Entity\FollowedSource;
-use App\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
-use App\IdentityAndAccess\Domain\Model\Repository\UserRepository;
-use App\SharedKernel\Application\Messaging\CommandHandler;
+use Basango\Aggregator\Domain\Model\Repository\SourceRepository;
+use Basango\FeedManagement\Application\UseCase\Command\FollowSource;
+use Basango\FeedManagement\Domain\Exception\SourceAlreadyFollowed;
+use Basango\FeedManagement\Domain\Model\Entity\FollowedSource;
+use Basango\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
+use Basango\IdentityAndAccess\Domain\Model\Repository\UserRepository;
+use Basango\SharedKernel\Application\Messaging\CommandHandler;
 
 /**
  * Class FollowSourceHandler.
