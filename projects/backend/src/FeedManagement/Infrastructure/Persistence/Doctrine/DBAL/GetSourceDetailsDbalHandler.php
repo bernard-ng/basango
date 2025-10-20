@@ -49,8 +49,10 @@ final readonly class GetSourceDetailsDbalHandler implements GetSourceDetailsHand
         $qb->from('source', 's')
             ->leftJoin('s', 'article', 'a', 'a.source_id = s.id')
             ->where('s.id = :sourceId')
-            ->setParameter('sourceId', $query->sourceId->toBinary(), ParameterType::BINARY)
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY);
+            ->setParameter('sourceId', $query->sourceId->toRfc4122())
+            ->setParameter('userId', $query->userId->toRfc4122());
+        // Aggregate columns are selected; include non-aggregated columns in GROUP BY for PostgreSQL
+        $qb->groupBy('s.id, s.name, s.description, s.url, s.updated_at, s.display_name, s.bias, s.reliability, s.transparency');
 
         try {
             $data = $qb->executeQuery()->fetchAssociative();
@@ -79,10 +81,10 @@ final readonly class GetSourceDetailsDbalHandler implements GetSourceDetailsHand
             ->from('article', 'a')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->where(' s.id = :sourceId')
-            ->andWhere('a.published_at BETWEEN FROM_UNIXTIME(:start) AND FROM_UNIXTIME(:end)')
+            ->andWhere('a.published_at BETWEEN to_timestamp(:start) AND to_timestamp(:end)')
             ->groupBy('day')
             ->orderBy('day', 'ASC')
-            ->setParameter('sourceId', $query->sourceId->toBinary(), ParameterType::BINARY)
+            ->setParameter('sourceId', $query->sourceId->toRfc4122())
             ->setParameter('start', $dateRange->start, ParameterType::INTEGER)
             ->setParameter('end', $dateRange->end, ParameterType::INTEGER)
             ->enableResultCache(new QueryCacheProfile(SourceCacheAttributes::CACHE_TTL, $cacheKey));
@@ -120,11 +122,11 @@ final readonly class GetSourceDetailsDbalHandler implements GetSourceDetailsHand
     {
         $cacheKey = SourceCacheAttributes::CATEGORIES->withId($query->sourceId->toString());
         $qb = $this->connection->createQueryBuilder()
-            ->select('a.categories')
+            ->select("array_to_string(a.categories, ',') AS categories")
             ->from('article', 'a')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->where('s.id = :sourceId')
-            ->setParameter('sourceId', $query->sourceId->toBinary(), ParameterType::BINARY)
+            ->setParameter('sourceId', $query->sourceId->toRfc4122())
             ->enableResultCache(new QueryCacheProfile(SourceCacheAttributes::CACHE_TTL, $cacheKey));
 
         try {

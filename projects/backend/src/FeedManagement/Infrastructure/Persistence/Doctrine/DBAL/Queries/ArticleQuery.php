@@ -22,7 +22,7 @@ trait ArticleQuery
             'a.id as article_id',
             'a.title as article_title',
             'a.link as article_link',
-            'a.categories as article_categories',
+            "array_to_string(a.categories, ',') as article_categories",
             'a.excerpt as article_excerpt',
             'a.published_at as article_published_at',
             'a.image as article_image',
@@ -36,7 +36,7 @@ trait ArticleQuery
             'a.id as article_id',
             'a.title as article_title',
             'a.link as article_link',
-            'a.categories as article_categories',
+            "array_to_string(a.categories, ',') as article_categories",
             'a.body as article_body',
             'a.hash as article_hash',
             'a.published_at as article_published_at',
@@ -62,17 +62,19 @@ trait ArticleQuery
     private function applyArticleFilters(QueryBuilder $qb, ArticleFilters $filters): QueryBuilder
     {
         if ($filters->category !== null) {
-            $qb->andWhere('a.categories LIKE :category')
-                ->setParameter('category', sprintf('%%%s%%', $filters->category));
+            // PostgreSQL array containment for single value
+            $qb->andWhere(':category = ANY(a.categories)')
+                ->setParameter('category', $filters->category);
         }
 
         if ($filters->search !== null) {
-            $qb->andWhere('a.title LIKE :search')
+            // Case-insensitive search in PostgreSQL
+            $qb->andWhere('a.title ILIKE :search')
                 ->setParameter('search', sprintf('%%%s%%', $filters->search));
         }
 
         if ($filters->dateRange instanceof DateRange) {
-            $qb->andWhere('a.published_at BETWEEN FROM_UNIXTIME(:start) AND FROM_UNIXTIME(:end)')
+            $qb->andWhere('a.published_at BETWEEN to_timestamp(:start) AND to_timestamp(:end)')
                 ->setParameter('start', $filters->dateRange->start, ParameterType::INTEGER)
                 ->setParameter('end', $filters->dateRange->end, ParameterType::INTEGER);
         }

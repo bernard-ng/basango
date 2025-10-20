@@ -5,6 +5,6 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <embeddable name="Basango\IdentityAndAccess\Domain\Model\ValueObject\Roles">
-        <field name="roles" type="json"/>
+        <field name="roles" type="jsonb"/>
     </embeddable>
 </doctrine-mapping>

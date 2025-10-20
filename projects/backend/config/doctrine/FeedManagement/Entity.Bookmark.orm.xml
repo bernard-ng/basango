@@ -12,7 +12,6 @@
             <generator strategy="NONE"/>
         </id>
 
-        <!-- fetching eager cause will always need to check the user's id whenever we deal with a bookmark -->
         <many-to-one field="user" target-entity="Basango\IdentityAndAccess\Domain\Model\Entity\User" fetch="EAGER">
             <join-column nullable="false" on-delete="CASCADE" />
         </many-to-one>

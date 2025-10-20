@@ -14,7 +14,6 @@ use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetArticleOverviewListDbalHandler.
@@ -45,8 +44,8 @@ final readonly class GetSourceArticleOverviewListDbalHandler implements GetSourc
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->where('s.id = :sourceId')
             ->orderBy('a.published_at', $query->filters->sortDirection->value)
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY)
-            ->setParameter('sourceId', $query->sourceId->toBinary(), ParameterType::BINARY)
+            ->setParameter('userId', $query->userId->toRfc4122())
+            ->setParameter('sourceId', $query->sourceId->toRfc4122())
         ;
 
         $qb = $this->applyArticleFilters($qb, $query->filters);

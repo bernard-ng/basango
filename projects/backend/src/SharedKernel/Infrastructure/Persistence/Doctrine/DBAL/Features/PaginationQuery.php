@@ -8,7 +8,6 @@ use Basango\SharedKernel\Domain\Model\Pagination\Page;
 use Basango\SharedKernel\Domain\Model\Pagination\PaginationCursor;
 use Basango\SharedKernel\Domain\Model\Pagination\PaginationInfo;
 use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
@@ -41,12 +40,12 @@ trait PaginationQuery
         if ($keyset->date === null) {
             $qb
                 ->andWhere(sprintf('%s <= :cursorLastId', $keyset->id))
-                ->setParameter('cursorLastId', $cursor->id->toString(), ParameterType::BINARY);
+                ->setParameter('cursorLastId', $cursor->id->toRfc4122());
         } else {
             $qb
                 ->andWhere(sprintf('(%s, %s) <= (:cursorLastDate, :cursorLastId)', $keyset->date, $keyset->id))
-                ->setParameter('cursorLastDate', $cursor->id->toBinary(), ParameterType::BINARY)
-                ->setParameter('cursorLastId', $cursor->date->format('Y-m-d H:i:s'));
+                ->setParameter('cursorLastDate', $cursor->date->format('Y-m-d H:i:s'))
+                ->setParameter('cursorLastId', $cursor->id->toRfc4122());
         }
 
         return $qb->setMaxResults($page->limit + 1);

@@ -40,7 +40,7 @@ trait SourceQuery
             "CONCAT('https://devscast.org/images/sources/', s.name, '.png') as source_image",
             'COUNT(a.hash) AS articles_count',
             'MAX(a.crawled_at) AS source_crawled_at',
-            'COUNT(CASE WHEN a.metadata IS NOT NULL THEN 1 ELSE NULL END) AS articles_metadata_available',
+            'COUNT(*) FILTER (WHERE a.metadata IS NOT NULL) AS articles_metadata_available',
         );
     }
 

@@ -52,7 +52,7 @@ final class LoginAttemptOrmRepository extends ServiceEntityRepository implements
         $this->createQueryBuilder('la')
             ->delete(LoginAttempt::class, 'la')
             ->where('la.user = :user')
-            ->setParameter('user', $user->id->toBinary())
+            ->setParameter('user', $user)
             ->getQuery()
             ->execute();
     }

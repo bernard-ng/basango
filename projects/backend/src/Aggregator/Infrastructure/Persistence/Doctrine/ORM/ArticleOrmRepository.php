@@ -9,6 +9,7 @@ use Basango\Aggregator\Domain\Model\Entity\Article;
 use Basango\Aggregator\Domain\Model\Identity\ArticleId;
 use Basango\Aggregator\Domain\Model\Repository\ArticleRepository;
 use Basango\SharedKernel\Domain\Model\ValueObject\DateRange;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -69,9 +70,9 @@ final class ArticleOrmRepository extends ServiceEntityRepository implements Arti
         }
 
         if ($date instanceof DateRange) {
-            $qb->andWhere('a.publishedAt BETWEEN FROM_UNIXTIME(:start) AND FROM_UNIXTIME(:end)')
-                ->setParameter('start', $date->start)
-                ->setParameter('end', $date->end);
+            $qb->andWhere('a.publishedAt BETWEEN :startDate AND :endDate')
+                ->setParameter('startDate', new DateTimeImmutable()->setTimestamp($date->start))
+                ->setParameter('endDate', new DateTimeImmutable()->setTimestamp($date->end));
         }
 
         $limit = 1000;

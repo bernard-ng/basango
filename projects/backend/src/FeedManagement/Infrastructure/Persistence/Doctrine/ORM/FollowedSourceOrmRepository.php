@@ -9,7 +9,6 @@ use Basango\FeedManagement\Domain\Model\Entity\FollowedSource;
 use Basango\FeedManagement\Domain\Model\Repository\FollowedSourceRepository;
 use Basango\IdentityAndAccess\Domain\Model\Identity\UserId;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -41,10 +40,10 @@ final class FollowedSourceOrmRepository extends ServiceEntityRepository implemen
     public function getByUserId(UserId $userId, SourceId $sourceId): ?FollowedSource
     {
         return $this->createQueryBuilder('fs')
-            ->andWhere('fs.follower = :userId')
-            ->andWhere('fs.source = :sourceId')
-            ->setParameter('sourceId', $sourceId->toBinary(), ParameterType::BINARY)
-            ->setParameter('userId', $userId->toBinary(), ParameterType::BINARY)
+            ->andWhere('IDENTITY(fs.follower) = :userId')
+            ->andWhere('IDENTITY(fs.source) = :sourceId')
+            ->setParameter('sourceId', $sourceId->toRfc4122())
+            ->setParameter('userId', $userId->toRfc4122())
             ->getQuery()
             ->getOneOrNullResult();
     }

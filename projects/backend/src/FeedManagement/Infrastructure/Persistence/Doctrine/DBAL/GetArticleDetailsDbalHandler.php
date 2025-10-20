@@ -13,7 +13,6 @@ use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\Book
 use Basango\FeedManagement\Infrastructure\Persistence\Doctrine\DBAL\Queries\SourceQuery;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetArticleDetailsDbalHandler.
@@ -42,8 +41,8 @@ final readonly class GetArticleDetailsDbalHandler implements GetArticleDetailsHa
         $qb->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->from('article', 'a')
             ->where('a.id = :articleId')
-            ->setParameter('articleId', $query->id->toBinary(), ParameterType::BINARY)
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY)
+            ->setParameter('articleId', $query->id->toRfc4122())
+            ->setParameter('userId', $query->userId->toRfc4122())
         ;
 
         try {
