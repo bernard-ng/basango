@@ -43,13 +43,17 @@ final readonly class GetSourceArticleOverviewListDbalHandler implements GetSourc
         $qb->from('article', 'a')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->where('s.id = :sourceId')
-            ->orderBy('a.published_at', $query->filters->sortDirection->value)
-            ->setParameter('userId', $query->userId->toRfc4122())
-            ->setParameter('sourceId', $query->sourceId->toRfc4122())
+            ->setParameter('userId', $query->userId->toString())
+            ->setParameter('sourceId', $query->sourceId->toString())
         ;
 
         $qb = $this->applyArticleFilters($qb, $query->filters);
-        $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('a.id', 'a.published_at'));
+        $qb = $this->applyCursorPagination(
+            $qb,
+            $query->page,
+            new PaginatorKeyset('a.id', 'a.published_at'),
+            $query->filters->sortDirection
+        );
 
         try {
             $data = $qb->executeQuery()->fetchAllAssociative();

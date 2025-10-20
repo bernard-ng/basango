@@ -42,8 +42,8 @@ final class FollowedSourceOrmRepository extends ServiceEntityRepository implemen
         return $this->createQueryBuilder('fs')
             ->andWhere('IDENTITY(fs.follower) = :userId')
             ->andWhere('IDENTITY(fs.source) = :sourceId')
-            ->setParameter('sourceId', $sourceId->toRfc4122())
-            ->setParameter('userId', $userId->toRfc4122())
+            ->setParameter('sourceId', $sourceId->toString())
+            ->setParameter('userId', $userId->toString())
             ->getQuery()
             ->getOneOrNullResult();
     }

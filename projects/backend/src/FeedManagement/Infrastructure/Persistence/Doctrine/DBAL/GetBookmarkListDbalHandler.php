@@ -37,8 +37,7 @@ final readonly class GetBookmarkListDbalHandler implements GetBookmarkListHandle
             ->leftJoin('b', 'bookmark_article', 'ba', 'ba.bookmark_id = b.id')
             ->where('b.user_id = :userId')
             ->groupBy('b.id')
-            ->orderBy('b.id', 'DESC')
-            ->setParameter('userId', $query->userId->toRfc4122())
+            ->setParameter('userId', $query->userId->toString())
         ;
 
         $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('b.id'));

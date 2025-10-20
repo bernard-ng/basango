@@ -30,7 +30,7 @@ final readonly class ArticleForExport
     public static function create(array $item): self
     {
         return new self(
-            ArticleId::fromBinary($item['article_id']),
+            ArticleId::fromString(DataMapping::string($item, 'article_id')),
             DataMapping::string($item, 'article_title'),
             DataMapping::string($item, 'article_link'),
             DataMapping::string($item, 'article_categories'),
