@@ -34,6 +34,7 @@ jobs:
             script: |
               cd /var/www/html/news.devscast.tech
               git pull origin main --rebase
+              cd projects/backend
               make deploy
               curl -X POST "https://api.telegram.org/bot${{ secrets.DEVY_TOKEN }}/sendMessage" \
                   -H "Content-Type: application/json" \
