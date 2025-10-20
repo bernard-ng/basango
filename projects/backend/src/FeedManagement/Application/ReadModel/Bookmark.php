@@ -28,7 +28,7 @@ final readonly class Bookmark
     public static function create(array $item): self
     {
         return new self(
-            BookmarkId::fromBinary($item['bookmark_id']),
+            BookmarkId::fromString(DataMapping::string($item, 'bookmark_id')),
             DataMapping::string($item, 'bookmark_name'),
             DataMapping::datetime($item, 'bookmark_created_at'),
             DataMapping::nullableString($item, 'bookmark_description'),

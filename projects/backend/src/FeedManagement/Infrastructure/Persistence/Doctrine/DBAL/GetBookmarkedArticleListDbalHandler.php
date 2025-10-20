@@ -43,12 +43,17 @@ final readonly class GetBookmarkedArticleListDbalHandler implements GetBookmarke
             ->innerJoin('ba', 'bookmark', 'b', 'b.id = ba.bookmark_id AND b.user_id = :userId')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->where('b.id = :bookmarkId')
-            ->setParameter('bookmarkId', $query->bookmarkId->toRfc4122())
-            ->setParameter('userId', $query->userId->toRfc4122())
+            ->setParameter('bookmarkId', $query->bookmarkId->toString())
+            ->setParameter('userId', $query->userId->toString())
         ;
 
         $qb = $this->applyArticleFilters($qb, $query->filters);
-        $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('a.id', 'a.published_at'));
+        $qb = $this->applyCursorPagination(
+            $qb,
+            $query->page,
+            new PaginatorKeyset('a.id', 'a.published_at'),
+            $query->filters->sortDirection
+        );
 
         try {
             $data = $qb->executeQuery()->fetchAllAssociative();

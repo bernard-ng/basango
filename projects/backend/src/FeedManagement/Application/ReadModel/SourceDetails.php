@@ -39,7 +39,7 @@ final readonly class SourceDetails
     public static function create(array $item, PublicationGraph $publicationGraph, CategoryShares $categoryShares): self
     {
         return new self(
-            SourceId::fromBinary($item['source_id']),
+            SourceId::fromString(DataMapping::string($item, 'source_id')),
             DataMapping::string($item, 'source_name'),
             DataMapping::string($item, 'source_url'),
             new Credibility(

@@ -41,8 +41,8 @@ final readonly class GetArticleDetailsDbalHandler implements GetArticleDetailsHa
         $qb->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->from('article', 'a')
             ->where('a.id = :articleId')
-            ->setParameter('articleId', $query->id->toRfc4122())
-            ->setParameter('userId', $query->userId->toRfc4122())
+            ->setParameter('articleId', $query->id->toString())
+            ->setParameter('userId', $query->userId->toString())
         ;
 
         try {

@@ -16,7 +16,7 @@ final readonly class PaginationCursor
 {
     public function __construct(
         public UuidV7 $id,
-        public \DateTimeImmutable $date,
+        public ?\DateTimeImmutable $date = null,
     ) {
     }
 
@@ -26,24 +26,15 @@ final readonly class PaginationCursor
      */
     public static function encode(array $item, PaginatorKeyset $keyset): string
     {
-        $id = DataMapping::uuid($item, $keyset->id)->toString();
+        $payload = [
+            'id' => DataMapping::string($item, $keyset->id),
+        ];
 
         if ($keyset->date !== null) {
-            $date = DataMapping::dateTime($item, $keyset->date)->format('Y-m-d H:i:s');
-
-            return base64_encode(
-                json_encode([
-                    'date' => $date,
-                    'id' => $id,
-                ], JSON_THROW_ON_ERROR)
-            );
+            $payload['date'] = DataMapping::dateTime($item, $keyset->date)->format('Y-m-d H:i:s');
         }
 
-        return base64_encode(
-            json_encode([
-                'id' => $id,
-            ], JSON_THROW_ON_ERROR)
-        );
+        return base64_encode(json_encode($payload, JSON_THROW_ON_ERROR));
 
     }
 
@@ -58,15 +49,25 @@ final readonly class PaginationCursor
         }
 
         try {
-            $data = json_decode(base64_decode($cursor), true, 512, JSON_THROW_ON_ERROR);
+            $decoded = base64_decode($cursor, true);
+            if ($decoded === false) {
+                return null;
+            }
 
-            if (! is_array($data) || ! isset($data['date'], $data['id'])) {
+            $data = json_decode($decoded, true, 512, JSON_THROW_ON_ERROR);
+
+            if (! is_array($data) || ! isset($data['id'])) {
                 throw new \InvalidArgumentException('Invalid cursor format');
+            }
+
+            $date = null;
+            if (isset($data['date'])) {
+                $date = new \DateTimeImmutable($data['date']);
             }
 
             return new self(
                 id: UuidV7::fromString($data['id']),
-                date: new \DateTimeImmutable($data['date'])
+                date: $date,
             );
         } catch (\Throwable) {
             return null;
