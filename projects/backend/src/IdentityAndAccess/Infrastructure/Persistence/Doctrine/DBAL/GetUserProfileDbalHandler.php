@@ -34,7 +34,7 @@ final readonly class GetUserProfileDbalHandler implements GetUserProfileHandler
             )
             ->from('user', 'u')
             ->where('u.id = :userId')
-            ->setParameter('userId', $query->userId->toRfc4122());
+            ->setParameter('userId', $query->userId->toString());
 
         /** @var array<string, mixed>|false $data */
         $data = $qb->executeQuery()->fetchAssociative();

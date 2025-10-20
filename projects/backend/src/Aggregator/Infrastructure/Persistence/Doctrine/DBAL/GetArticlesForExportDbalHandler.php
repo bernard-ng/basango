@@ -41,7 +41,8 @@ final readonly class GetArticlesForExportDbalHandler implements GetArticlesForEx
             )
             ->from('article', 'a')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
-            ->orderBy('a.published_at', 'DESC');
+            ->orderBy('a.published_at', 'DESC')
+            ->addOrderBy('a.id', 'DESC');
 
         if ($query->source !== null) {
             $qb->andWhere('s.name = :source')

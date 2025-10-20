@@ -36,7 +36,7 @@ final readonly class GetSourceOverviewListDbalHandler implements GetSourceOvervi
         $qb = $this->addFollowedSourceExistsQuery($qb);
 
         $qb->from('source', 's')
-            ->setParameter('userId', $query->userId->toRfc4122())
+            ->setParameter('userId', $query->userId->toString())
         ;
 
         $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('s.id', 's.created_at'));
@@ -47,7 +47,7 @@ final readonly class GetSourceOverviewListDbalHandler implements GetSourceOvervi
             throw NoResult::forQuery($qb->getSQL(), $qb->getParameters(), $e);
         }
 
-        $pagination = $this->createPaginationInfo($data, $query->page, new PaginatorKeyset('source_id'));
+        $pagination = $this->createPaginationInfo($data, $query->page, new PaginatorKeyset('source_id', 'source_created_at'));
         return SourceOverviewList::create($data, $pagination);
     }
 }

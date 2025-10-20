@@ -23,7 +23,7 @@ final readonly class UserReference
     public static function create(array $item): self
     {
         return new self(
-            UserId::fromBinary($item['user_id']),
+            UserId::fromString(DataMapping::string($item, 'user_id')),
             DataMapping::string($item, 'user_name')
         );
     }

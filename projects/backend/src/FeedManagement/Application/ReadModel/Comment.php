@@ -27,7 +27,7 @@ final readonly class Comment
     public static function create(array $item): self
     {
         return new self(
-            CommentId::fromBinary($item['comment_id']),
+            CommentId::fromString(DataMapping::string($item, 'comment_id')),
             UserReference::create($item),
             DataMapping::enum($item, 'comment_sentiment', Sentiment::class),
             DataMapping::string($item, 'comment_content'),

@@ -26,10 +26,10 @@ final readonly class SourceStatistics
     public static function create(array $item): self
     {
         return new self(
-            SourceId::fromBinary($item['source_id']),
+            SourceId::fromString(DataMapping::string($item, 'source_id')),
             DataMapping::string($item, 'source_name'),
             DataMapping::integer($item, 'articles_count'),
-            DataMapping::integer($item, 'article_metadata_available'),
+            DataMapping::integer($item, 'articles_metadata_available'),
             DataMapping::nullableDatetime($item, 'source_crawled_at')
         );
     }

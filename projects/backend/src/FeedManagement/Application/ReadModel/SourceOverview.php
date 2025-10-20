@@ -27,7 +27,7 @@ final readonly class SourceOverview
     public static function create(array $item): self
     {
         return new self(
-            SourceId::fromBinary($item['source_id']),
+            SourceId::fromString(DataMapping::string($item, 'source_id')),
             DataMapping::string($item, 'source_name'),
             DataMapping::string($item, 'source_url'),
             DataMapping::nullableString($item, 'source_display_name'),
