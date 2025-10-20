@@ -305,15 +305,7 @@ final readonly class ImportEngine
         }
 
         if (is_string($value)) {
-            if (strlen($value) === 16) {
-                $uuid = Uuid::fromBinary($value);
-
-                return method_exists($uuid, 'toString')
-                    ? $uuid->toString()
-                    : $uuid->toRfc4122();
-            }
-
-            return $value;
+            return Uuid::fromBinary($value)->toString();
         }
 
         return (string) $value;

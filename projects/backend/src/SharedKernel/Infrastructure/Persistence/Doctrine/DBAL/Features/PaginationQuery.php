@@ -54,6 +54,7 @@ trait PaginationQuery
         if ($keyset->date !== null) {
             $qb->addOrderBy($keyset->date, $orderDirection);
         }
+
         $qb->addOrderBy($keyset->id, $orderDirection);
 
         $cursor = PaginationCursor::decode($page->cursor);
