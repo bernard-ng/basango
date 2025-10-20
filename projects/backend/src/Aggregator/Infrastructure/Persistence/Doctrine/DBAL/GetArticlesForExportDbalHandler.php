@@ -32,7 +32,7 @@ final readonly class GetArticlesForExportDbalHandler implements GetArticlesForEx
                 'a.id as article_id',
                 'a.title as article_title',
                 'a.link as article_link',
-                'a.categories as article_categories',
+                "array_to_string(a.categories, ',') as article_categories",
                 'a.body as article_body',
                 's.name as article_source',
                 'a.hash as article_hash',
@@ -49,7 +49,7 @@ final readonly class GetArticlesForExportDbalHandler implements GetArticlesForEx
         }
 
         if ($query->date instanceof DateRange) {
-            $qb->andWhere('a.published_at BETWEEN :start AND :end')
+            $qb->andWhere('a.published_at BETWEEN to_timestamp(:start) AND to_timestamp(:end)')
                 ->setParameter('start', $query->date->start)
                 ->setParameter('end', $query->date->end);
         }

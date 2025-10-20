@@ -10,7 +10,7 @@
         <field name="device" type="string" nullable="true" />
         <field name="isBot" type="boolean" nullable="false" >
             <options>
-                <option name="default">0</option>
+                <option name="default">false</option>
             </options>
         </field>
     </embeddable>

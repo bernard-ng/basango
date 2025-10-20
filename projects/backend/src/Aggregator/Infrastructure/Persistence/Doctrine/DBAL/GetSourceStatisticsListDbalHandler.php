@@ -34,7 +34,7 @@ final readonly class GetSourceStatisticsListDbalHandler implements GetSourceStat
             )
             ->from('source', 's')
             ->leftJoin('s', 'article', 'a', 'a.source_id = s.id')
-            ->groupBy('s.id')
+            ->groupBy('s.id, s.name')
             ->orderBy('s.name', 'ASC');
 
         try {

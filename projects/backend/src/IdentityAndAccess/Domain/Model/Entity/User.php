@@ -33,7 +33,7 @@ class User
 
     public readonly UserId $id;
 
-    private function __construct(
+    public function __construct(
         private(set) string $name,
         private(set) EmailAddress $email,
         private(set) Roles $roles,

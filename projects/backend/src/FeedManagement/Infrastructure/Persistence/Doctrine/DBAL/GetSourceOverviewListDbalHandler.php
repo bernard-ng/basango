@@ -12,7 +12,6 @@ use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetSourceOverviewListDbalHandler.
@@ -37,8 +36,7 @@ final readonly class GetSourceOverviewListDbalHandler implements GetSourceOvervi
         $qb = $this->addFollowedSourceExistsQuery($qb);
 
         $qb->from('source', 's')
-            ->groupBy('s.name')
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY)
+            ->setParameter('userId', $query->userId->toRfc4122())
         ;
 
         $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('s.id', 's.created_at'));

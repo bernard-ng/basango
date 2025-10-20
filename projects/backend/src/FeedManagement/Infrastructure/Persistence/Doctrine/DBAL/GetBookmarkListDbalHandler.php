@@ -12,7 +12,6 @@ use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetBookmarkListDbalHandler.
@@ -39,7 +38,7 @@ final readonly class GetBookmarkListDbalHandler implements GetBookmarkListHandle
             ->where('b.user_id = :userId')
             ->groupBy('b.id')
             ->orderBy('b.id', 'DESC')
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY)
+            ->setParameter('userId', $query->userId->toRfc4122())
         ;
 
         $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('b.id'));

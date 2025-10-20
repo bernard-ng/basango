@@ -13,7 +13,6 @@ use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetBookmarkedArticleListDbalHandler.
@@ -44,8 +43,8 @@ final readonly class GetBookmarkedArticleListDbalHandler implements GetBookmarke
             ->innerJoin('ba', 'bookmark', 'b', 'b.id = ba.bookmark_id AND b.user_id = :userId')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             ->where('b.id = :bookmarkId')
-            ->setParameter('bookmarkId', $query->bookmarkId->toBinary(), ParameterType::BINARY)
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY)
+            ->setParameter('bookmarkId', $query->bookmarkId->toRfc4122())
+            ->setParameter('userId', $query->userId->toRfc4122())
         ;
 
         $qb = $this->applyArticleFilters($qb, $query->filters);

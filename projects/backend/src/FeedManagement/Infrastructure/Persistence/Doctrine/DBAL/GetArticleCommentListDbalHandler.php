@@ -11,7 +11,6 @@ use Basango\SharedKernel\Domain\Model\Pagination\PaginatorKeyset;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\Features\PaginationQuery;
 use Basango\SharedKernel\Infrastructure\Persistence\Doctrine\DBAL\NoResult;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetArticleCommentListDbalHandler.
@@ -41,7 +40,7 @@ final readonly class GetArticleCommentListDbalHandler implements GetArticleComme
             ->innerJoin('c', 'user', 'u', 'c.user_id = u.id')
             ->where('c.article_id = :articleId')
             ->orderBy('c.created_at', 'DESC')
-            ->setParameter('articleId', $query->articleId->toBinary(), ParameterType::BINARY);
+            ->setParameter('articleId', $query->articleId->toRfc4122());
 
         $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('c.id', 'c.created_at'));
 

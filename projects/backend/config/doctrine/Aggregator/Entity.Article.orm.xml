@@ -11,17 +11,12 @@
         <id name="id" type="article_id">
             <generator strategy="NONE" />
         </id>
-        <indexes>
-            <index fields="hash" />
-            <index fields="publishedAt" />
-            <index name="IDX_PUBLISHED_AT_ID" fields="publishedAt, id" />
-        </indexes>
 
         <field name="title" length="1024" />
         <field name="body" type="text" />
         <embedded name="link" class="Basango\Aggregator\Domain\Model\ValueObject\Link" use-column-prefix="false" />
         <field name="hash" length="32" />
-        <field name="categories" nullable="true" />
+        <field name="categories" type="text[]" nullable="true" />
 
         <many-to-one field="source" target-entity="Basango\Aggregator\Domain\Model\Entity\Source">
             <join-column nullable="false" on-delete="CASCADE" />
@@ -39,13 +34,13 @@
         <field name="image"
                insertable="false"
                updatable="false"
-               column-definition="VARCHAR(1024) GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.image'))) STORED"
+               column-definition="VARCHAR(1024) GENERATED ALWAYS AS ((metadata->>'image')) STORED"
         />
         <field
                 name="excerpt"
                 insertable="false"
                 updatable="false"
-                column-definition="VARCHAR(255) GENERATED ALWAYS AS (CONCAT(LEFT(body, 200), '...')) STORED"
+                column-definition="VARCHAR(255) GENERATED ALWAYS AS ((left(body, 200) || '...')) STORED"
         />
 
         <field name="publishedAt" type="datetime_immutable" />

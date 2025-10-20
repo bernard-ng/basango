@@ -16,7 +16,7 @@
             <join-column nullable="false" on-delete="CASCADE" />
         </many-to-one>
 
-        <field name="ipAddress" nullable="true" length="15" />
+        <field name="ipAddress" type="inet" nullable="true" length="15" />
         <embedded name="device" class="Basango\SharedKernel\Domain\Model\ValueObject\Tracking\Device" />
         <embedded name="location" class="Basango\SharedKernel\Domain\Model\ValueObject\Tracking\GeoLocation" />
 

@@ -20,6 +20,7 @@ final class OpenGraphType extends Type
     {
         return $platform->getJsonTypeDeclarationSQL([
             'nullable' => true,
+            'jsonb' => true,
         ]);
     }
 

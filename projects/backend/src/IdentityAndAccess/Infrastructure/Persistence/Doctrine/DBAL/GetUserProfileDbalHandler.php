@@ -9,7 +9,6 @@ use Basango\IdentityAndAccess\Application\UseCase\Query\GetUserProfile;
 use Basango\IdentityAndAccess\Application\UseCase\QueryHandler\GetUserProfileHandler;
 use Basango\IdentityAndAccess\Domain\Exception\UserNotFound;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
 
 /**
  * Class GetUserProfileDbalHandler.
@@ -35,7 +34,7 @@ final readonly class GetUserProfileDbalHandler implements GetUserProfileHandler
             )
             ->from('user', 'u')
             ->where('u.id = :userId')
-            ->setParameter('userId', $query->userId->toBinary(), ParameterType::BINARY);
+            ->setParameter('userId', $query->userId->toRfc4122());
 
         /** @var array<string, mixed>|false $data */
         $data = $qb->executeQuery()->fetchAssociative();
