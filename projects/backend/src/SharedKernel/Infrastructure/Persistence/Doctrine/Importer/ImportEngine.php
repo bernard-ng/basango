@@ -192,9 +192,8 @@ final readonly class ImportEngine
                     $val = $row[$col] ?? null;
 
                     if ($val !== null) {
-                        // Convert BINARY(16) UUIDs to canonical RFC4122
                         if ($col === 'id' || str_ends_with((string) $col, '_id')) {
-                            $params[$i++] = Uuid::fromBinary($val)->toString();
+                            $params[$i++] = $this->normalizeUuidValue($val);
                             continue;
                         }
 
@@ -297,5 +296,26 @@ final readonly class ImportEngine
         }
 
         return $converted !== false ? $converted : $value;
+    }
+
+    private function normalizeUuidValue(mixed $value): string
+    {
+        if ($value instanceof Uuid) {
+            return (string) $value;
+        }
+
+        if (is_string($value)) {
+            if (strlen($value) === 16) {
+                $uuid = Uuid::fromBinary($value);
+
+                return method_exists($uuid, 'toString')
+                    ? $uuid->toString()
+                    : $uuid->toRfc4122();
+            }
+
+            return $value;
+        }
+
+        return (string) $value;
     }
 }
