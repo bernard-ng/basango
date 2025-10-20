@@ -6,6 +6,8 @@ services:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: app
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'no'
+    ports:
+      - "3306:3306"
     volumes:
       - ./var/volumes/mariadb:/var/lib/mysql:rw
       - ./var/volumes/backend-var:/var/www/var
