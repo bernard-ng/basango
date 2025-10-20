@@ -39,8 +39,7 @@ final readonly class GetArticleCommentListDbalHandler implements GetArticleComme
             ->from('comment', 'c')
             ->innerJoin('c', 'user', 'u', 'c.user_id = u.id')
             ->where('c.article_id = :articleId')
-            ->orderBy('c.created_at', 'DESC')
-            ->setParameter('articleId', $query->articleId->toRfc4122());
+            ->setParameter('articleId', $query->articleId->toString());
 
         $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('c.id', 'c.created_at'));
 

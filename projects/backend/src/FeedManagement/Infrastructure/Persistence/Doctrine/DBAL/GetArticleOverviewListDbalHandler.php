@@ -43,11 +43,16 @@ final readonly class GetArticleOverviewListDbalHandler implements GetArticleOver
         $qb->from('article', 'a')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
             //->orderBy('a.published_at', $query->filters->sortDirection->value)
-            ->setParameter('userId', $query->userId->toRfc4122())
+            ->setParameter('userId', $query->userId->toString())
         ;
 
         $qb = $this->applyArticleFilters($qb, $query->filters);
-        $qb = $this->applyCursorPagination($qb, $query->page, new PaginatorKeyset('a.id', 'a.published_at'));
+        $qb = $this->applyCursorPagination(
+            $qb,
+            $query->page,
+            new PaginatorKeyset('a.id', 'a.published_at'),
+            $query->filters->sortDirection
+        );
 
         try {
             $data = $qb->executeQuery()->fetchAllAssociative();

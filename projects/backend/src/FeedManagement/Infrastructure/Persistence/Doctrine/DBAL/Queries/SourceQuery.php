@@ -22,6 +22,7 @@ trait SourceQuery
                 "CONCAT('https://devscast.org/images/sources/', s.name, '.png') as source_image",
                 's.url as source_url',
                 's.name as source_name',
+                's.created_at as source_created_at',
             );
     }
 

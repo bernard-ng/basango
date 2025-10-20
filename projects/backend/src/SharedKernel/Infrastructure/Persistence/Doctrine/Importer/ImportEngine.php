@@ -194,7 +194,7 @@ final readonly class ImportEngine
                     if ($val !== null) {
                         // Convert BINARY(16) UUIDs to canonical RFC4122
                         if ($col === 'id' || str_ends_with((string) $col, '_id')) {
-                            $params[$i++] = Uuid::fromBinary($val)->toRfc4122();
+                            $params[$i++] = Uuid::fromBinary($val)->toString();
                             continue;
                         }
 
