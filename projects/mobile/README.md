@@ -1,6 +1,6 @@
 # Mobile
 
-![Coding Standard](https://github.com/bernard-ng/drc-news-app/actions/workflows/quality.yaml/badge.svg)
+![Coding Standard](https://github.com/bernard-ng/basango/actions/workflows/quality.yaml/badge.svg)
 
 ---
 

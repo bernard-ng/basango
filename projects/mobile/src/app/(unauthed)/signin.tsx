@@ -49,7 +49,7 @@ export default function SignIn() {
             <YStack flex={1} gap="$4" width="100%" justifyContent="flex-start">
                 <YStack gap="$4">
                     <Heading>Connexion</Heading>
-                    <Text>Bienvenue sur CongoNews, la plateforme d&#39;actualités intelligente</Text>
+                    <Text>Bienvenue sur Basango, la plateforme d&#39;actualités intelligente</Text>
                 </YStack>
 
                 <YStack gap="$2">
@@ -63,7 +63,7 @@ export default function SignIn() {
                 </YStack>
 
                 <Caption>
-                    En continuant, vous acceptez les conditions d&#39;utilisation de CongoNews et reconnaissez avoir lu
+                    En continuant, vous acceptez les conditions d&#39;utilisation de Basango et reconnaissez avoir lu
                     notre politique de confidentialité.
                 </Caption>
                 <Link href="/signup" asChild>
