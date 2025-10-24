@@ -13,7 +13,7 @@ export default function Welcome() {
             <AppIcon width={120} height={120} />
             <YStack width="100%" gap="$6">
                 <YStack gap="$3">
-                    <Display textAlign="center">Bienvenue sur CongoNews</Display>
+                    <Display textAlign="center">Bienvenue sur Basango</Display>
                     <Text textAlign="center" lineHeight="$1" marginTop="auto">
                         La première plateforme d&#39;actualités intelligente qui vous aide à rester informé sur
                         congolaise et internationale.
@@ -30,7 +30,7 @@ export default function Welcome() {
                 </YStack>
 
                 <Caption textAlign="center">
-                    En continuant, vous acceptez les conditions d&#39;utilisation de CongoNews et reconnaissez avoir lu
+                    En continuant, vous acceptez les conditions d&#39;utilisation de Basango et reconnaissez avoir lu
                     notre politique de confidentialité.
                 </Caption>
             </YStack>

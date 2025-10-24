@@ -1,25 +1,25 @@
 {
   "expo": {
-    "name": "congonews",
-    "slug": "congonews",
+    "name": "basango",
+    "slug": "basango",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/logo.png",
-    "scheme": "congonews",
+    "scheme": "basango",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "githubUrl": "https://github.com/bernard-ng/drc-news-app",
+    "githubUrl": "https://github.com/bernard-ng/basango",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "dev.ngandu.congonews"
+      "bundleIdentifier": "dev.ngandu.basango"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/logo.png",
         "backgroundColor": "#ffffff",
-        "package": "dev.ngandu.congonews"
+        "package": "dev.ngandu.basango"
       },
-      "package": "dev.ngandu.congonews"
+      "package": "dev.ngandu.basango"
     },
     "web": {
       "bundler": "metro",
@@ -43,7 +43,7 @@
         "@sentry/react-native/expo",
         {
           "url": "https://glitchtip.devscast.tech/",
-          "project": "drc-news-app",
+          "project": "basango",
           "organization": "devscast-software"
         }
       ]

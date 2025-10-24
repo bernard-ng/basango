@@ -9,7 +9,7 @@
 |-------------------|------------------------------------------------------------|
 | core and backend  | https://github.com/bernard-ng/drc-news-corpus              |
 | ML models         | https://github.com/bernard-ng/drc-news-ml                  |
-| Mobile App        | https://github.com/bernard-ng/drc-news-app                 |
+| Mobile App        | https://github.com/bernard-ng/basango                 |
 | Dataset (partial) | https://huggingface.co/datasets/bernard-ng/drc-news-corpus |
 
 ---

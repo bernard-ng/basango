@@ -48,7 +48,7 @@ export default function SingUp() {
             <YStack flex={1} gap="$4" width="100%" justifyContent="flex-start">
                 <YStack gap="$4">
                     <Heading>Inscription</Heading>
-                    <Text>Rejoignez la communauté CongoNews et restez informé des dernières actualités</Text>
+                    <Text>Rejoignez la communauté Basango et restez informé des dernières actualités</Text>
                 </YStack>
 
                 <YStack gap="$2">
@@ -63,7 +63,7 @@ export default function SingUp() {
                     <FormPasswordInput control={control} name="password" />
                 </YStack>
                 <Caption>
-                    En continuant, vous acceptez les conditions d&#39;utilisation de CongoNews et reconnaissez avoir lu
+                    En continuant, vous acceptez les conditions d&#39;utilisation de Basango et reconnaissez avoir lu
                     notre politique de confidentialité.
                 </Caption>
                 <Link href="/signin">
