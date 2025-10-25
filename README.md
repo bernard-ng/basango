@@ -1,4 +1,4 @@
-# Basango : Towards a scalable and intelligent system for Congolese News curation
+# Basango: Towards a scalable and intelligent system for Congolese News curation
 
 [![backend audit](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml)
 [![backend deploy](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml)

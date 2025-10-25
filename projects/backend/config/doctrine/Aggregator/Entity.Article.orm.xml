@@ -18,7 +18,7 @@
         <field name="hash" length="32" />
         <field name="categories" type="text[]" nullable="true" />
 
-        <many-to-one field="source" target-entity="Basango\Aggregator\Domain\Model\Entity\Source">
+        <many-to-one field="source" target-entity="Basango\Aggregator\Domain\Model\Entity\Source" fetch="EAGER">
             <join-column nullable="false" on-delete="CASCADE" />
         </many-to-one>
 
@@ -30,6 +30,7 @@
         </field>
         <field name="metadata" type="open_graph" nullable="true" />
         <embedded name="readingTime" class="Basango\Aggregator\Domain\Model\ValueObject\ReadingTime" use-column-prefix="false" />
+        <field name="tokenStatistics" type="token_statistics" nullable="true" />
 
         <field name="image"
                insertable="false"

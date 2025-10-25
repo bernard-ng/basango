@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Basango\IdentityAndAccess\Domain\Model\Entity;
 
-use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
+use Gesdinet\JWTRefreshTokenBundle\Model\AbstractRefreshToken;
 
-class RefreshToken extends BaseRefreshToken
+class RefreshToken extends AbstractRefreshToken
 {
 }

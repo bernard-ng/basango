@@ -11,15 +11,15 @@ namespace Basango\SharedKernel\Domain;
  */
 final class Application
 {
-    public string $name = 'DRC News Corpus';
+    public string $name = 'Basango';
 
-    public string $website = 'https://research.devscast.org/drc-news-corpus';
+    public string $website = 'https://basango.ngandu.dev';
 
     public string $emailAddress = 'contact@devscast.tech';
 
     public string $infoAddress = 'contact@devscast.tech';
 
-    public string $emailName = 'DRC News Corpus';
+    public string $emailName = 'Basango';
 
     public string $legalName = 'Devscast Software SàSu';
 

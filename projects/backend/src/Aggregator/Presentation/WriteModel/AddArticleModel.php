@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Basango\Aggregator\Presentation\WriteModel;
 
 use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
+use Basango\Aggregator\Domain\Model\ValueObject\TokenStatistics;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -32,4 +33,6 @@ final class AddArticleModel
     public array $categories = [];
 
     public ?OpenGraph $metadata = null;
+
+    public ?TokenStatistics $tokenStatistics = null;
 }

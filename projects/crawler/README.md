@@ -12,7 +12,7 @@
 
 - Install the project in your virtualenv so the `basango` CLI is available:
   - With uv: `uv run --with . basango --help`
-  - Or install locally: `pip install -e .` then `basango --help`
+  - Or install locally: `uv sync` then `basango --help`
 
 #### Sync crawl (in-process)
 

@@ -70,6 +70,7 @@ doctrine:
             article_id: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\ArticleIdType
             source_id: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\SourceIdType
             open_graph: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\OpenGraphType
+            token_statistics: Basango\Aggregator\Infrastructure\Persistence\Doctrine\DBAL\Types\TokenStatisticsType
 
             # Identity and Access
             user_id: Basango\IdentityAndAccess\Infrastructure\Persistence\Doctrine\DBAL\Types\UserIdType
@@ -125,6 +126,7 @@ doctrine:
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
+        enable_native_lazy_objects: true
         entity_managers:
             default:
                 validate_xml_mapping: false

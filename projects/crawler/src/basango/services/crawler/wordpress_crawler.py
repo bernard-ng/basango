@@ -3,6 +3,8 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional, override, cast, Final, Any, Sequence
 
+from markdownify import markdownify
+
 from basango.domain.article import Article
 from bs4 import BeautifulSoup
 
@@ -104,7 +106,10 @@ class WordpressCrawler(BaseCrawler):
         body_html = data.get("content", {}).get("rendered", "")
 
         title = BeautifulSoup(title_html, "html.parser").get_text(" ", strip=True)
-        body = BeautifulSoup(body_html, "html.parser").get_text(" ", strip=True)
+        body = markdownify(
+            BeautifulSoup(body_html, "html.parser").get_text(" ", strip=False),
+            heading_style="ATX",
+        )
         timestamp = self._compute_timestamp(data.get("date"))
 
         categories_value = self._map_categories(data.get("categories", []))
