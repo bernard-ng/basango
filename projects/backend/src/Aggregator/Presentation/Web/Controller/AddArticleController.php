@@ -47,11 +47,12 @@ final class AddArticleController extends AbstractController
         $this->handleCommand(new CreateArticle(
             $model->title,
             Link::from($model->link),
-            implode(', ', $model->categories),
+            $model->categories,
             $model->body,
             $model->source,
             $model->timestamp,
             $model->metadata,
+            $model->tokenStatistics
         ));
 
         return new JsonResponse(status: Response::HTTP_CREATED);

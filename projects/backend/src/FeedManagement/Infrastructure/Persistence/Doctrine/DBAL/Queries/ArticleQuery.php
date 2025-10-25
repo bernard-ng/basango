@@ -62,15 +62,17 @@ trait ArticleQuery
     private function applyArticleFilters(QueryBuilder $qb, ArticleFilters $filters): QueryBuilder
     {
         if ($filters->category !== null) {
-            // PostgreSQL array containment for single value
             $qb->andWhere(':category = ANY(a.categories)')
                 ->setParameter('category', $filters->category);
         }
 
         if ($filters->search !== null) {
-            // Case-insensitive search in PostgreSQL
-            $qb->andWhere('a.title ILIKE :search')
-                ->setParameter('search', sprintf('%%%s%%', $filters->search));
+            $qb
+                ->addSelect("ts_rank(a.tsv, to_tsquery('french', :search)) AS rank")
+                ->andWhere("a.tsv @@ to_tsquery('french', :search)")
+                ->setParameter('search', $filters->search)
+                ->resetOrderBy()
+                ->orderBy('rank', $filters->sortDirection->value);
         }
 
         if ($filters->dateRange instanceof DateRange) {

@@ -6,6 +6,7 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 from basango.domain.article import Article
 from bs4 import BeautifulSoup, Tag
+from markdownify import markdownify
 
 from basango.core.config import CrawlerConfig, ClientConfig
 from basango.core.config.source_config import HtmlSourceConfig
@@ -283,15 +284,15 @@ class HtmlCrawler(BaseCrawler):
             matches = node.select(selector)
             if matches:
                 parts = [
-                    item.get_text(" ", strip=True)
+                    markdownify(item.get_text(" ", strip=False), heading_style="ATX")
                     for item in matches
                     if item.get_text(strip=True)
                 ]
                 if parts:
                     # Join without separators: callers can post-process if
                     # needed, but this preserves maximum fidelity.
-                    return "".join(parts)
-        return node.get_text(" ", strip=True)
+                    return "\n".join(parts)
+        return markdownify(node.get_text(" ", strip=False), heading_style="ATX")
 
     @staticmethod
     def _extract_categories(

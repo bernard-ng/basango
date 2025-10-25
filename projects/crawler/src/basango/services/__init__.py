@@ -3,6 +3,7 @@ from .http_client import BaseHttpClient, SyncHttpClient, AsyncHttpClient
 from .open_graph import OpenGraphProvider
 from .persistence import BasePersistor, CsvPersistor, JsonPersistor
 from .user_agents import UserAgentProvider
+from .tokenizer import Tokenizer
 
 HttpClient = SyncHttpClient
 
@@ -17,4 +18,5 @@ __all__ = [
     "BasePersistor",
     "CsvPersistor",
     "JsonPersistor",
+    "Tokenizer",
 ]

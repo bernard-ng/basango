@@ -48,14 +48,13 @@ trait PaginationQuery
         PaginatorKeyset $keyset,
         SortDirection $direction = SortDirection::DESC
     ): QueryBuilder {
-        $orderDirection = strtoupper($direction->value);
         $comparisonOperator = $direction === SortDirection::ASC ? '>' : '<';
 
         if ($keyset->date !== null) {
-            $qb->addOrderBy($keyset->date, $orderDirection);
+            $qb->addOrderBy($keyset->date, $direction->value);
         }
 
-        $qb->addOrderBy($keyset->id, $orderDirection);
+        $qb->addOrderBy($keyset->id, $direction->value);
 
         $cursor = PaginationCursor::decode($page->cursor);
         if (! $cursor instanceof PaginationCursor) {

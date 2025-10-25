@@ -1,24 +1,24 @@
 # Core and Backend
 
-![Deployed](https://github.com/bernard-ng/drc-news-corpus/actions/workflows/deploy.yaml/badge.svg)
-![Coding Standard](https://github.com/bernard-ng/drc-news-corpus/actions/workflows/quality.yaml/badge.svg)
-![Tests](https://github.com/bernard-ng/drc-news-corpus/actions/workflows/tests.yaml/badge.svg)
-![Security](https://github.com/bernard-ng/drc-news-corpus/actions/workflows/audit.yaml/badge.svg)
+![Deployed](https://github.com/bernard-ng/basango/actions/workflows/deploy.yaml/badge.svg)
+![Coding Standard](https://github.com/bernard-ng/basango/actions/workflows/quality.yaml/badge.svg)
+![Tests](https://github.com/bernard-ng/basango/actions/workflows/tests.yaml/badge.svg)
+![Security](https://github.com/bernard-ng/basango/actions/workflows/audit.yaml/badge.svg)
 
 | Scope             | Link                                                       |
 |-------------------|------------------------------------------------------------|
-| core and backend  | https://github.com/bernard-ng/drc-news-corpus              |
+| core and backend  | https://github.com/bernard-ng/basango              |
 | ML models         | https://github.com/bernard-ng/drc-news-ml                  |
 | Mobile App        | https://github.com/bernard-ng/basango                 |
-| Dataset (partial) | https://huggingface.co/datasets/bernard-ng/drc-news-corpus |
+| Dataset (partial) | https://huggingface.co/datasets/bernard-ng/basango |
 
 ---
 
-## DRC News Corpus : Towards a scalable and intelligent system for Congolese News curation
+## Basango : Towards a scalable and intelligent system for Congolese News curation
 
 ### Introduction
 
-The **"DRC News Corpus"** is a structured and scalable dataset of news articles sourced from major media outlets covering diverse aspects of the Democratic Republic of Congo (DRC). Designed for efficiency, this system enables the automated collection, processing, and organization of news stories spanning politics, economy, society, culture, environment, and international affairs.
+The **"Basango"** is a structured and scalable dataset of news articles sourced from major media outlets covering diverse aspects of the Democratic Republic of Congo (DRC). Designed for efficiency, this system enables the automated collection, processing, and organization of news stories spanning politics, economy, society, culture, environment, and international affairs.
 
 ### Scalability and Use Cases:
 
@@ -45,7 +45,7 @@ If you want to rebuild the dataset follow the steps bellow :
 
 #### Installation
 ```bash
-git clone https://github.com/bernard-ng/drc-news-corpus.git && cd drc-news-corpus
+git clone https://github.com/bernard-ng/basango.git && cd basango
 make build
 make start
 ```
@@ -104,5 +104,5 @@ a CSV file will be generated in the `data` directory.
 
 
 ### Acknowledgment:
-The compilation and curation of the "DRC News Corpus" were conducted by Tshabu Ngandu Bernard with the primary objective of facilitating research and analysis related to the Democratic Republic of Congo. 
+The compilation and curation of the "Basango" were conducted by Tshabu Ngandu Bernard with the primary objective of facilitating research and analysis related to the Democratic Republic of Congo. 
 I do not own the content of the articles, and all rights belong to the respective publishers. The dataset is intended for non-commercial research purposes only.

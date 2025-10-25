@@ -1,15 +1,23 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import asdict, is_dataclass
+from datetime import datetime
 from typing import Optional, Any, Dict, List, Sequence
 
 from basango.domain.article import Article
 from bs4 import BeautifulSoup
+from pydantic import HttpUrl
 
 from basango.core.config import CrawlerConfig, ClientConfig
 from basango.domain import DateRange, SourceKind, PageRange
 from basango.domain.exception import ArticleOutOfRange
-from basango.services import HttpClient, DateParser, OpenGraphProvider, BasePersistor
+from basango.services import (
+    HttpClient,
+    DateParser,
+    OpenGraphProvider,
+    BasePersistor,
+    Tokenizer,
+)
 
 
 class BaseCrawler(ABC):
@@ -35,6 +43,7 @@ class BaseCrawler(ABC):
         self.persistors: list[BasePersistor] = list(persistors) if persistors else []
         self.date_parser = DateParser()
         self.open_graph = OpenGraphProvider()
+        self.tokenizer = Tokenizer()
 
     @abstractmethod
     def fetch(self) -> None:
@@ -61,23 +70,35 @@ class BaseCrawler(ABC):
             metadata_value = None
         elif is_dataclass(metadata) and not isinstance(metadata, type):
             metadata_value = asdict(metadata)
-        else:
+        elif isinstance(metadata, dict):
             metadata_value = metadata
+        else:
+            metadata_value = None
 
-        article = {
-            "title": title,
-            "link": link,
-            "body": body,
-            "categories": categories,
-            "source": getattr(self.source, "source_id", None),
-            "timestamp": timestamp,
-            "metadata": metadata_value,
-        }
+        # Get source_id and ensure it's a string
+        source_id = getattr(self.source, "source_id", None)
+        if source_id is None:
+            source_id = "unknown"
 
-        self._persist(article)
-        logging.info(f"> {article['title']} [saved]")
+        article = Article(
+            title=title,
+            link=HttpUrl(link),  # Convert str to HttpUrl
+            body=body,
+            categories=categories,
+            source=source_id,  # Ensure it's a string, not None
+            timestamp=datetime.fromtimestamp(
+                timestamp
+            ),  # Convert int timestamp to datetime
+            metadata=metadata_value,
+        )
+        article.token_statistics = self.tokenizer.count_tokens(
+            article.title, article.body, article.categories
+        )
 
-        return Article(**article)
+        self._persist(article.to_dict())
+        logging.info("> %s [saved]", article.title)
+
+        return article
 
     @abstractmethod
     def fetch_one(

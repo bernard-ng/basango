@@ -37,7 +37,7 @@ sources:
         replacement: "$3-$2-$1 $4"
       source_selectors:
         articles: ".view-content > .views-row.content-row"
-        article_title: ".views-field-title a"
+        article_title: "h1.page-header"
         article_link: ".views-field-title a"
         article_body: ".field-name-body"
         article_date: ".views-field-created"
@@ -45,7 +45,7 @@ sources:
         pagination: "ul.pagination > li.pager-last > a"
       pagination_template: "actualite"
       supports_categories: false
-      requires_details: false
+      requires_details: true
       requires_rate_limit: false
 
     - source_id: 7sur7.cd

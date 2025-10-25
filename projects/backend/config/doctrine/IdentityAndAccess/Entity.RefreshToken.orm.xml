@@ -8,5 +8,12 @@
             repository-class="Gesdinet\JWTRefreshTokenBundle\Entity\RefreshTokenRepository"
             table="refresh_tokens"
     >
+        <id name="id" type="integer">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="refresh_tokens_id_seq" allocation-size="100" initial-value="1" />
+        </id>
+        <field name="refreshToken" type="string" column="refresh_token" length="128" unique="true"/>
+        <field name="username" type="string" length="255" column="username"/>
+        <field name="valid" type="datetime"/>
     </entity>
 </doctrine-mapping>

@@ -10,6 +10,7 @@ use Basango\Aggregator\Domain\Model\ValueObject\OpenGraph;
 use Basango\Aggregator\Domain\Model\ValueObject\ReadingTime;
 use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Credibility;
 use Basango\Aggregator\Domain\Model\ValueObject\Scoring\Sentiment;
+use Basango\Aggregator\Domain\Model\ValueObject\TokenStatistics;
 
 /**
  * Class Article.
@@ -25,13 +26,14 @@ class Article
         public readonly Link $link,
         public readonly string $body,
         public readonly string $hash,
-        private(set) string $categories,
+        private(set) array $categories,
         public readonly Source $source,
         public readonly \DateTimeImmutable $publishedAt,
         public readonly \DateTimeImmutable $crawledAt = new \DateTimeImmutable(),
         private(set) Credibility $credibility = new Credibility(),
         private(set) Sentiment $sentiment = Sentiment::NEUTRAL,
         private(set) ?OpenGraph $metadata = null,
+        private(set) ?TokenStatistics $tokenStatistics = null,
         private(set) ?ReadingTime $readingTime = null,
         private(set) ?\DateTimeImmutable $updatedAt = null,
         public readonly ?string $image = null,
@@ -56,7 +58,7 @@ class Article
         return $this;
     }
 
-    public function assignCategories(string $categories): self
+    public function assignCategories(array $categories): self
     {
         $this->categories = $categories;
         $this->updatedAt = new \DateTimeImmutable();
@@ -80,6 +82,13 @@ class Article
             image: $object?->image,
             locale: $object->locale ?? 'fr'
         );
+
+        return $this;
+    }
+
+    public function defineTokenStatistics(?TokenStatistics $statistics): self
+    {
+        $this->tokenStatistics = $statistics;
 
         return $this;
     }

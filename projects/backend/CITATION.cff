@@ -2,7 +2,7 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: DRC News Corpus
+title: Basango
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
@@ -14,11 +14,11 @@ authors:
     email: bernard@devscast.tech
     affiliation: Devscast Community
     orcid: 'https://orcid.org/0009-0003-9777-6349'
-repository-code: 'https://github.com/bernard-ng/drc-news-corpus'
+repository-code: 'https://github.com/bernard-ng/basango'
 repository: >-
-  https://www.huggingface.c0/datasets/bernard-ng/drc-news-corpus
+  https://www.huggingface.c0/datasets/bernard-ng/basango
 abstract: >-
-  The "DRC News Corpus" is a curated collection of news
+  The "Basango" is a curated collection of news
   articles sourced from major media outlets covering a wide
   spectrum of topics related to the Democratic Republic of
   Congo (DRC). This dataset encompasses a diverse range of

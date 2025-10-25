@@ -42,7 +42,7 @@ final readonly class GetArticleOverviewListDbalHandler implements GetArticleOver
 
         $qb->from('article', 'a')
             ->innerJoin('a', 'source', 's', 'a.source_id = s.id')
-            //->orderBy('a.published_at', $query->filters->sortDirection->value)
+            ->orderBy('a.published_at', $query->filters->sortDirection->value)
             ->setParameter('userId', $query->userId->toString())
         ;
 
