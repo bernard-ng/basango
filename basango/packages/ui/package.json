@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui",
+  "name": "@basango/ui",
   "version": "0.0.0",
   "private": true,
   "exports": {
@@ -11,8 +11,8 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@basango/eslint-config": "*",
+    "@basango/typescript-config": "*",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
