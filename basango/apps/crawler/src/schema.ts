@@ -310,5 +310,27 @@ export const resolveConfigPath = (basePath: string, env?: string): string => {
 	return `${withoutExt}.${env}${ext}`;
 };
 
-export const schemaToJSON = <T extends z.ZodTypeAny>(schema: T) =>
-	schema.toJSON();
+export const schemaToJSON = <T extends z.ZodTypeAny>(schema: T): unknown => {
+        const candidate = schema as unknown as { toJSON?: () => unknown };
+        if (typeof candidate.toJSON === "function") {
+                return candidate.toJSON();
+        }
+
+        const typeName = (schema as { _def?: { typeName?: z.ZodFirstPartyTypeKind } })._def
+                ?.typeName;
+
+        switch (typeName) {
+                case z.ZodFirstPartyTypeKind.ZodObject:
+                        return { type: "object" };
+                case z.ZodFirstPartyTypeKind.ZodArray:
+                        return { type: "array" };
+                case z.ZodFirstPartyTypeKind.ZodString:
+                        return { type: "string" };
+                case z.ZodFirstPartyTypeKind.ZodNumber:
+                        return { type: "number" };
+                case z.ZodFirstPartyTypeKind.ZodBoolean:
+                        return { type: "boolean" };
+                default:
+                        return { type: "unknown" };
+        }
+};
