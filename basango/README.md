@@ -1,135 +1,42 @@
-# Turborepo starter
+# Basango: Towards a scalable and intelligent system for Congolese News curation
 
-This Turborepo starter is maintained by the Turborepo core team.
+[![backend audit](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml)
+[![backend deploy](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml)
+[![backend quality](https://github.com/bernard-ng/basango/actions/workflows/backend_quality.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_quality.yaml)
+[![backend tests](https://github.com/bernard-ng/basango/actions/workflows/backend_tests.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_tests.yaml)
+[![crawler audit](https://github.com/bernard-ng/basango/actions/workflows/crawler_audit.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_audit.yml)
+[![crawler quality](https://github.com/bernard-ng/basango/actions/workflows/crawler_quality.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_quality.yml)
+[![crawler tests](https://github.com/bernard-ng/basango/actions/workflows/crawler_tests.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_tests.yml)
+[![mobile quality](https://github.com/bernard-ng/basango/actions/workflows/mobile_quality.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/mobile_quality.yaml)
 
-## Using this example
+| Scope             | Link                                      |
+|-------------------|-------------------------------------------|
+| Crawler           | [README.md](./projects/crawler/README.md) |
+| Backend           | [README.md](./projects/backend/README.md) |
+| Mobile            | [README.md](./projects/mobile/README.md)  |
 
-Run the following command:
+---
+### Introduction
 
-```sh
-npx create-turbo@latest
-```
+The **"Basango"** is a structured and scalable system of news articles sourced from major media outlets covering diverse aspects of the Democratic Republic of Congo (DRC). Designed for efficiency, this system enables the automated collection, processing, and organization of news stories spanning politics, economy, society, culture, environment, and international affairs.
 
-## What's inside?
+This system is built to support large-scale text analysis, making it a valuable resource for researchers, journalists, policymakers, and data scientists. It facilitates tasks such as sentiment analysis, trend detection, entity recognition, and language modeling, providing deep insights into the evolving socio-political and economic landscape of the DRC.
 
-This Turborepo includes the following packages/apps:
+To ensure quality and reliability, the dataset prioritizes reputable news sources while maintaining an adaptable framework for continuous expansion. However, users are encouraged to critically assess the content, as journalistic standards and perspectives may vary.
 
-### Apps and Packages
+### Sources
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+| Source               | Articles | Link                                 |
+|----------------------|----------|--------------------------------------|
+| radiookapi.net       | +100k    | https://www.radiookapi.net/actualite |
+| mediacongo.cd        | +100k    | https://www.mediacongo.net/          |
+| beto.cd              | +30k     | https://www.beto.cd/                 |
+| actualite.cd         | +57k     | https://actualite.cd/                |
+| 7sur7.cd             | +50k     | https://7sur7.cd                     |
+| newscd.net           | +5k      | https://newscd.net                   |
+| congoindependant.com | +10k     | https://www.congoindependant.com/    |
+| congoactu.net        | +10k     | https://www.congoactu.net/           |
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+### Acknowledgment:
+The compilation and curation of the "Basango" were conducted by Bernard Ngandu with the primary objective of facilitating research and analysis related to the Democratic Republic of Congo.
+I do not own the content of the articles, and all rights belong to the respective publishers. The dataset is intended for non-commercial research purposes only.
