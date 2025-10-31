@@ -1,0 +1,17 @@
+{
+  "name": "@basango/db",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@date-fns/utc": "^2.1.1",
+    "drizzle-orm": "^0.44.7",
+    "pg": "^8.16.3",
+    "snakecase-keys": "^9.0.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.6"
+  }
+}
