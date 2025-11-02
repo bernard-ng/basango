@@ -1,3 +1,5 @@
+import { DEFAULT_USER_AGENT, OPEN_GRAPH_USER_AGENT } from "@/constants";
+
 export class UserAgents {
   private static readonly USER_AGENTS: string[] = [
     "Mozilla/5.0 (iPhone; CPU iPhone OS 10_4_8; like Mac OS X) AppleWebKit/603.39 (KHTML, like Gecko) Chrome/52.0.3638.271 Mobile Safari/537.5",
@@ -15,16 +17,13 @@ export class UserAgents {
   private readonly rotate: boolean;
   private readonly fallback: string;
 
-  constructor(
-    rotate: boolean = true,
-    fallback: string = "Basango/0.1 (+https://github.com/bernard-ng/basango)",
-  ) {
+  constructor(rotate: boolean = true, fallback: string = DEFAULT_USER_AGENT) {
     this.rotate = rotate;
     this.fallback = fallback;
   }
 
   static og(): string {
-    return "facebookexternalhit/1.1";
+    return OPEN_GRAPH_USER_AGENT;
   }
 
   get(): string {
