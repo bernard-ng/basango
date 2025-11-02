@@ -1,18 +1,9 @@
-import type { SQL, AnyColumn } from "drizzle-orm";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  gt,
-  lt,
-  or,
-  sql,
-} from "drizzle-orm";
+import type { AnyColumn, SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 
 import type { Database } from "@db/client";
 import {
-  appUsers,
+  users,
   articles,
   bookmarkArticles,
   bookmarks,
@@ -104,6 +95,86 @@ interface NormalizedArticleFilters {
   sortDirection: SortDirection;
 }
 
+export interface ArticleExportRow {
+  articleId: string;
+  articleTitle: string;
+  articleLink: string;
+  articleCategories: string | null;
+  articleBody: string;
+  articleSource: string;
+  articleHash: string;
+  articlePublishedAt: string;
+  articleCrawledAt: string;
+}
+
+export interface ArticleExportParams {
+  source?: string | null;
+  dateRange?: { start: number; end: number } | null;
+  batchSize?: number;
+}
+
+export async function* getArticlesForExport(
+  db: Database,
+  params: ArticleExportParams = {},
+): AsyncGenerator<ArticleExportRow> {
+  const batchSize =
+    params.batchSize && params.batchSize > 0 ? params.batchSize : 1000;
+
+  const filters: SQL[] = [];
+
+  if (params.source) {
+    filters.push(eq(sources.name, params.source));
+  }
+
+  if (params.dateRange) {
+    filters.push(
+      sql`${articles.publishedAt} BETWEEN to_timestamp(${params.dateRange.start}) AND to_timestamp(${params.dateRange.end})`,
+    );
+  }
+
+  let query = db
+    .select({
+      articleId: articles.id,
+      articleTitle: articles.title,
+      articleLink: articles.link,
+      articleCategories: sql<
+        string | null
+      >`array_to_string(${articles.categories}, ',')`,
+      articleBody: articles.body,
+      articleSource: sources.name,
+      articleHash: articles.hash,
+      articlePublishedAt: articles.publishedAt,
+      articleCrawledAt: articles.crawledAt,
+    })
+    .from(articles)
+    .innerJoin(sources, eq(articles.sourceId, sources.id));
+
+  if (filters.length === 1) {
+    query = query.where(filters[0]);
+  } else if (filters.length > 1) {
+    query = query.where(and(...filters));
+  }
+
+  query = query.orderBy(desc(articles.publishedAt), desc(articles.id));
+
+  let offset = 0;
+  while (true) {
+    const rows = await query.limit(batchSize).offset(offset);
+    if (rows.length === 0) {
+      break;
+    }
+
+    for (const row of rows) {
+      yield {
+        ...row,
+        articleCategories: row.articleCategories ?? null,
+      };
+    }
+
+    offset += batchSize;
+  }
+}
+
 const SOURCE_IMAGE_BASE = "https://devscast.org/images/sources/";
 
 function normalizeArticleFilters(
@@ -113,7 +184,8 @@ function normalizeArticleFilters(
   const trimmedCategory = filters?.category?.trim();
 
   return {
-    search: trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
+    search:
+      trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
     category:
       trimmedCategory && trimmedCategory.length > 0
         ? trimmedCategory
@@ -123,9 +195,10 @@ function normalizeArticleFilters(
   };
 }
 
-function buildArticleFilterConditions(
-  filters: NormalizedArticleFilters,
-): { conditions: SQL[]; searchQuery?: string } {
+function buildArticleFilterConditions(filters: NormalizedArticleFilters): {
+  conditions: SQL[];
+  searchQuery?: string;
+} {
   const conditions: SQL[] = [];
   let searchQuery: string | undefined;
 
@@ -181,7 +254,9 @@ async function fetchArticleOverview(
     article_id: articles.id,
     article_title: articles.title,
     article_link: articles.link,
-    article_categories: sql<string | null>`array_to_string(${articles.categories}, ',')`,
+    article_categories: sql<
+      string | null
+    >`array_to_string(${articles.categories}, ',')`,
     article_excerpt: articles.excerpt,
     article_published_at: articles.publishedAt,
     article_image: articles.image,
@@ -242,9 +317,7 @@ async function fetchArticleOverview(
     orderings.push(desc(articles.publishedAt), desc(articles.id));
   }
 
-  const rows = await query
-    .orderBy(...orderings)
-    .limit(options.page.limit + 1);
+  const rows = await query.orderBy(...orderings).limit(options.page.limit + 1);
 
   return buildPaginationResult(rows, options.page, {
     id: "article_id",
@@ -314,7 +387,9 @@ export async function getBookmarkedArticleList(
     article_id: articles.id,
     article_title: articles.title,
     article_link: articles.link,
-    article_categories: sql<string | null>`array_to_string(${articles.categories}, ',')`,
+    article_categories: sql<
+      string | null
+    >`array_to_string(${articles.categories}, ',')`,
     article_excerpt: articles.excerpt,
     article_published_at: articles.publishedAt,
     article_image: articles.image,
@@ -377,9 +452,7 @@ export async function getBookmarkedArticleList(
     orderings.push(desc(articles.publishedAt), desc(articles.id));
   }
 
-  const rows = await query
-    .orderBy(...orderings)
-    .limit(page.limit + 1);
+  const rows = await query.orderBy(...orderings).limit(page.limit + 1);
 
   return buildPaginationResult(rows, page, {
     id: "article_id",
@@ -398,7 +471,9 @@ export async function getArticleDetails(
       article_id: articles.id,
       article_title: articles.title,
       article_link: articles.link,
-      article_categories: sql<string | null>`array_to_string(${articles.categories}, ',')`,
+      article_categories: sql<
+        string | null
+      >`array_to_string(${articles.categories}, ',')`,
       article_body: articles.body,
       article_hash: articles.hash,
       article_published_at: articles.publishedAt,
@@ -442,10 +517,7 @@ export async function getArticleCommentList(
     whereConditions.push(
       or(
         lt(comments.createdAt, cursor.date),
-        and(
-          eq(comments.createdAt, cursor.date),
-          lt(comments.id, cursor.id),
-        ),
+        and(eq(comments.createdAt, cursor.date), lt(comments.id, cursor.id)),
       ),
     );
   }
@@ -456,11 +528,11 @@ export async function getArticleCommentList(
       comment_content: comments.content,
       comment_sentiment: comments.sentiment,
       comment_created_at: comments.createdAt,
-      user_id: appUsers.id,
-      user_name: appUsers.name,
+      user_id: users.id,
+      user_name: users.name,
     })
     .from(comments)
-    .innerJoin(appUsers, eq(comments.userId, appUsers.id));
+    .innerJoin(users, eq(comments.userId, users.id));
 
   if (whereConditions.length === 1) {
     query = query.where(whereConditions[0]);
