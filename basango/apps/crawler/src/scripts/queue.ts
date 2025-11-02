@@ -1,33 +1,42 @@
-import {parseArgs} from "node:util";
+import { parseArgs } from "node:util";
 
-import {logger} from "@basango/logger";
-
-import {PipelineConfigManager} from "@crawler/config";
-import {createQueueSettings} from "@crawler/services/async/queue";
-import {scheduleAsyncCrawl} from "@crawler/services/async/tasks";
+import { logger } from "@basango/logger";
+import { PipelineConfigManager } from "@/config";
+import { createQueueSettings } from "@/process/async/queue";
+import { scheduleAsyncCrawl } from "@/process/async/tasks";
 
 interface QueueCliOptions {
-  "source-id"?: string;
+  source?: string;
   env: string;
-  "page-range"?: string;
-  "date-range"?: string;
+  page?: string;
+  date?: string;
   category?: string;
   "redis-url"?: string;
   help?: boolean;
 }
 
-const usage = `Usage: bun run src/scripts/queue.ts -- --source-id <id> [options]\n\nOptions:\n  --env <env>              Environment to load (default: development)\n  --page-range <range>     Optional page range filter (e.g. 1:5)\n  --date-range <range>     Optional date range filter (e.g. 2024-01-01:2024-01-31)\n  --category <slug>        Optional category to crawl\n  --redis-url <url>        Override Redis connection URL\n  -h, --help               Show this message`;
+const usage = `
+    Usage: bun run src/scripts/queue -- --source <id> [options]
+    
+    Options:
+      --page <range>        Optional page range filter (e.g. 1:5)
+      --date <range>        Optional date range filter (e.g. 2024-01-01:2024-01-31)
+      --category <slug>     Optional category to crawl
+      --redis-url <url>     Override Redis connection URL
+      --env <env>           Environment to load (default: development)
+      -h, --help            Show this message
+`;
 
 const parseCliArgs = (): QueueCliOptions => {
-  const {values} = parseArgs({
+  const { values } = parseArgs({
     options: {
-      "source-id": {type: "string"},
-      env: {type: "string", default: "development"},
-      "page-range": {type: "string"},
-      "date-range": {type: "string"},
-      category: {type: "string"},
-      "redis-url": {type: "string"},
-      help: {type: "boolean", short: "h"},
+      source: { type: "string" },
+      page: { type: "string" },
+      date: { type: "string" },
+      category: { type: "string" },
+      "redis-url": { type: "string" },
+      env: { type: "string", default: "development" },
+      help: { type: "boolean", short: "h" },
     },
   });
 
@@ -37,50 +46,35 @@ const parseCliArgs = (): QueueCliOptions => {
 const main = async (): Promise<void> => {
   const options = parseCliArgs();
 
-  if (options.help || !options["source-id"]) {
+  if (options.help || !options.source) {
     console.log(usage);
-    if (!options["source-id"]) {
+    if (!options.source) {
       process.exitCode = 1;
     }
     return;
   }
 
   const env = options.env ?? "development";
-  const manager = new PipelineConfigManager({env});
-  const config = manager.ensureDirectories();
-  manager.setupLogging(config);
+  const manager = new PipelineConfigManager({ env });
+  manager.setupLogging(manager.get(env));
 
   const settings = options["redis-url"]
-    ? createQueueSettings({redis_url: options["redis-url"]})
+    ? createQueueSettings({ redis_url: options["redis-url"] })
     : undefined;
 
   try {
-    const jobId = await scheduleAsyncCrawl({
-      sourceId: options["source-id"],
+    const id = await scheduleAsyncCrawl({
+      sourceId: options.source,
       env,
-      pageRange: options["page-range"] ?? null,
-      dateRange: options["date-range"] ?? null,
+      pageRange: options.page ?? null,
+      dateRange: options.date ?? null,
       category: options.category ?? null,
       settings,
     });
 
-    logger.info(
-      {
-        jobId,
-        sourceId: options["source-id"],
-        env,
-      },
-      "Scheduled asynchronous crawl job",
-    );
-    console.log(
-      `Scheduled async crawl job ${jobId} for source '${options["source-id"]}' (env=${env})`,
-    );
+    logger.info({ id, ...options }, "Scheduled asynchronous crawl job");
   } catch (error) {
-    logger.error(
-      error instanceof Error ? error : {error},
-      "Failed to schedule crawl job",
-    );
-    console.error(`Failed to schedule crawl job: ${(error as Error).message}`);
+    logger.error({ error }, "Failed to schedule crawl job");
     process.exitCode = 1;
   }
 };

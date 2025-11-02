@@ -21,7 +21,7 @@ jobs:
   functional:
     name: phpunit
     runs-on: ubuntu-latest
-#    services:
+#    process:
 #      mysql:
 #        image: mariadb:10.11.11
 #        env:
@@ -68,4 +68,4 @@ jobs:
           run: composer app:test
           env:
             APP_ENV: test
-#            DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/app_test
+#            DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.process.mysql.ports['3306'] }}/app_test

@@ -7,13 +7,13 @@ import {
   ListingTaskPayloadSchema,
   ProcessedTaskPayload,
   ProcessedTaskPayloadSchema,
-} from "./schemas";
+} from "@/process/async/schemas";
 import {
   createQueueManager,
   QueueManager,
   QueueSettings,
   QueueSettingsInput,
-} from "./queue";
+} from "@/process/async/queue";
 
 export interface CrawlerTaskHandlers {
   collectListing: (payload: ListingTaskPayload) => Promise<number> | number;

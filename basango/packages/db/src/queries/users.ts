@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
-import type { Database } from "@db/client";
-import { users } from "@db/schema";
+import type { Database } from "@/client";
+import { users } from "@/schema";
 
 export interface UserProfileRow {
   user_id: string;

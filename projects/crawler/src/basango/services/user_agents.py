@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class UserAgentProvider:
+class UserAgents:
     USER_AGENTS = [
         "Mozilla/5.0 (iPhone; CPU iPhone OS 10_4_8; like Mac OS X) AppleWebKit/603.39 (KHTML, like Gecko) Chrome/52.0.3638.271 Mobile Safari/537.5",
         "Mozilla/5.0 (Linux; U; Linux x86_64; en-US) Gecko/20130401 Firefox/52.7",

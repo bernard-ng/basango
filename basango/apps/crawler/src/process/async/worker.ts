@@ -1,5 +1,5 @@
 import IORedis from "ioredis";
-import { Worker, QueueEvents } from "bullmq";
+import { QueueEvents, Worker } from "bullmq";
 
 import {
   createQueueManager,
@@ -7,8 +7,12 @@ import {
   QueueManager,
   QueueSettings,
   QueueSettingsInput,
-} from "./queue";
-import { collectArticle, collectListing, forwardForProcessing } from "./tasks";
+} from "@/process/async/queue";
+import {
+  collectArticle,
+  collectListing,
+  forwardForProcessing,
+} from "@/process/async/tasks";
 
 export interface WorkerOptions {
   queueNames?: string[];
@@ -79,6 +83,7 @@ export const startWorker = (options: WorkerOptions = {}): WorkerHandle => {
     close: async () => {
       await Promise.all(workers.map((worker) => worker.close()));
       await Promise.all(events.map((event) => event.close()));
+
       if (!options.queueManager) {
         await manager.close();
       }

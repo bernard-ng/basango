@@ -1,14 +1,15 @@
 import { describe, expect, it } from "vitest";
-
 import {
+  PageRangeSchema,
+  PageRangeSpecSchema,
   PipelineConfigSchema,
+} from "@/schema";
+import {
   createDateRange,
   formatDateRange,
   isTimestampInRange,
-  PageRangeSpecSchema,
-  PageRangeSchema,
   schemaToJSON,
-} from "./schema";
+} from "@/utils";
 
 describe("schema helpers", () => {
   it("creates date range from spec", () => {
@@ -30,6 +31,7 @@ describe("schema helpers", () => {
 
   it("produces json schema", () => {
     const json = schemaToJSON(PipelineConfigSchema);
+    // @ts-ignore
     expect(json.type).toBe("object");
   });
 });

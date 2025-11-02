@@ -1,11 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-
+import { QueueManager } from "../process/async/queue";
 import {
-  scheduleAsyncCrawl,
-  registerCrawlerTaskHandlers,
   collectListing,
-} from "./tasks";
-import { QueueManager } from "./queue";
+  registerCrawlerTaskHandlers,
+  scheduleAsyncCrawl,
+} from "@/process/async/tasks";
 
 describe("Async tasks", () => {
   it("schedules crawl with provided manager", async () => {

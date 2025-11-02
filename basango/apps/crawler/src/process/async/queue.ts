@@ -11,8 +11,8 @@ import {
   ListingTaskPayloadSchema,
   ProcessedTaskPayload,
   ProcessedTaskPayloadSchema,
-} from "./schemas";
-import { parseRedisUrl } from "@crawler/utils";
+} from "@/process/async/schemas";
+import { parseRedisUrl } from "@/utils";
 
 const QueueSettingsSchema = z.object({
   redis_url: z

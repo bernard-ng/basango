@@ -1,10 +1,10 @@
-import {parseArgs} from "node:util";
+import { parseArgs } from "node:util";
 
-import {logger} from "@basango/logger";
+import { logger } from "@basango/logger";
 
-import {PipelineConfigManager} from "@crawler/config";
-import {createQueueManager, createQueueSettings,} from "@crawler/services/async/queue";
-import {startWorker} from "@crawler/services/async/worker";
+import { PipelineConfigManager } from "@/config";
+import { createQueueManager, createQueueSettings } from "@/process/async/queue";
+import { startWorker } from "@/process/async/worker";
 
 interface WorkerCliOptions {
   env: string;
@@ -14,16 +14,25 @@ interface WorkerCliOptions {
   help?: boolean;
 }
 
-const usage = `Usage: bun run src/scripts/worker.ts [options]\n\nOptions:\n  --env <env>              Environment to load (default: development)\n  -q, --queue <name>       Queue name to listen on (repeatable)\n  --concurrency <number>   Number of concurrent jobs per worker\n  --redis-url <url>        Override Redis connection URL\n  -h, --help               Show this message`;
+const usage = `
+    Usage: bun run src/scripts/worker [options]
+    
+    Options:
+      --env <env>              Environment to load (default: development)
+      -q, --queue <name>       Queue name to listen on (repeatable)
+      --concurrency <number>   Number of concurrent jobs per worker
+      --redis-url <url>        Override Redis connection URL
+      -h, --help               Show this message
+`;
 
 const parseCliArgs = (): WorkerCliOptions => {
-  const {values} = parseArgs({
+  const { values } = parseArgs({
     options: {
-      env: {type: "string", default: "development"},
-      queue: {type: "string", multiple: true, short: "q"},
-      concurrency: {type: "string"},
-      "redis-url": {type: "string"},
-      help: {type: "boolean", short: "h"},
+      env: { type: "string", default: "development" },
+      queue: { type: "string", multiple: true, short: "q" },
+      concurrency: { type: "string" },
+      "redis-url": { type: "string" },
+      help: { type: "boolean", short: "h" },
     },
   });
 
@@ -52,25 +61,24 @@ const main = async (): Promise<void> => {
   }
 
   const env = options.env ?? "development";
-  const manager = new PipelineConfigManager({env});
-  const config = manager.ensureDirectories();
-  manager.setupLogging(config);
+  const manager = new PipelineConfigManager({ env });
+  manager.setupLogging(manager.get(env));
 
   let concurrency: number | undefined;
   try {
     concurrency = parseConcurrency(options.concurrency);
   } catch (error) {
     logger.error(
-      error instanceof Error ? error : {error},
+      error instanceof Error ? error : { error },
       "Invalid concurrency value provided",
     );
     process.exitCode = 1;
     return;
   }
   const settings = options["redis-url"]
-    ? createQueueSettings({redis_url: options["redis-url"]})
+    ? createQueueSettings({ redis_url: options["redis-url"] })
     : undefined;
-  const queueManager = createQueueManager({settings});
+  const queueManager = createQueueManager({ settings });
 
   const queueNames = options.queue?.length
     ? options.queue.map((name) => queueManager.queueName(name))
@@ -83,7 +91,7 @@ const main = async (): Promise<void> => {
   });
 
   const shutdown = async (signal: NodeJS.Signals) => {
-    logger.info({signal}, "Received shutdown signal, draining workers");
+    logger.info({ signal }, "Received shutdown signal, draining workers");
     try {
       await handle.close();
     } finally {
