@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { db } from "@db/client";
+import { db } from "@/client";
 
 export async function checkHealth() {
   await db.execute(sql`SELECT 1`);

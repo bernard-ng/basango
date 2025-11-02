@@ -6,7 +6,7 @@ import trafilatura
 
 from basango.core.config import ClientConfig
 from basango.services.http_client import SyncHttpClient
-from basango.services.user_agents import UserAgentProvider
+from basango.services.user_agents import UserAgents
 
 
 @dataclass
@@ -19,7 +19,7 @@ class OpenGraphObject:
 
 class OpenGraphProvider:
     def __init__(
-        self, user_agent_provider: UserAgentProvider = UserAgentProvider(rotate=False)
+        self, user_agent_provider: UserAgents = UserAgents(rotate=False)
     ) -> None:
         self._user_agent = user_agent_provider.og()
         self._http_client = SyncHttpClient(

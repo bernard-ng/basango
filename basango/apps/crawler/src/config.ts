@@ -1,26 +1,21 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
+import fs from "node:fs";
+import path from "node:path";
 
-import {logger} from "@basango/logger";
+import { logger } from "@basango/logger";
 
+import { PipelineConfig, PipelineConfigSchema } from "@/schema";
 import {
+  ensureDirectories,
   mergePipelineConfig,
-  PipelineConfig,
-  PipelineConfigSchema,
   resolveConfigPath,
   resolveProjectPaths,
-} from "./schema";
-import {ensureDirectories} from "./utils";
+} from "@/utils";
+import { DEFAULT_CONFIG_FILES } from "@/constants";
 
 export interface LoadConfigOptions {
-  configPath?: string;
+  path?: string;
   env?: string;
 }
-
-const DEFAULT_CONFIG_FILES = [
-  path.join(process.cwd(), "config", "pipeline.json"),
-  path.join(process.cwd(), "pipeline.json"),
-];
 
 const readJsonFile = (filePath: string): unknown => {
   const contents = fs.readFileSync(filePath, "utf-8");
@@ -38,7 +33,7 @@ const locateConfigFile = (explicit?: string): string => {
     }
   }
 
-  return DEFAULT_CONFIG_FILES[0];
+  return DEFAULT_CONFIG_FILES[0]!;
 };
 
 const readPipelineConfig = (configPath: string): PipelineConfig => {
@@ -71,7 +66,7 @@ const applyEnvironmentOverride = (
 };
 
 export const loadConfig = (options: LoadConfigOptions = {}): PipelineConfig => {
-  const basePath = locateConfigFile(options.configPath);
+  const basePath = locateConfigFile(options.path);
   const config = applyEnvironmentOverride(
     readPipelineConfig(basePath),
     basePath,
@@ -88,12 +83,12 @@ export const dumpConfig = (
 ): void => {
   const destination = targetPath ?? locateConfigFile();
   const normalized = PipelineConfigSchema.parse(config);
-  fs.mkdirSync(path.dirname(destination), {recursive: true});
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
   fs.writeFileSync(destination, JSON.stringify(normalized, null, 2));
 };
 
 export interface PipelineConfigManagerOptions {
-  configPath?: string;
+  path?: string;
   env?: string;
   autoLoad?: boolean;
 }
@@ -106,12 +101,12 @@ export class PipelineConfigManager {
   private cache?: PipelineConfig;
 
   constructor(options: PipelineConfigManagerOptions = {}) {
-    this.explicitPath = options.configPath;
+    this.explicitPath = options.path;
     this.defaultEnv = options.env ?? "development";
 
     if (options.autoLoad !== false) {
       this.cache = loadConfig({
-        configPath: this.explicitPath,
+        path: this.explicitPath,
         env: this.defaultEnv,
       });
     }
@@ -122,14 +117,14 @@ export class PipelineConfigManager {
 
     if (resolvedEnv !== this.defaultEnv) {
       return loadConfig({
-        configPath: this.explicitPath,
+        path: this.explicitPath,
         env: resolvedEnv,
       });
     }
 
     if (!this.cache) {
       this.cache = loadConfig({
-        configPath: this.explicitPath,
+        path: this.explicitPath,
         env: resolvedEnv,
       });
     }
@@ -137,29 +132,9 @@ export class PipelineConfigManager {
     return this.cache;
   }
 
-  reload(env?: string): PipelineConfig {
-    const resolvedEnv = env ?? this.defaultEnv;
-    const config = loadConfig({
-      configPath: this.explicitPath,
-      env: resolvedEnv,
-    });
-
-    if (resolvedEnv === this.defaultEnv) {
-      this.cache = config;
-    }
-
-    return config;
-  }
-
-  ensureDirectories(config?: PipelineConfig): PipelineConfig {
-    const pipeline = config ?? this.get();
-    ensureDirectories(pipeline.paths);
-    return pipeline;
-  }
-
   setupLogging(config?: PipelineConfig): void {
     const pipeline = config ?? this.get();
-    this.ensureDirectories(pipeline);
+    ensureDirectories(pipeline.paths);
 
     const level = pipeline.logging.level.toLowerCase();
     process.env.LOG_LEVEL = level;
@@ -168,15 +143,10 @@ export class PipelineConfigManager {
     if (pipeline.logging.file_logging) {
       const logDir = pipeline.paths.logs;
       const destination = path.join(logDir, pipeline.logging.log_file);
-      fs.mkdirSync(path.dirname(destination), {recursive: true});
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
       if (!fs.existsSync(destination)) {
         fs.writeFileSync(destination, "");
       }
     }
-  }
-
-  resolveConfigPath(env?: string): string {
-    const base = locateConfigFile(this.explicitPath);
-    return resolveConfigPath(base, env ?? this.defaultEnv);
   }
 }

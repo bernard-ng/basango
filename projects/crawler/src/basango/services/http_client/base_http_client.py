@@ -8,7 +8,7 @@ from typing import Any, Optional, TypeAlias
 import httpx
 
 from basango.core.config import ClientConfig
-from basango.services.user_agents import UserAgentProvider
+from basango.services.user_agents import UserAgents
 
 HttpHeaders: TypeAlias = dict[str, str] | None
 HttpParams: TypeAlias = dict[str, Any] | None
@@ -20,13 +20,13 @@ TRANSIENT_STATUSES = (429, 500, 502, 503, 504)
 @dataclass
 class BaseHttpClient(ABC):
     client_config: ClientConfig
-    user_agent_provider: UserAgentProvider | None = None
+    user_agent_provider: UserAgents | None = None
     default_headers: HttpHeaders = None
     _user_agent: str = field(init=False, repr=False)
     _headers: dict[str, str] = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
-        provider = self.user_agent_provider or UserAgentProvider(
+        provider = self.user_agent_provider or UserAgents(
             rotate=self.client_config.rotate,
             fallback=self.client_config.user_agent,
         )

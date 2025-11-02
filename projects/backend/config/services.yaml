@@ -1,4 +1,4 @@
-# This file is the entry point to configure your own services.
+# This file is the entry point to configure your own process.
 # Files in the packages/ subdirectory configure your dependencies.
 
 # Put parameters here that don't need to change on each machine where the app is deployed
@@ -7,10 +7,10 @@ parameters:
     basango_notification_email: '%env(BASANGO_NOTIFICATION_EMAIL)%'
 
 services:
-    # default configuration for services in *this* file
+    # default configuration for process in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true      # Automatically injects dependencies in your process.
+        autoconfigure: true # Automatically registers your process as commands, event subscribers, etc.
         bind:
             $projectDir: '%kernel.project_dir%'
             $crawlingNotificationEmail: '%basango_notification_email%'
@@ -42,7 +42,7 @@ services:
         tags:
             - { name: monolog.formatter }
 
-    # makes classes in src/ available to be used as services
+    # makes classes in src/ available to be used as process
     # this creates a service per class whose id is the fully-qualified class name
     Basango\:
         resource: '../src/'

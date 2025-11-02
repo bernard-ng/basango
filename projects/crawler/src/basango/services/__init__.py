@@ -2,7 +2,7 @@ from .date_parser import DateParser
 from .http_client import BaseHttpClient, SyncHttpClient, AsyncHttpClient
 from .open_graph import OpenGraphProvider
 from .persistence import BasePersistor, CsvPersistor, JsonPersistor
-from .user_agents import UserAgentProvider
+from .user_agents import UserAgents
 from .tokenizer import Tokenizer
 
 HttpClient = SyncHttpClient
@@ -14,7 +14,7 @@ __all__ = [
     "AsyncHttpClient",
     "HttpClient",
     "OpenGraphProvider",
-    "UserAgentProvider",
+    "UserAgents",
     "BasePersistor",
     "CsvPersistor",
     "JsonPersistor",

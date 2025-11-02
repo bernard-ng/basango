@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-
-import { createQueueManager, createQueueSettings } from "./queue";
+import { createQueueManager, createQueueSettings } from "@/process/async/queue";
 
 class InMemoryQueue {
   public jobs: Array<{ name: string; data: unknown }> = [];

@@ -3,9 +3,9 @@ import os from "node:os";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { loadConfig } from "@/config";
 
-import { loadConfig } from "./config";
-import { resolveConfigPath } from "./schema";
+import { resolveConfigPath } from "@/utils";
 
 describe("loadConfig", () => {
   it("parses json configuration and ensures directories", () => {
@@ -32,7 +32,7 @@ describe("loadConfig", () => {
       ),
     );
 
-    const config = loadConfig({ configPath });
+    const config = loadConfig({ path: configPath });
 
     expect(config.fetch.client.timeout).toBe(10);
     expect(fs.existsSync(paths.data)).toBe(true);
@@ -74,7 +74,7 @@ describe("loadConfig", () => {
       ),
     );
 
-    const config = loadConfig({ configPath: basePath, env: "production" });
+    const config = loadConfig({ path: basePath, env: "production" });
 
     expect(config.logging.level).toBe("DEBUG");
   });

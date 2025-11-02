@@ -1,10 +1,5 @@
 import { z } from "zod";
-
-import {
-  AnySourceConfig,
-  DateRangeSchema,
-  PageRangeSchema,
-} from "@crawler/schema";
+import { AnySourceConfig, DateRangeSchema, PageRangeSchema } from "@/schema";
 
 export const ListingTaskPayloadSchema = z.object({
   source_id: z.string(),

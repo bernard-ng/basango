@@ -1,20 +1,19 @@
 {
   "name": "@basango/crawler",
-  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -b",
     "test": "vitest --run",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "queue": "bun run src/scripts/queue.ts",
     "worker": "bun run src/scripts/worker.ts"
   },
   "dependencies": {
     "@basango/logger": "workspace:*",
     "bullmq": "^4.17.0",
-    "date-fns": "^3.6.0",
+    "date-fns": "catalog:",
     "ioredis": "^5.3.2",
     "tiktoken": "^1.0.14",
     "zod": "catalog:"

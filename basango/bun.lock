@@ -4,6 +4,7 @@
     "": {
       "name": "basango",
       "devDependencies": {
+        "@basango/tsconfig": "workspace:*",
         "@biomejs/biome": "^2.3.1",
         "@manypkg/cli": "^0.25.1",
         "turbo": "^2.5.8",
@@ -19,12 +20,11 @@
         "date-fns": "^3.6.0",
         "ioredis": "^5.3.2",
         "tiktoken": "^1.0.14",
-        "zod": "^4.0.0",
+        "zod": "catalog:",
       },
     },
     "packages/db": {
       "name": "@basango/db",
-      "version": "1.0.0",
       "dependencies": {
         "@basango/logger": "workspace:*",
         "@date-fns/utc": "^2.1.1",
@@ -52,12 +52,12 @@
     },
     "packages/tsconfig": {
       "name": "@basango/tsconfig",
-      "version": "0.0.0",
     },
   },
   "catalog": {
     "@types/bun": "^1.3.1",
     "typescript": "^5.9.3",
+    "zod": "^4.0.0",
   },
   "packages": {
     "@basango/crawler": ["@basango/crawler@workspace:apps/crawler"],

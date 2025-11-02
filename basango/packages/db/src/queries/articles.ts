@@ -1,24 +1,24 @@
 import type { AnyColumn, SQL } from "drizzle-orm";
 import { and, asc, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 
-import type { Database } from "@db/client";
+import type { Database } from "@/client";
 import {
-  users,
   articles,
   bookmarkArticles,
   bookmarks,
   comments,
   sources,
-} from "@db/schema";
+  users,
+} from "@/schema";
 import {
   buildPaginationResult,
   createPageState,
   decodeCursor,
   type PageRequest,
-  type PaginationMeta,
   type PageState,
+  type PaginationMeta,
   type SortDirection,
-} from "@db/utils/pagination";
+} from "@/utils/pagination";
 
 export interface ArticleFilters {
   search?: string | null;
@@ -128,7 +128,14 @@ export async function* getArticlesForExport(
 
   if (params.dateRange) {
     filters.push(
-      sql`${articles.publishedAt} BETWEEN to_timestamp(${params.dateRange.start}) AND to_timestamp(${params.dateRange.end})`,
+      sql`${articles.publishedAt} BETWEEN to_timestamp(
+      ${params.dateRange.start}
+      )
+      AND
+      to_timestamp
+      (
+      ${params.dateRange.end}
+      )`,
     );
   }
 
@@ -137,9 +144,8 @@ export async function* getArticlesForExport(
       articleId: articles.id,
       articleTitle: articles.title,
       articleLink: articles.link,
-      articleCategories: sql<
-        string | null
-      >`array_to_string(${articles.categories}, ',')`,
+      articleCategories: sql<string | null>`array_to_string
+          (${articles.categories}, ',')`,
       articleBody: articles.body,
       articleSource: sources.name,
       articleHash: articles.hash,
@@ -203,7 +209,9 @@ function buildArticleFilterConditions(filters: NormalizedArticleFilters): {
   let searchQuery: string | undefined;
 
   if (filters.category) {
-    conditions.push(sql`${filters.category} = ANY(${articles.categories})`);
+    conditions.push(sql`${filters.category} = ANY(
+    ${articles.categories}
+    )`);
   }
 
   if (filters.search) {
@@ -211,14 +219,23 @@ function buildArticleFilterConditions(filters: NormalizedArticleFilters): {
     if (sanitized.length > 0) {
       searchQuery = sanitized;
       conditions.push(
-        sql`${articles.tsv} @@ to_tsquery('french', ${sanitized})`,
+        sql`${articles.tsv} @@ to_tsquery('french',
+        ${sanitized}
+        )`,
       );
     }
   }
 
   if (filters.dateRange) {
     conditions.push(
-      sql`${articles.publishedAt} BETWEEN to_timestamp(${filters.dateRange.start}) AND to_timestamp(${filters.dateRange.end})`,
+      sql`${articles.publishedAt} BETWEEN to_timestamp(
+      ${filters.dateRange.start}
+      )
+      AND
+      to_timestamp
+      (
+      ${filters.dateRange.end}
+      )`,
     );
   }
 
@@ -226,12 +243,12 @@ function buildArticleFilterConditions(filters: NormalizedArticleFilters): {
 }
 
 function buildBookmarkExistsExpression(userId: string): SQL<boolean> {
-  return sql`EXISTS (
-    SELECT 1
-    FROM ${bookmarkArticles} ba
-    INNER JOIN ${bookmarks} b ON ba.bookmark_id = b.id
-    WHERE ba.article_id = ${articles.id} AND b.user_id = ${userId}
-  )`;
+  return sql`EXISTS
+  (SELECT 1
+   FROM ${bookmarkArticles} ba
+            INNER JOIN ${bookmarks} b ON ba.bookmark_id = b.id
+   WHERE ba.article_id = ${articles.id}
+     AND b.user_id = ${userId})`;
 }
 
 async function fetchArticleOverview(
@@ -254,9 +271,8 @@ async function fetchArticleOverview(
     article_id: articles.id,
     article_title: articles.title,
     article_link: articles.link,
-    article_categories: sql<
-      string | null
-    >`array_to_string(${articles.categories}, ',')`,
+    article_categories: sql<string | null>`array_to_string
+        (${articles.categories}, ',')`,
     article_excerpt: articles.excerpt,
     article_published_at: articles.publishedAt,
     article_image: articles.image,
@@ -306,8 +322,12 @@ async function fetchArticleOverview(
   if (searchQuery) {
     orderings.push(
       options.filters.sortDirection === "asc"
-        ? sql`ts_rank(${articles.tsv}, to_tsquery('french', ${searchQuery})) ASC`
-        : sql`ts_rank(${articles.tsv}, to_tsquery('french', ${searchQuery})) DESC`,
+        ? sql`ts_rank
+                  (${articles.tsv}, to_tsquery('french', ${searchQuery}))
+                  ASC`
+        : sql`ts_rank
+                  (${articles.tsv}, to_tsquery('french', ${searchQuery}))
+                  DESC`,
     );
   }
 
@@ -387,9 +407,8 @@ export async function getBookmarkedArticleList(
     article_id: articles.id,
     article_title: articles.title,
     article_link: articles.link,
-    article_categories: sql<
-      string | null
-    >`array_to_string(${articles.categories}, ',')`,
+    article_categories: sql<string | null>`array_to_string
+        (${articles.categories}, ',')`,
     article_excerpt: articles.excerpt,
     article_published_at: articles.publishedAt,
     article_image: articles.image,
@@ -441,8 +460,12 @@ export async function getBookmarkedArticleList(
   if (searchQuery) {
     orderings.push(
       filters.sortDirection === "asc"
-        ? sql`ts_rank(${articles.tsv}, to_tsquery('french', ${searchQuery})) ASC`
-        : sql`ts_rank(${articles.tsv}, to_tsquery('french', ${searchQuery})) DESC`,
+        ? sql`ts_rank
+                  (${articles.tsv}, to_tsquery('french', ${searchQuery}))
+                  ASC`
+        : sql`ts_rank
+                  (${articles.tsv}, to_tsquery('french', ${searchQuery}))
+                  DESC`,
     );
   }
 
@@ -471,9 +494,8 @@ export async function getArticleDetails(
       article_id: articles.id,
       article_title: articles.title,
       article_link: articles.link,
-      article_categories: sql<
-        string | null
-      >`array_to_string(${articles.categories}, ',')`,
+      article_categories: sql<string | null>`array_to_string
+          (${articles.categories}, ',')`,
       article_body: articles.body,
       article_hash: articles.hash,
       article_published_at: articles.publishedAt,

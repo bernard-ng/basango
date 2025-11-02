@@ -1,15 +1,15 @@
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 
-import type { Database } from "@db/client";
-import { bookmarkArticles, bookmarks } from "@db/schema";
+import type { Database } from "@/client";
+import { bookmarkArticles, bookmarks } from "@/schema";
 import {
   buildPaginationResult,
   createPageState,
   decodeCursor,
   type PageRequest,
   type PaginationMeta,
-} from "@db/utils/pagination";
+} from "@/utils/pagination";
 
 export interface BookmarkRow {
   bookmark_id: string;

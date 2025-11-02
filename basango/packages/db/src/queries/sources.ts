@@ -1,16 +1,16 @@
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 
-import type { Database } from "@db/client";
-import { articles, followedSources, sources } from "@db/schema";
+import type { Database } from "@/client";
+import { articles, followedSources, sources } from "@/schema";
 import {
   buildPaginationResult,
   createPageState,
   decodeCursor,
   type PageRequest,
   type PaginationMeta,
-} from "@db/utils/pagination";
-import { PUBLICATION_GRAPH_DAYS, SOURCE_IMAGE_BASE } from "@db/constant";
+} from "@/utils/pagination";
+import { PUBLICATION_GRAPH_DAYS, SOURCE_IMAGE_BASE } from "@/constant";
 
 export interface SourceOverviewRow {
   source_id: string;

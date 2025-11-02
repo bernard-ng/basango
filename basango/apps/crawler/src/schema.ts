@@ -1,20 +1,14 @@
-import * as path from "node:path";
-
-import {format as formatDate, getUnixTime, isMatch, parse} from "date-fns";
 import {z} from "zod";
+import {createSourcesConfig, resolveProjectPaths} from "@/utils";
 
 export const UpdateDirectionSchema = z.enum(["forward", "backward"]);
-export type UpdateDirection = z.infer<typeof UpdateDirectionSchema>;
-
 export const SourceKindSchema = z.enum(["wordpress", "html"]);
-export type SourceKind = z.infer<typeof SourceKindSchema>;
 
 export const SourceDateSchema = z.object({
   format: z.string().default("yyyy-LL-dd HH:mm"),
   pattern: z.string().nullable().optional(),
   replacement: z.string().nullable().optional(),
 });
-export type SourceDate = z.infer<typeof SourceDateSchema>;
 
 export const SourceSelectorsSchema = z.object({
   articles: z.string().optional().nullable(),
@@ -25,7 +19,6 @@ export const SourceSelectorsSchema = z.object({
   article_categories: z.string().optional().nullable(),
   pagination: z.string().default("ul.pagination > li a"),
 });
-export type SourceSelectors = z.infer<typeof SourceSelectorsSchema>;
 
 const BaseSourceSchema = z.object({
   source_id: z.string(),
@@ -53,10 +46,6 @@ export const WordPressSourceConfigSchema = BaseSourceSchema.extend({
   ),
 });
 
-export type HtmlSourceConfig = z.infer<typeof HtmlSourceConfigSchema>;
-export type WordPressSourceConfig = z.infer<typeof WordPressSourceConfigSchema>;
-export type AnySourceConfig = HtmlSourceConfig | WordPressSourceConfig;
-
 export const DateRangeSchema = z
   .object({
     start: z.number().int(),
@@ -77,8 +66,6 @@ export const DateRangeSchema = z
     }
   });
 
-export type DateRange = z.infer<typeof DateRangeSchema>;
-
 export const PageRangeSchema = z
   .object({
     start: z.number().int().min(0),
@@ -93,83 +80,24 @@ export const PageRangeSchema = z
     }
   });
 
-export type PageRange = z.infer<typeof PageRangeSchema>;
-
 export const PageRangeSpecSchema = z
   .string()
   .regex(/^[0-9]+:[0-9]+$/, "Invalid page range format. Use start:end")
   .transform((spec) => {
     const [startText, endText] = spec.split(":");
     return {
-      start: Number.parseInt(startText, 10),
-      end: Number.parseInt(endText, 10),
+      start: Number.parseInt(String(startText), 10),
+      end: Number.parseInt(String(endText), 10),
     };
   });
-
-const defaultDateFormat = "yyyy-LL-dd";
 
 export const DateRangeSpecSchema = z
   .string()
   .regex(/.+:.+/, "Expected start:end format")
   .transform((spec) => {
     const [startRaw, endRaw] = spec.split(":");
-    return {startRaw, endRaw};
+    return {startRaw: String(startRaw), endRaw: String(endRaw)};
   });
-
-const parseDate = (value: string, format: string): Date => {
-  if (!isMatch(value, format)) {
-    throw new Error(`Invalid date '${value}' for format '${format}'`);
-  }
-  const parsed = parse(value, format, new Date());
-  if (Number.isNaN(parsed.getTime())) {
-    throw new Error(`Invalid date '${value}' for format '${format}'`);
-  }
-  return parsed;
-};
-
-export interface CreateDateRangeOptions {
-  format?: string;
-  separator?: string;
-}
-
-export const createDateRange = (
-  spec: string,
-  options: CreateDateRangeOptions = {},
-): DateRange => {
-  const {format = defaultDateFormat, separator = ":"} = options;
-  if (!separator) {
-    throw new Error("Separator cannot be empty");
-  }
-
-  const normalized = spec.replace(separator, ":");
-  const parsedSpec = DateRangeSpecSchema.parse(normalized);
-
-  const startDate = parseDate(parsedSpec.startRaw, format);
-  const endDate = parseDate(parsedSpec.endRaw, format);
-
-  const range = {
-    start: getUnixTime(startDate),
-    end: getUnixTime(endDate),
-  };
-
-  return DateRangeSchema.parse(range);
-};
-
-export const formatDateRange = (
-  range: DateRange,
-  fmt = defaultDateFormat,
-): string => {
-  const start = formatDate(new Date(range.start * 1000), fmt);
-  const end = formatDate(new Date(range.end * 1000), fmt);
-  return `${start}:${end}`;
-};
-
-export const isTimestampInRange = (
-  range: DateRange,
-  timestamp: number,
-): boolean => {
-  return range.start <= timestamp && timestamp <= range.end;
-};
 
 export const ProjectPathsSchema = z.object({
   root: z.string(),
@@ -177,16 +105,6 @@ export const ProjectPathsSchema = z.object({
   logs: z.string(),
   configs: z.string(),
 });
-export type ProjectPaths = z.infer<typeof ProjectPathsSchema>;
-
-export const resolveProjectPaths = (rootDir: string): ProjectPaths => {
-  return ProjectPathsSchema.parse({
-    root: rootDir,
-    data: path.join(rootDir, "data", "dataset"),
-    logs: path.join(rootDir, "data", "logs"),
-    configs: path.join(rootDir, "config"),
-  });
-};
 
 export const LoggingConfigSchema = z.object({
   level: z.string().default("INFO"),
@@ -203,7 +121,6 @@ export const LoggingConfigSchema = z.object({
     .default(10 * 1024 * 1024),
   backup_count: z.number().int().nonnegative().default(5),
 });
-export type LoggingConfig = z.infer<typeof LoggingConfigSchema>;
 
 export const ClientConfigSchema = z.object({
   timeout: z.number().positive().default(20),
@@ -234,34 +151,15 @@ export const CrawlerConfigSchema = z.object({
   direction: UpdateDirectionSchema.default("forward"),
 });
 
-export type ClientConfig = z.infer<typeof ClientConfigSchema>;
-export type CrawlerConfig = z.infer<typeof CrawlerConfigSchema> & {
-  source?: AnySourceConfig;
-};
-
 export const FetchConfigSchema = z.object({
   client: ClientConfigSchema.default(ClientConfigSchema.parse({})),
   crawler: CrawlerConfigSchema.default(CrawlerConfigSchema.parse({})),
 });
-export type FetchConfig = z.infer<typeof FetchConfigSchema>;
 
-const SourcesConfigSchema = z.object({
+export const SourcesConfigSchema = z.object({
   html: z.array(HtmlSourceConfigSchema).default([]),
   wordpress: z.array(WordPressSourceConfigSchema).default([]),
 });
-
-export type SourcesConfig = z.infer<typeof SourcesConfigSchema> & {
-  find: (sourceId: string) => AnySourceConfig | undefined;
-};
-
-export const createSourcesConfig = (input: unknown): SourcesConfig => {
-  const parsed = SourcesConfigSchema.parse(input);
-  const resolver = (sourceId: string) =>
-    [...parsed.html, ...parsed.wordpress].find(
-      (source) => source.source_id === sourceId,
-    );
-  return Object.assign({find: resolver}, parsed);
-};
 
 export const PipelineConfigSchema = z.object({
   paths: ProjectPathsSchema.default(resolveProjectPaths(process.cwd())),
@@ -271,61 +169,29 @@ export const PipelineConfigSchema = z.object({
     .union([SourcesConfigSchema, z.undefined()])
     .transform((value) => createSourcesConfig(value ?? {})),
 });
-export type PipelineConfig = z.infer<typeof PipelineConfigSchema>
 
-export const mergePipelineConfig = (
-  base: PipelineConfig,
-  overrides: Partial<PipelineConfig>,
-): PipelineConfig => {
-  const paths = overrides.paths ?? base.paths;
-  const logging = {...base.logging, ...(overrides.logging ?? {})};
-  const fetch = {
-    client: {...base.fetch.client, ...(overrides.fetch?.client ?? {})},
-    crawler: {...base.fetch.crawler, ...(overrides.fetch?.crawler ?? {})},
-  };
+export type UpdateDirection = z.infer<typeof UpdateDirectionSchema>;
+export type SourceKind = z.infer<typeof SourceKindSchema>;
+export type SourceDate = z.infer<typeof SourceDateSchema>;
+export type SourceSelectors = z.infer<typeof SourceSelectorsSchema>;
+export type HtmlSourceConfig = z.infer<typeof HtmlSourceConfigSchema>;
+export type WordPressSourceConfig = z.infer<typeof WordPressSourceConfigSchema>;
+export type AnySourceConfig = HtmlSourceConfig | WordPressSourceConfig;
+export type DateRange = z.infer<typeof DateRangeSchema>;
+export type PageRange = z.infer<typeof PageRangeSchema>;
 
-  const sources = createSourcesConfig({
-    html: overrides.sources?.html ?? base.sources.html,
-    wordpress: overrides.sources?.wordpress ?? base.sources.wordpress,
-  });
-
-  return {
-    paths,
-    logging,
-    fetch,
-    sources,
-  };
+export interface CreateDateRangeOptions {
+  format?: string;
+  separator?: string;
+}
+export type SourcesConfig = z.infer<typeof SourcesConfigSchema> & {
+  find: (sourceId: string) => AnySourceConfig | undefined;
 };
-
-export const resolveConfigPath = (basePath: string, env?: string): string => {
-  if (!env || env === "development") {
-    return basePath;
-  }
-
-  const ext = path.extname(basePath);
-  const withoutExt = basePath.slice(0, basePath.length - ext.length);
-  return `${withoutExt}.${env}${ext}`;
+export type ProjectPaths = z.infer<typeof ProjectPathsSchema>;
+export type LoggingConfig = z.infer<typeof LoggingConfigSchema>;
+export type ClientConfig = z.infer<typeof ClientConfigSchema>;
+export type CrawlerConfig = z.infer<typeof CrawlerConfigSchema> & {
+  source?: AnySourceConfig;
 };
-
-export const schemaToJSON = <T extends z.ZodTypeAny>(schema: T): unknown => {
-  const toJSONSchema = (z as any).toJSONSchema as
-    | ((s: z.ZodTypeAny, opts?: Record<string, unknown>) => unknown)
-    | undefined;
-
-  if (typeof toJSONSchema === "function") {
-    try {
-      // target can be "draft-2020-12" | "draft-7" | "draft-4" | "openapi-3.0"
-      return toJSONSchema(schema, {target: "draft-2020-12", unrepresentable: "any"});
-    } catch {
-      // fall through to minimal mapping
-    }
-  }
-
-  if (schema instanceof z.ZodObject) return {type: "object"};
-  if (schema instanceof z.ZodArray) return {type: "array"};
-  if (schema instanceof z.ZodString) return {type: "string"};
-  if (schema instanceof z.ZodNumber) return {type: "number"};
-  if (schema instanceof z.ZodBoolean) return {type: "boolean"};
-
-  return {type: "unknown"};
-};
+export type FetchConfig = z.infer<typeof FetchConfigSchema>;
+export type PipelineConfig = z.infer<typeof PipelineConfigSchema>;
