@@ -4,8 +4,8 @@
                 "rootDir": "src",
                 "outDir": "dist",
                 "paths": {
-                        "@basango/crawler": ["./src/index.ts"],
-                        "@basango/crawler/*": ["./src/*"]
+                        "@crawler": ["./src/index.ts"],
+                        "@crawler/*": ["./src/*"]
                 }
         },
         "include": ["src"],

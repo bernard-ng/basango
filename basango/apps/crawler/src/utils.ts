@@ -3,7 +3,7 @@ import fs from "node:fs";
 import type { RedisOptions } from "ioredis";
 import { get_encoding } from "tiktoken";
 
-import type { ProjectPaths } from "@/schema";
+import type { ProjectPaths } from "@crawler/schema";
 
 export const ensureDirectories = (paths: ProjectPaths): void => {
 	for (const dir of [paths.data, paths.logs, paths.configs]) {
