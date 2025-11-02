@@ -15,6 +15,7 @@
     "bullmq": "^4.17.0",
     "date-fns": "catalog:",
     "ioredis": "^5.3.2",
+    "node-html-parser": "^6.1.10",
     "tiktoken": "^1.0.14",
     "zod": "catalog:"
   }
