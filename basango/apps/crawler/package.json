@@ -7,7 +7,9 @@
 	"types": "dist/index.d.ts",
         "scripts": {
                 "build": "tsc -b",
-                "test": "vitest --run"
+                "test": "vitest --run",
+                "queue": "bun run src/scripts/queue.ts",
+                "worker": "bun run src/scripts/worker.ts"
         },
         "dependencies": {
                 "@basango/logger": "workspace:*",
