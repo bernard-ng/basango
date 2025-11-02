@@ -1,1 +1,1 @@
-export * from "../services/crawler/async/queue";
+export * from "@basango/crawler/services/async/queue";

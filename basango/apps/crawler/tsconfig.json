@@ -1,13 +1,13 @@
 {
-        "extends": "@basango/tsconfig/base.json",
-        "compilerOptions": {
-                "rootDir": "src",
-                "outDir": "dist",
-                "paths": {
-                        "@crawler": ["./src/index.ts"],
-                        "@crawler/*": ["./src/*"]
-                }
-        },
-        "include": ["src"],
-        "references": []
+  "extends": "@basango/tsconfig/base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@crawler": ["./src/index.ts"],
+      "@crawler/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": []
 }

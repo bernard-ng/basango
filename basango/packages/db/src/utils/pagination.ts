@@ -32,13 +32,15 @@ const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 100;
 
 export function createPageState(request: PageRequest = {}): PageState {
-  const page = Number.isFinite(request.page) && (request.page ?? 0) > 0
-    ? Math.trunc(request.page!)
-    : DEFAULT_PAGE;
+  const page =
+    Number.isFinite(request.page) && (request.page ?? 0) > 0
+      ? Math.trunc(request.page!)
+      : DEFAULT_PAGE;
 
-  let limit = Number.isFinite(request.limit) && (request.limit ?? 0) > 0
-    ? Math.trunc(request.limit!)
-    : DEFAULT_LIMIT;
+  let limit =
+    Number.isFinite(request.limit) && (request.limit ?? 0) > 0
+      ? Math.trunc(request.limit!)
+      : DEFAULT_LIMIT;
 
   if (limit < DEFAULT_LIMIT) {
     limit = DEFAULT_LIMIT;

@@ -9,11 +9,8 @@ import {
   decodeCursor,
   type PageRequest,
   type PaginationMeta,
-  type PageState,
 } from "@db/utils/pagination";
-
-const SOURCE_IMAGE_BASE = "https://devscast.org/images/sources/";
-const PUBLICATION_GRAPH_DAYS = 180;
+import { PUBLICATION_GRAPH_DAYS, SOURCE_IMAGE_BASE } from "@db/constant";
 
 export interface SourceOverviewRow {
   source_id: string;
@@ -62,12 +59,97 @@ export interface SourceDetailsResult {
   categoryShares: CategoryShare[];
 }
 
+export interface SourceStatisticsRow {
+  sourceId: string;
+  sourceName: string;
+  sourceCrawledAt: string | null;
+  articlesCount: number;
+  articleMetadataAvailable: number;
+}
+
+export async function getSourceStatisticsList(
+  db: Database,
+): Promise<SourceStatisticsRow[]> {
+  const rows = await db
+    .select({
+      sourceId: sources.id,
+      sourceName: sources.name,
+      sourceCrawledAt: sql<string | null>`max
+          (${articles.crawledAt})`,
+      articlesCount: sql<number>`count
+          (${articles.id})`,
+      articleMetadataAvailable: sql<number>`sum
+          (CASE WHEN ${articles.metadata} IS NOT NULL THEN 1 ELSE 0 END)`,
+    })
+    .from(sources)
+    .leftJoin(articles, eq(articles.sourceId, sources.id))
+    .groupBy(sources.id, sources.name)
+    .orderBy(sources.name.asc());
+
+  return rows.map((row) => ({
+    sourceId: row.sourceId,
+    sourceName: row.sourceName,
+    sourceCrawledAt: row.sourceCrawledAt,
+    articlesCount: Number(row.articlesCount ?? 0),
+    articleMetadataAvailable: Number(row.articleMetadataAvailable ?? 0),
+  }));
+}
+
+export interface PublicationDateParams {
+  source: string;
+  category?: string | null;
+}
+
+async function selectPublicationBoundary(
+  db: Database,
+  fn: "min" | "max",
+  params: PublicationDateParams,
+): Promise<string> {
+  const conditions: SQL[] = [eq(sources.name, params.source)];
+
+  if (params.category) {
+    conditions.push(sql`${params.category} = ANY(${articles.categories})`);
+  }
+
+  const whereClause =
+    conditions.length > 1 ? and(...conditions) : conditions[0];
+
+  const [result] = await db
+    .select({
+      boundary:
+        fn === "min"
+          ? sql<string | null>`min
+                    (${articles.publishedAt})`
+          : sql<string | null>`max
+                    (${articles.publishedAt})`,
+    })
+    .from(articles)
+    .innerJoin(sources, eq(articles.sourceId, sources.id))
+    .where(whereClause);
+
+  return result?.boundary ?? new Date().toISOString();
+}
+
+export async function getEarliestPublicationDate(
+  db: Database,
+  params: PublicationDateParams,
+): Promise<string> {
+  return selectPublicationBoundary(db, "min", params);
+}
+
+export async function getLatestPublicationDate(
+  db: Database,
+  params: PublicationDateParams,
+): Promise<string> {
+  return selectPublicationBoundary(db, "max", params);
+}
+
 function buildFollowExistsExpression(userId: string): SQL<boolean> {
-  return sql`EXISTS (
-    SELECT 1
-    FROM ${followedSources} f
-    WHERE f.source_id = ${sources.id} AND f.follower_id = ${userId}
-  )`;
+  return sql`EXISTS
+  (SELECT 1
+   FROM ${followedSources} f
+   WHERE f.source_id = ${sources.id}
+     AND f.follower_id = ${userId})`;
 }
 
 export async function getSourceOverviewList(
@@ -126,16 +208,27 @@ async function fetchPublicationGraph(
 
   const rows = await db
     .select({
-      day: sql<string>`date(${articles.publishedAt})`,
-      count: sql<number>`count(${articles.id})`,
+      day: sql<string>`date
+          (${articles.publishedAt})`,
+      count: sql<number>`count
+          (${articles.id})`,
     })
     .from(articles)
     .where(eq(articles.sourceId, sourceId))
     .where(
-      sql`${articles.publishedAt} BETWEEN to_timestamp(${range.start}) AND to_timestamp(${range.end})`,
+      sql`${articles.publishedAt} BETWEEN to_timestamp(
+      ${range.start}
+      )
+      AND
+      to_timestamp
+      (
+      ${range.end}
+      )`,
     )
-    .groupBy(sql`date(${articles.publishedAt})`)
-    .orderBy(sql`date(${articles.publishedAt})`);
+    .groupBy(sql`date
+        (${articles.publishedAt})`)
+    .orderBy(sql`date
+        (${articles.publishedAt})`);
 
   const counts = new Map<string, number>();
   for (const row of rows) {
@@ -164,7 +257,8 @@ async function fetchCategoryShares(
 ): Promise<CategoryShare[]> {
   const rows = await db
     .select({
-      categories: sql<string | null>`array_to_string(${articles.categories}, ',')`,
+      categories: sql<string | null>`array_to_string
+          (${articles.categories}, ',')`,
     })
     .from(articles)
     .where(eq(articles.sourceId, sourceId));
@@ -179,7 +273,10 @@ async function fetchCategoryShares(
     }
   }
 
-  const total = Array.from(counts.values()).reduce((acc, value) => acc + value, 0);
+  const total = Array.from(counts.values()).reduce(
+    (acc, value) => acc + value,
+    0,
+  );
 
   const shares: CategoryShare[] = Array.from(counts.entries()).map(
     ([category, count]) => ({
@@ -211,9 +308,18 @@ export async function getSourceDetails(
       source_reliability: sources.reliability,
       source_transparency: sources.transparency,
       source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-      articles_count: sql<number>`count(${articles.id})`,
-      source_crawled_at: sql<string | null>`max(${articles.crawledAt})`,
-      articles_metadata_available: sql<number>`count(*) FILTER (WHERE ${articles.metadata} IS NOT NULL)`,
+      articles_count: sql<number>`count
+          (${articles.id})`,
+      source_crawled_at: sql<string | null>`max
+          (${articles.crawledAt})`,
+      articles_metadata_available: sql<number>`count
+          (*)
+          FILTER (WHERE
+          ${articles.metadata}
+          IS
+          NOT
+          NULL
+          )`,
       source_is_followed: followExpression,
     })
     .from(sources)
