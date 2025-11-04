@@ -10,7 +10,7 @@ import {
   WordPressSourceConfigSchema,
 } from "@/schema";
 
-export const PROJECT_DIR = path.resolve(process.cwd(), "basango", "apps", "crawler");
+export const PROJECT_DIR = path.resolve(__dirname, "../");
 
 export const PipelineConfigSchema = z.object({
   paths: z.object({

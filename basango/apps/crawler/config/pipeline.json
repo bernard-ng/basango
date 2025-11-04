@@ -20,9 +20,9 @@
     },
     "crawler": {
       "notify": false,
-      "use_multi_threading": false,
+      "useMultiThreading": false,
       "maxWorkers": 5,
-      "direction": "%env(BASANGO_CRAWLER_DEFAULT_DIRECTION)%"
+      "direction": "%env(BASANGO_CRAWLER_UPDATE_DIRECTION)%"
     },
     "async": {
       "redisUrl": "%env(BASANGO_CRAWLER_ASYNC_REDIS_URL)%",
