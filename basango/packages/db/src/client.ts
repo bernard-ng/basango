@@ -13,8 +13,7 @@ const connectionConfig = {
 };
 
 const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ?? process.env.DATABASE_PRIMARY_URL!,
+  connectionString: process.env.DATABASE_URL ?? process.env.DATABASE_PRIMARY_URL!,
   ...connectionConfig,
 });
 
@@ -31,9 +30,7 @@ export const getConnectionPoolStats = () => {
 
   const totalConnections = connectionConfig.max;
   const utilization =
-    totalConnections > 0
-      ? Math.round((stats.active / totalConnections) * 100)
-      : 0;
+    totalConnections > 0 ? Math.round((stats.active / totalConnections) * 100) : 0;
 
   return {
     timestamp: new Date().toISOString(),
@@ -44,8 +41,7 @@ export const getConnectionPoolStats = () => {
       totalConnections,
       totalActive: stats.active,
       totalWaiting: stats.waiting,
-      hasExhaustedPools:
-        stats.active >= totalConnections || (stats.waiting ?? 0) > 0,
+      hasExhaustedPools: stats.active >= totalConnections || (stats.waiting ?? 0) > 0,
       utilizationPercent: utilization,
     },
   };

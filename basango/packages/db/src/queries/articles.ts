@@ -2,14 +2,7 @@ import type { AnyColumn, SQL } from "drizzle-orm";
 import { and, asc, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 
 import type { Database } from "@/client";
-import {
-  articles,
-  bookmarkArticles,
-  bookmarks,
-  comments,
-  sources,
-  users,
-} from "@/schema";
+import { articles, bookmarkArticles, bookmarks, comments, sources, users } from "@/schema";
 import {
   buildPaginationResult,
   createPageState,
@@ -117,8 +110,7 @@ export async function* getArticlesForExport(
   db: Database,
   params: ArticleExportParams = {},
 ): AsyncGenerator<ArticleExportRow> {
-  const batchSize =
-    params.batchSize && params.batchSize > 0 ? params.batchSize : 1000;
+  const batchSize = params.batchSize && params.batchSize > 0 ? params.batchSize : 1000;
 
   const filters: SQL[] = [];
 
@@ -183,19 +175,13 @@ export async function* getArticlesForExport(
 
 const SOURCE_IMAGE_BASE = "https://devscast.org/images/sources/";
 
-function normalizeArticleFilters(
-  filters?: ArticleFilters,
-): NormalizedArticleFilters {
+function normalizeArticleFilters(filters?: ArticleFilters): NormalizedArticleFilters {
   const trimmedSearch = filters?.search?.trim();
   const trimmedCategory = filters?.category?.trim();
 
   return {
-    search:
-      trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
-    category:
-      trimmedCategory && trimmedCategory.length > 0
-        ? trimmedCategory
-        : undefined,
+    search: trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
+    category: trimmedCategory && trimmedCategory.length > 0 ? trimmedCategory : undefined,
     dateRange: filters?.dateRange ?? null,
     sortDirection: filters?.sortDirection ?? "desc",
   };
@@ -261,8 +247,9 @@ async function fetchArticleOverview(
   },
 ): Promise<ArticleOverviewResult> {
   const baseConditions = options.baseConditions ?? [];
-  const { conditions: filterConditions, searchQuery } =
-    buildArticleFilterConditions(options.filters);
+  const { conditions: filterConditions, searchQuery } = buildArticleFilterConditions(
+    options.filters,
+  );
   const whereConditions = [...baseConditions, ...filterConditions];
 
   const bookmarkExpression = buildBookmarkExistsExpression(options.userId);
@@ -297,17 +284,11 @@ async function fetchArticleOverview(
       options.filters.sortDirection === "asc"
         ? or(
             gt(articles.publishedAt, cursor.date),
-            and(
-              eq(articles.publishedAt, cursor.date),
-              gt(articles.id, cursor.id),
-            ),
+            and(eq(articles.publishedAt, cursor.date), gt(articles.id, cursor.id)),
           )
         : or(
             lt(articles.publishedAt, cursor.date),
-            and(
-              eq(articles.publishedAt, cursor.date),
-              lt(articles.id, cursor.id),
-            ),
+            and(eq(articles.publishedAt, cursor.date), lt(articles.id, cursor.id)),
           );
     whereConditions.push(comparison);
   }
@@ -394,8 +375,7 @@ export async function getBookmarkedArticleList(
 ): Promise<ArticleOverviewResult> {
   const page = createPageState(params.page);
   const filters = normalizeArticleFilters(params.filters);
-  const { conditions: filterConditions, searchQuery } =
-    buildArticleFilterConditions(filters);
+  const { conditions: filterConditions, searchQuery } = buildArticleFilterConditions(filters);
 
   const whereConditions: SQL[] = [
     eq(bookmarks.id, params.bookmarkId),
@@ -435,17 +415,11 @@ export async function getBookmarkedArticleList(
       filters.sortDirection === "asc"
         ? or(
             gt(articles.publishedAt, cursor.date),
-            and(
-              eq(articles.publishedAt, cursor.date),
-              gt(articles.id, cursor.id),
-            ),
+            and(eq(articles.publishedAt, cursor.date), gt(articles.id, cursor.id)),
           )
         : or(
             lt(articles.publishedAt, cursor.date),
-            and(
-              eq(articles.publishedAt, cursor.date),
-              lt(articles.id, cursor.id),
-            ),
+            and(eq(articles.publishedAt, cursor.date), lt(articles.id, cursor.id)),
           );
     whereConditions.push(comparison);
   }
