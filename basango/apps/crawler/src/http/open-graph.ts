@@ -1,33 +1,30 @@
 import { parse } from "node-html-parser";
 
 import { OPEN_GRAPH_USER_AGENT } from "@/constants";
-import type { ClientConfig } from "@/schema";
 import { SyncHttpClient } from "@/http/http-client";
 import { UserAgents } from "@/http/user-agent";
+import { config } from "@/config";
+import { ArticleMetadata } from "@/schema";
 
-export interface OpenGraphMetadata {
-  title?: string | null;
-  description?: string | null;
-  image?: string | null;
-  url?: string | null;
-}
-
-export interface OpenGraphProviderOptions {
-  client?: Pick<SyncHttpClient, "get">;
-  clientConfig?: ClientConfig;
-  userAgentProvider?: UserAgents;
-}
-
-const pick = (values: Array<string | null | undefined>): string | null => {
+/**
+ * Picks the first non-empty value from the provided array.
+ * @param values - An array of string values
+ */
+const pick = (values: Array<string | null | undefined>): string | undefined => {
   for (const value of values) {
     if (value && value.trim().length > 0) {
       return value.trim();
     }
   }
-  return null;
+  return undefined;
 };
 
-const extractMeta = (root: ReturnType<typeof parse>, property: string): string | null => {
+/**
+ * Extracts the content of a meta tag given its property or name.
+ * @param root - The root HTML element
+ * @param property - The property or name of the meta tag to extract
+ */
+const extract = (root: ReturnType<typeof parse>, property: string): string | null => {
   const selector = `meta[property='${property}'], meta[name='${property}']`;
   const node = root.querySelector(selector);
   if (!node) {
@@ -36,70 +33,64 @@ const extractMeta = (root: ReturnType<typeof parse>, property: string): string |
   return node.getAttribute("content") ?? null;
 };
 
-export class OpenGraphProvider {
+/**
+ * OpenGraph consumer for extracting Open Graph metadata from HTML pages.
+ * Uses a synchronous HTTP client to fetch the HTML content.
+ *
+ * @author Bernard Ngandu <bernard@devscast.tech>
+ */
+export class OpenGraph {
   private readonly client: Pick<SyncHttpClient, "get">;
 
-  constructor(options: OpenGraphProviderOptions = {}) {
-    const provider =
-      options.userAgentProvider ?? new UserAgents(false, OPEN_GRAPH_USER_AGENT);
-    const clientConfig: ClientConfig =
-      options.clientConfig ?? ({
-        timeout: 20,
-        user_agent: OPEN_GRAPH_USER_AGENT,
-        follow_redirects: true,
-        verify_ssl: true,
-        rotate: false,
-        max_retries: 2,
-        backoff_initial: 1,
-        backoff_multiplier: 2,
-        backoff_max: 5,
-        respect_retry_after: true,
-      } satisfies ClientConfig);
+  constructor() {
+    const settings = config.fetch.client;
+    const provider = new UserAgents(true, OPEN_GRAPH_USER_AGENT);
 
-    this.client =
-      options.client ??
-      new SyncHttpClient(clientConfig, {
-        userAgentProvider: provider,
-        defaultHeaders: { "User-Agent": provider.og() },
-      });
+    this.client = new SyncHttpClient(settings, {
+      userAgentProvider: provider,
+      defaultHeaders: { "User-Agent": provider.og() },
+    });
   }
 
-  async consumeUrl(url: string): Promise<OpenGraphMetadata | null> {
+  /**
+   * Consume a URL and extract Open Graph metadata.
+   * @param url - The URL to fetch and parse
+   */
+  async consumeUrl(url: string): Promise<ArticleMetadata | undefined> {
     try {
       const response = await this.client.get(url);
       const html = await response.text();
-      return OpenGraphProvider.consumeHtml(html, url);
+      return OpenGraph.consumeHtml(html, url);
     } catch {
-      return null;
+      return undefined;
     }
   }
 
-  static consumeHtml(html: string, url?: string): OpenGraphMetadata | null {
+  /**
+   * Consume HTML content and extract Open Graph metadata.
+   * @param html - HTML content as a string
+   * @param url - Optional URL of the page
+   */
+  static consumeHtml(html: string, url?: string): ArticleMetadata | undefined {
     if (!html) {
-      return null;
+      return undefined;
     }
 
     const root = parse(html);
-    const title = pick([
-      extractMeta(root, "og:title"),
-      root.querySelector("title")?.text,
-    ]);
-    const description = pick([
-      extractMeta(root, "og:description"),
-      extractMeta(root, "description"),
-    ]);
+    const title = pick([extract(root, "og:title"), root.querySelector("title")?.text]);
+    const description = pick([extract(root, "og:description"), extract(root, "description")]);
     const image = pick([
-      extractMeta(root, "og:image"),
+      extract(root, "og:image"),
       root.querySelector("img")?.getAttribute("src") ?? null,
     ]);
     const canonical = pick([
-      extractMeta(root, "og:url"),
+      extract(root, "og:url"),
       root.querySelector("link[rel='canonical']")?.getAttribute("href") ?? null,
       url ?? null,
     ]);
 
     if (!title && !description && !image && !canonical) {
-      return null;
+      return undefined;
     }
 
     return {

@@ -1,32 +1,4 @@
 {
-  "fetch": {
-    "client": {
-      "timeout": 20,
-      "user_agent": "Basango/0.1 (+https://github.com/bernard-ng/basango)",
-      "follow_redirects": true,
-      "verify_ssl": true,
-      "rotate": true,
-      "max_retries": 3,
-      "backoff_initial": 1,
-      "backoff_multiplier": 2,
-      "backoff_max": 30,
-      "respect_retry_after": true
-    },
-    "crawler": {
-      "notify": false,
-      "use_multi_threading": false,
-      "max_workers": 5
-    }
-  },
-  "logging": {
-    "level": "ERROR",
-    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    "file_logging": true,
-    "console_logging": true,
-    "log_file": "pipeline.log",
-    "max_log_size": 10485760,
-    "backup_count": 5
-  },
   "sources": {
     "html": [
       {
@@ -38,16 +10,16 @@
         },
         "source_selectors": {
           "articles": ".view-content > .views-row.content-row",
-          "article_title": ".views-field-title a",
+          "article_title": "h1.page-header",
           "article_link": ".views-field-title a",
           "article_body": ".field-name-body",
           "article_date": ".views-field-created",
           "article_categories": ".views-field-field-cat-gorie a",
-          "pagination": "ul.pagination > li a(:last-child)"
+          "pagination": "ul.pagination > li.pager-last > a"
         },
-        "pagination_template": "/actualite?page={page}",
+        "pagination_template": "actualite",
         "supports_categories": false,
-        "requires_details": false,
+        "requires_details": true,
         "requires_rate_limit": false
       },
       {
@@ -64,29 +36,29 @@
           "article_link": ".views-field-title a",
           "article_body": ".field.field--name-body",
           "article_date": ".views-field-created",
-          "pagination": "ul.pagination > li a(:last-child)"
+          "pagination": "ul.pagination > li.pager__item.pager__item--last > a"
         },
-        "pagination_template": "/index.php/category/{category}?page={page}",
+        "pagination_template": "index.php/category/{category}",
         "supports_categories": true,
         "requires_details": false,
         "requires_rate_limit": false
       },
       {
         "source_id": "mediacongo.net",
-        "source_url": "https://mediacongo.net",
+        "source_url": "https://www.mediacongo.net",
         "source_date": {
           "format": "%d.%m.%Y %H:%M"
         },
         "source_selectors": {
           "articles": ".for_aitems > .article_other_item",
           "article_title": "img",
-          "article_link": "a(:first-child)",
+          "article_link": "a:first-child",
           "article_categories": "a.color_link",
           "article_body": ".article_ttext",
           "article_date": ".article_other_about",
-          "pagination": ".nav > a(:last-child)"
+          "pagination": "div.pagination > div > a:last-child"
         },
-        "pagination_template": "/articles.html?page={page}",
+        "pagination_template": "articles.html",
         "supports_categories": false,
         "requires_details": true,
         "requires_rate_limit": false
@@ -106,7 +78,7 @@
           "article_body": ".views-field.views-field-body",
           "article_date": "#p-date"
         },
-        "pagination_template": "/actualite?page={page}",
+        "pagination_template": "actualite",
         "supports_categories": false,
         "requires_details": true,
         "requires_rate_limit": false
@@ -128,12 +100,18 @@
         "source_url": "https://angazainstitute.ac.cd"
       },
       { "source_id": "b-onetv.cd", "source_url": "https://b-onetv.cd" },
-      { "source_id": "bukavufm.com", "source_url": "https://bukavufm.com" },
+      {
+        "source_id": "bukavufm.com",
+        "source_url": "https://bukavufm.com"
+      },
       {
         "source_id": "changement7.net",
         "source_url": "https://changement7.net"
       },
-      { "source_id": "congoactu.net", "source_url": "https://congoactu.net" },
+      {
+        "source_id": "congoactu.net",
+        "source_url": "https://congoactu.net"
+      },
       {
         "source_id": "congoindependant.com",
         "source_url": "https://www.congoindependant.com"
@@ -142,7 +120,10 @@
         "source_id": "congoquotidien.com",
         "source_url": "https://www.congoquotidien.com"
       },
-      { "source_id": "cumulard.cd", "source_url": "https://www.cumulard.cd" },
+      {
+        "source_id": "cumulard.cd",
+        "source_url": "https://www.cumulard.cd"
+      },
       {
         "source_id": "environews-rdc.net",
         "source_url": "https://environews-rdc.net"
@@ -155,7 +136,10 @@
         "source_id": "geopolismagazine.org",
         "source_url": "https://geopolismagazine.org"
       },
-      { "source_id": "habarirdc.net", "source_url": "https://habarirdc.net" },
+      {
+        "source_id": "habarirdc.net",
+        "source_url": "https://habarirdc.net"
+      },
       { "source_id": "infordc.com", "source_url": "https://infordc.com" },
       {
         "source_id": "kilalopress.net",
@@ -169,7 +153,10 @@
         "source_id": "laprunellerdc.cd",
         "source_url": "https://laprunellerdc.cd"
       },
-      { "source_id": "lesmedias.net", "source_url": "https://lesmedias.net" },
+      {
+        "source_id": "lesmedias.net",
+        "source_url": "https://lesmedias.net"
+      },
       {
         "source_id": "lesvolcansnews.net",
         "source_url": "https://lesvolcansnews.net"
@@ -182,14 +169,23 @@
         "source_id": "objectif-infos.cd",
         "source_url": "https://objectif-infos.cd"
       },
-      { "source_id": "scooprdc.net", "source_url": "https://scooprdc.net" },
+      {
+        "source_id": "scooprdc.net",
+        "source_url": "https://scooprdc.net"
+      },
       {
         "source_id": "journaldekinshasa.com",
         "source_url": "https://www.journaldekinshasa.com"
       },
-      { "source_id": "lepotentiel.cd", "source_url": "https://lepotentiel.cd" },
+      {
+        "source_id": "lepotentiel.cd",
+        "source_url": "https://lepotentiel.cd"
+      },
       { "source_id": "acturdc.com", "source_url": "https://acturdc.com" },
-      { "source_id": "matininfos.net", "source_url": "https://matininfos.net" }
+      {
+        "source_id": "matininfos.net",
+        "source_url": "https://matininfos.net"
+      }
     ]
   }
 }

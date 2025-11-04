@@ -1,8 +1,12 @@
 import { setTimeout as delay } from "node:timers/promises";
 
-import type { ClientConfig } from "@/schema";
-import { DEFAULT_RETRY_AFTER_HEADER, DEFAULT_USER_AGENT, TRANSIENT_HTTP_STATUSES } from "@/constants";
+import {
+  DEFAULT_RETRY_AFTER_HEADER,
+  DEFAULT_USER_AGENT,
+  TRANSIENT_HTTP_STATUSES,
+} from "@/constants";
 import { UserAgents } from "@/http/user-agent";
+import { FetchClientConfig } from "@/config";
 
 export type HttpHeaders = Record<string, string>;
 export type HttpParams = Record<string, string | number | boolean | null | undefined>;
@@ -34,13 +38,19 @@ export class HttpError extends Error {
   }
 }
 
+/**
+ * Default sleep function using setTimeout.
+ * @param ms - Milliseconds to sleep
+ */
 const defaultSleep = (ms: number): Promise<void> => {
-  if (typeof Bun !== "undefined" && typeof Bun.sleep === "function") {
-    return Bun.sleep(ms);
-  }
   return delay(ms).then(() => undefined);
 };
 
+/**
+ * Builds a URL with query parameters.
+ * @param url - The base URL
+ * @param params - The query parameters to append
+ */
 const buildUrl = (url: string, params?: HttpParams): string => {
   if (!params || Object.keys(params).length === 0) {
     return url;
@@ -55,10 +65,15 @@ const buildUrl = (url: string, params?: HttpParams): string => {
   return target.toString();
 };
 
-const computeBackoff = (config: ClientConfig, attempt: number): number => {
+/**
+ * Computes the backoff time in milliseconds based on the configuration and attempt number.
+ * @param config - Fetch client configuration
+ * @param attempt - Current attempt number
+ */
+const computeBackoff = (config: FetchClientConfig, attempt: number): number => {
   const base = Math.min(
-    config.backoff_initial * Math.pow(config.backoff_multiplier, attempt),
-    config.backoff_max,
+    config.backoffInitial * Math.pow(config.backoffMultiplier, attempt),
+    config.backoffMax,
   );
   const jitter = Math.random() * base * 0.25;
   return (base + jitter) * 1000;
@@ -79,18 +94,23 @@ const parseRetryAfter = (header: string): number => {
   return delta > 0 ? delta : 0;
 };
 
+/**
+ * Base HTTP client providing common functionality.
+ *
+ * @author Bernard Ngandu <bernard@devscast.tech>
+ */
 export class BaseHttpClient {
-  protected readonly config: ClientConfig;
+  protected readonly config: FetchClientConfig;
   protected readonly fetchImpl: typeof fetch;
   protected readonly sleep: (ms: number) => Promise<void>;
   protected readonly headers: HttpHeaders;
 
-  constructor(config: ClientConfig, options: HttpClientOptions = {}) {
+  constructor(config: FetchClientConfig, options: HttpClientOptions = {}) {
     this.config = config;
     const provider =
       options.userAgentProvider ??
-      new UserAgents(config.rotate, config.user_agent ?? DEFAULT_USER_AGENT);
-    const userAgent = provider.get() ?? config.user_agent ?? DEFAULT_USER_AGENT;
+      new UserAgents(config.rotate, config.userAgent ?? DEFAULT_USER_AGENT);
+    const userAgent = provider.get() ?? config.userAgent ?? DEFAULT_USER_AGENT;
 
     const baseHeaders: HttpHeaders = { "User-Agent": userAgent };
     if (options.defaultHeaders) {
@@ -115,7 +135,7 @@ export class BaseHttpClient {
 
     if (response) {
       const retryAfter = response.headers.get(retryAfterHeader);
-      if (retryAfter && this.config.respect_retry_after) {
+      if (retryAfter && this.config.respectRetryAfter) {
         waitMs = parseRetryAfter(retryAfter);
       }
     }
@@ -130,16 +150,17 @@ export class BaseHttpClient {
   }
 }
 
+/**
+ * Synchronous HTTP client with retry and timeout capabilities.
+ *
+ * @author Bernard Ngandu <bernard@devscast.tech>
+ */
 export class SyncHttpClient extends BaseHttpClient {
-  async request(
-    method: string,
-    url: string,
-    options: HttpRequestOptions = {},
-  ): Promise<Response> {
+  async request(method: string, url: string, options: HttpRequestOptions = {}): Promise<Response> {
     const retryAfterHeader = options.retryAfterHeader ?? DEFAULT_RETRY_AFTER_HEADER;
     const target = buildUrl(url, options.params);
 
-    const maxAttempts = this.config.max_retries + 1;
+    const maxAttempts = this.config.maxRetries + 1;
     let attempt = 0;
     let lastError: unknown;
 
@@ -155,20 +176,19 @@ export class SyncHttpClient extends BaseHttpClient {
           headers,
           body: options.data as BodyInit | undefined,
           signal: controller.signal,
-          redirect: this.config.follow_redirects ? "follow" : "manual",
+          redirect: this.config.followRedirects ? "follow" : "manual",
         };
 
         if (options.json !== undefined) {
           init.body = JSON.stringify(options.json);
-          (init.headers as Record<string, string>)["Content-Type"] ??=
-            "application/json";
+          (init.headers as Record<string, string>)["Content-Type"] ??= "application/json";
         }
 
         const response = await this.fetchImpl(target, init);
 
         if (
           TRANSIENT_HTTP_STATUSES.includes(response.status as number) &&
-          attempt < this.config.max_retries
+          attempt < this.config.maxRetries
         ) {
           await this.maybeDelay(attempt, response, retryAfterHeader);
           attempt += 1;
@@ -188,12 +208,12 @@ export class SyncHttpClient extends BaseHttpClient {
 
         if (error instanceof DOMException && error.name === "AbortError") {
           lastError = error;
-          if (attempt >= this.config.max_retries) {
+          if (attempt >= this.config.maxRetries) {
             throw error;
           }
         } else {
           lastError = error;
-          if (attempt >= this.config.max_retries) {
+          if (attempt >= this.config.maxRetries) {
             throw error;
           }
         }
@@ -207,9 +227,7 @@ export class SyncHttpClient extends BaseHttpClient {
       }
     }
 
-    throw lastError instanceof Error
-      ? lastError
-      : new Error("HTTP request failed after retries");
+    throw lastError instanceof Error ? lastError : new Error("HTTP request failed after retries");
   }
 
   get(url: string, options?: Omit<HttpRequestOptions, "data" | "json">): Promise<Response> {

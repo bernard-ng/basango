@@ -1,0 +1,108 @@
+import { parse as parseHtml, HTMLElement } from "node-html-parser";
+
+import { SyncHttpClient } from "@/http/http-client";
+import { OpenGraph } from "@/http/open-graph";
+import type { Persistor } from "@/process/persistence";
+import { config, FetchCrawlerConfig } from "@/config";
+import { AnySourceConfig, Article } from "@/schema";
+
+export interface CrawlerOptions {
+  persistors?: Persistor[];
+}
+
+export abstract class BaseCrawler {
+  protected readonly settings: FetchCrawlerConfig;
+  protected readonly source: AnySourceConfig;
+  protected readonly http: SyncHttpClient;
+  protected readonly persistors: Persistor[];
+  protected readonly openGraph: OpenGraph;
+
+  protected constructor(settings: FetchCrawlerConfig, options: CrawlerOptions = {}) {
+    if (!settings.source) {
+      throw new Error("Crawler requires a bound source");
+    }
+
+    this.http = new SyncHttpClient(config.fetch.client);
+    this.persistors = options.persistors ?? [];
+    this.openGraph = new OpenGraph();
+
+    this.settings = settings;
+    this.source = settings.source as AnySourceConfig;
+  }
+
+  /**
+   * Fetch and process articles from the source.
+   */
+  abstract fetch(): Promise<void> | void;
+
+  /**
+   * Crawl the given URL and return the HTML content as a string.
+   * @param url - The URL to crawl
+   */
+  async crawl(url: string): Promise<string> {
+    const response = await this.http.get(url);
+    return await response.text();
+  }
+
+  /**
+   * Extract text content from an HTML node.
+   * @param node - The HTML node
+   */
+  protected textContent(node: HTMLElement | null | undefined): string | null {
+    if (!node) return null;
+    // innerText keeps spacing similar to browser rendering
+    const value = (node as any).innerText ?? node.text;
+    const text = typeof value === "string" ? value.trim() : String(value ?? "").trim();
+    return text.length ? text : null;
+  }
+
+  /**
+   * Extract the first matching element from the root using the selector.
+   * @param root - The root HTML element
+   * @param selector - The CSS selector
+   */
+  protected extractFirst(root: HTMLElement, selector?: string | null): HTMLElement | null {
+    if (!selector) return null;
+    try {
+      return (root as any).querySelector?.(selector) ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Extract all matching elements from the root using the selector.
+   * @param root - The root HTML element
+   * @param selector - The CSS selector
+   */
+  protected extractAll(root: HTMLElement, selector?: string | null): HTMLElement[] {
+    if (!selector) return [];
+    try {
+      return ((root as any).querySelectorAll?.(selector) ?? []) as HTMLElement[];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Parse HTML string into an HTMLElement.
+   * @param html - The HTML string
+   */
+  protected parseHtml(html: string): HTMLElement {
+    return parseHtml(html) as unknown as HTMLElement;
+  }
+
+  /**
+   * Enrich the record with Open Graph metadata from the given URL.
+   * @param record - The article record
+   * @param url - The URL to fetch Open Graph data from
+   */
+  protected async enrichWithOpenGraph(record: Article, url?: string): Promise<Article> {
+    try {
+      const metadata = url ? await this.openGraph.consumeUrl(url) : undefined;
+      return { ...record, metadata };
+    } catch {
+      return { ...record, metadata: undefined };
+    }
+  }
+}

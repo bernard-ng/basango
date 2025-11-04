@@ -1,5 +1,12 @@
 import { DEFAULT_USER_AGENT, OPEN_GRAPH_USER_AGENT } from "@/constants";
 
+/**
+ * User agent provider with optional rotation.
+ * Allows fetching a random user agent from a predefined list
+ * or using a fallback user agent.
+ *
+ * @author Bernard Ngandu <bernard@devscast.tech>
+ */
 export class UserAgents {
   private static readonly USER_AGENTS: string[] = [
     "Mozilla/5.0 (iPhone; CPU iPhone OS 10_4_8; like Mac OS X) AppleWebKit/603.39 (KHTML, like Gecko) Chrome/52.0.3638.271 Mobile Safari/537.5",
@@ -22,7 +29,7 @@ export class UserAgents {
     this.fallback = fallback;
   }
 
-  static og(): string {
+  og(): string {
     return OPEN_GRAPH_USER_AGENT;
   }
 

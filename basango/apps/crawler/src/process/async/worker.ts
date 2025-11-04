@@ -1,27 +1,16 @@
 import IORedis from "ioredis";
 import { QueueEvents, Worker } from "bullmq";
 
-import {
-  createQueueManager,
-  QueueFactory,
-  QueueManager,
-  QueueSettings,
-  QueueSettingsInput,
-} from "@/process/async/queue";
-import {
-  collectArticle,
-  collectListing,
-  forwardForProcessing,
-} from "@/process/async/tasks";
+import { QueueFactory, QueueManager } from "@/process/async/queue";
+import { collectArticle, collectListing, forwardForProcessing } from "@/process/async/tasks";
 
 export interface WorkerOptions {
   queueNames?: string[];
-  settings?: QueueSettings | QueueSettingsInput;
   connection?: IORedis;
   queueFactory?: QueueFactory;
   concurrency?: number;
   onError?: (error: Error) => void;
-  queueManager?: QueueManager;
+  queueManager: QueueManager;
 }
 
 export interface WorkerHandle {
@@ -30,15 +19,8 @@ export interface WorkerHandle {
   close: () => Promise<void>;
 }
 
-export const startWorker = (options: WorkerOptions = {}): WorkerHandle => {
-  const manager =
-    options.queueManager ??
-    createQueueManager({
-      settings: options.settings,
-      connection: options.connection,
-      queueFactory: options.queueFactory,
-    });
-
+export const startWorker = (options: WorkerOptions): WorkerHandle => {
+  const manager = options.queueManager;
   const queueNames = options.queueNames ?? manager.iterQueueNames();
   const workers: Worker[] = [];
   const events: QueueEvents[] = [];

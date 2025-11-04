@@ -1,36 +1,28 @@
 import { z } from "zod";
-import { AnySourceConfig, DateRangeSchema, PageRangeSchema } from "@/schema";
+import { ArticleSchema, DateRangeSchema, PageRangeSchema } from "@/schema";
 
 export const ListingTaskPayloadSchema = z.object({
-  source_id: z.string(),
-  env: z.string().default("development"),
-  page_range: z.string().optional().nullable(),
-  date_range: z.string().optional().nullable(),
-  category: z.string().optional().nullable(),
+  sourceId: z.string(),
+  pageRange: z.string().optional(),
+  dateRange: z.string().optional(),
+  category: z.string().optional(),
+});
+
+export const DetailsTaskPayloadSchema = z.object({
+  sourceId: z.string(),
+  url: z.url(),
+  data: z.any().optional(),
+  page: z.number().int().nonnegative().optional(),
+  pageRange: PageRangeSchema.optional(),
+  dateRange: DateRangeSchema.optional(),
+  category: z.string().optional(),
+});
+
+export const ProcessingTaskPayloadSchema = z.object({
+  sourceId: z.string(),
+  article: ArticleSchema,
 });
 
 export type ListingTaskPayload = z.infer<typeof ListingTaskPayloadSchema>;
-
-export const ArticleTaskPayloadSchema = z.object({
-  source_id: z.string(),
-  env: z.string().default("development"),
-  url: z.url(),
-  page: z.number().int().nonnegative().optional(),
-  page_range: PageRangeSchema.optional().nullable(),
-  date_range: DateRangeSchema.optional().nullable(),
-  category: z.string().optional().nullable(),
-});
-
-export type ArticleTaskPayload = z.infer<typeof ArticleTaskPayloadSchema>;
-
-export const ProcessedTaskPayloadSchema = z.object({
-  source_id: z.string(),
-  env: z.string().default("development"),
-  article: z.any(),
-});
-
-export type ProcessedTaskPayload = z.infer<typeof ProcessedTaskPayloadSchema>;
-
-export interface ListingContext {
-  source: AnySourceConfig;
-}
+export type DetailsTaskPayload = z.infer<typeof DetailsTaskPayloadSchema>;
+export type ProcessingTaskPayload = z.infer<typeof ProcessingTaskPayloadSchema>;
