@@ -29,17 +29,17 @@ export interface ArticleFilters {
 
 export interface ArticleOverviewRow {
   article_id: string;
-  article_title: string;
-  article_link: string;
-  article_categories: string | null;
+  articleTitle: string;
+  articleLink: string;
+  articleCategories: string | null;
   article_excerpt: string | null;
   article_published_at: string;
   article_image: string | null;
   article_reading_time: number | null;
-  source_id: string;
+  sourceId: string;
   source_display_name: string | null;
   source_image: string;
-  source_url: string;
+  sourceUrl: string;
   source_name: string;
   source_created_at: string;
   article_is_bookmarked: boolean;
@@ -52,10 +52,10 @@ export interface ArticleOverviewResult {
 
 export interface ArticleDetailsRow {
   article_id: string;
-  article_title: string;
-  article_link: string;
-  article_categories: string | null;
-  article_body: string;
+  articleTitle: string;
+  articleLink: string;
+  articleCategories: string | null;
+  articleBody: string;
   article_hash: string;
   article_published_at: string;
   article_crawled_at: string;
@@ -66,10 +66,10 @@ export interface ArticleDetailsRow {
   article_sentiment: string;
   article_metadata: unknown;
   article_reading_time: number | null;
-  source_id: string;
+  sourceId: string;
   source_name: string;
   source_description: string | null;
-  source_url: string;
+  sourceUrl: string;
   source_updated_at: string | null;
   source_display_name: string | null;
   source_bias: string;
@@ -269,18 +269,18 @@ async function fetchArticleOverview(
 
   const selectFields = {
     article_id: articles.id,
-    article_title: articles.title,
-    article_link: articles.link,
-    article_categories: sql<string | null>`array_to_string
+    articleTitle: articles.title,
+    articleLink: articles.link,
+    articleCategories: sql<string | null>`array_to_string
         (${articles.categories}, ',')`,
     article_excerpt: articles.excerpt,
     article_published_at: articles.publishedAt,
     article_image: articles.image,
     article_reading_time: articles.readingTime,
-    source_id: sources.id,
+    sourceId: sources.id,
     source_display_name: sources.displayName,
     source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-    source_url: sources.url,
+    sourceUrl: sources.url,
     source_name: sources.name,
     source_created_at: sources.createdAt,
     article_is_bookmarked: bookmarkExpression,
@@ -405,18 +405,18 @@ export async function getBookmarkedArticleList(
 
   const selectFields = {
     article_id: articles.id,
-    article_title: articles.title,
-    article_link: articles.link,
-    article_categories: sql<string | null>`array_to_string
+    articleTitle: articles.title,
+    articleLink: articles.link,
+    articleCategories: sql<string | null>`array_to_string
         (${articles.categories}, ',')`,
     article_excerpt: articles.excerpt,
     article_published_at: articles.publishedAt,
     article_image: articles.image,
     article_reading_time: articles.readingTime,
-    source_id: sources.id,
+    sourceId: sources.id,
     source_display_name: sources.displayName,
     source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-    source_url: sources.url,
+    sourceUrl: sources.url,
     source_name: sources.name,
     source_created_at: sources.createdAt,
     article_is_bookmarked: sql<boolean>`true`,
@@ -492,11 +492,11 @@ export async function getArticleDetails(
   const [row] = await db
     .select({
       article_id: articles.id,
-      article_title: articles.title,
-      article_link: articles.link,
-      article_categories: sql<string | null>`array_to_string
+      articleTitle: articles.title,
+      articleLink: articles.link,
+      articleCategories: sql<string | null>`array_to_string
           (${articles.categories}, ',')`,
-      article_body: articles.body,
+      articleBody: articles.body,
       article_hash: articles.hash,
       article_published_at: articles.publishedAt,
       article_crawled_at: articles.crawledAt,
@@ -507,10 +507,10 @@ export async function getArticleDetails(
       article_sentiment: articles.sentiment,
       article_metadata: articles.metadata,
       article_reading_time: articles.readingTime,
-      source_id: sources.id,
+      sourceId: sources.id,
       source_name: sources.name,
       source_description: sources.description,
-      source_url: sources.url,
+      sourceUrl: sources.url,
       source_updated_at: sources.updatedAt,
       source_display_name: sources.displayName,
       source_bias: sources.bias,

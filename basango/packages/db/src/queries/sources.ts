@@ -13,10 +13,10 @@ import {
 import { PUBLICATION_GRAPH_DAYS, SOURCE_IMAGE_BASE } from "@/constant";
 
 export interface SourceOverviewRow {
-  source_id: string;
+  sourceId: string;
   source_display_name: string | null;
   source_image: string;
-  source_url: string;
+  sourceUrl: string;
   source_name: string;
   source_created_at: string;
   source_is_followed: boolean;
@@ -40,10 +40,10 @@ export interface CategoryShare {
 
 export interface SourceDetailsResult {
   source: {
-    source_id: string;
+    sourceId: string;
     source_name: string;
     source_description: string | null;
-    source_url: string;
+    sourceUrl: string;
     source_updated_at: string | null;
     source_display_name: string | null;
     source_bias: string;
@@ -148,7 +148,7 @@ function buildFollowExistsExpression(userId: string): SQL<boolean> {
   return sql`EXISTS
   (SELECT 1
    FROM ${followedSources} f
-   WHERE f.source_id = ${sources.id}
+   WHERE f.sourceId = ${sources.id}
      AND f.follower_id = ${userId})`;
 }
 
@@ -161,10 +161,10 @@ export async function getSourceOverviewList(
 
   let query = db
     .select({
-      source_id: sources.id,
+      sourceId: sources.id,
       source_display_name: sources.displayName,
       source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-      source_url: sources.url,
+      sourceUrl: sources.url,
       source_name: sources.name,
       source_created_at: sources.createdAt,
       source_is_followed: followExpression,
@@ -186,7 +186,7 @@ export async function getSourceOverviewList(
     .limit(page.limit + 1);
 
   return buildPaginationResult(rows, page, {
-    id: "source_id",
+    id: "sourceId",
     date: "source_created_at",
   });
 }
@@ -298,10 +298,10 @@ export async function getSourceDetails(
 
   const [row] = await db
     .select({
-      source_id: sources.id,
+      sourceId: sources.id,
       source_name: sources.name,
       source_description: sources.description,
-      source_url: sources.url,
+      sourceUrl: sources.url,
       source_updated_at: sources.updatedAt,
       source_display_name: sources.displayName,
       source_bias: sources.bias,

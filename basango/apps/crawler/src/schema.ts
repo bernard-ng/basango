@@ -1,50 +1,7 @@
-import {z} from "zod";
-import {createSourcesConfig, resolveProjectPaths} from "@/utils";
+import { z } from "zod";
 
 export const UpdateDirectionSchema = z.enum(["forward", "backward"]);
 export const SourceKindSchema = z.enum(["wordpress", "html"]);
-
-export const SourceDateSchema = z.object({
-  format: z.string().default("yyyy-LL-dd HH:mm"),
-  pattern: z.string().nullable().optional(),
-  replacement: z.string().nullable().optional(),
-});
-
-export const SourceSelectorsSchema = z.object({
-  articles: z.string().optional().nullable(),
-  article_title: z.string().optional().nullable(),
-  article_link: z.string().optional().nullable(),
-  article_body: z.string().optional().nullable(),
-  article_date: z.string().optional().nullable(),
-  article_categories: z.string().optional().nullable(),
-  pagination: z.string().default("ul.pagination > li a"),
-});
-
-const BaseSourceSchema = z.object({
-  source_id: z.string(),
-  source_url: z.url(),
-  source_date: SourceDateSchema.default(SourceDateSchema.parse({})),
-  source_kind: SourceKindSchema,
-  categories: z.array(z.string()).default([]),
-  supports_categories: z.boolean().default(false),
-  requires_details: z.boolean().default(false),
-  requires_rate_limit: z.boolean().default(false),
-});
-
-export const HtmlSourceConfigSchema = BaseSourceSchema.extend({
-  source_kind: z.literal("html"),
-  source_selectors: SourceSelectorsSchema.default(
-    SourceSelectorsSchema.parse({}),
-  ),
-  pagination_template: z.string(),
-});
-
-export const WordPressSourceConfigSchema = BaseSourceSchema.extend({
-  source_kind: z.literal("wordpress"),
-  source_date: SourceDateSchema.default(
-    SourceDateSchema.parse({format: "yyyy-LL-dd'T'HH:mm:ss"}),
-  ),
-});
 
 export const DateRangeSchema = z
   .object({
@@ -96,102 +53,79 @@ export const DateRangeSpecSchema = z
   .regex(/.+:.+/, "Expected start:end format")
   .transform((spec) => {
     const [startRaw, endRaw] = spec.split(":");
-    return {startRaw: String(startRaw), endRaw: String(endRaw)};
+    return { startRaw: String(startRaw), endRaw: String(endRaw) };
   });
 
-export const ProjectPathsSchema = z.object({
-  root: z.string(),
-  data: z.string(),
-  logs: z.string(),
-  configs: z.string(),
+export const SourceDateSchema = z.object({
+  format: z.string().default("yyyy-LL-dd HH:mm"),
+  pattern: z.string().nullable().optional(),
+  replacement: z.string().nullable().optional(),
 });
 
-export const LoggingConfigSchema = z.object({
-  level: z.string().default("INFO"),
-  format: z
-    .string()
-    .default("%(asctime)s - %(name)s - %(levelname)s - %(message)s"),
-  console_logging: z.boolean().default(true),
-  file_logging: z.boolean().default(false),
-  log_file: z.string().default("crawler.log"),
-  max_log_size: z
-    .number()
-    .int()
-    .positive()
-    .default(10 * 1024 * 1024),
-  backup_count: z.number().int().nonnegative().default(5),
+const BaseSourceSchema = z.object({
+  sourceId: z.string(),
+  sourceUrl: z.url(),
+  sourceDate: SourceDateSchema,
+  sourceKind: SourceKindSchema,
+  categories: z.array(z.string()).default([]),
+  supportsCategories: z.boolean().default(false),
+  requiresDetails: z.boolean().default(false),
+  requiresRateLimit: z.boolean().default(false),
 });
 
-export const ClientConfigSchema = z.object({
-  timeout: z.number().positive().default(20),
-  user_agent: z
-    .string()
-    .default("Basango/0.1 (+https://github.com/bernard-ng/basango)"),
-  follow_redirects: z.boolean().default(true),
-  verify_ssl: z.boolean().default(true),
-  rotate: z.boolean().default(true),
-  max_retries: z.number().int().nonnegative().default(3),
-  backoff_initial: z.number().nonnegative().default(1),
-  backoff_multiplier: z.number().positive().default(2),
-  backoff_max: z.number().nonnegative().default(30),
-  respect_retry_after: z.boolean().default(true),
+export const HtmlSourceConfigSchema = BaseSourceSchema.extend({
+  sourceKind: z.literal("html"),
+  sourceSelectors: z.object({
+    articles: z.string(),
+    articleTitle: z.string(),
+    articleLink: z.string(),
+    articleBody: z.string(),
+    articleDate: z.string(),
+    articleCategories: z.string().optional(),
+    pagination: z.string().default("ul.pagination > li a"),
+  }),
+  paginationTemplate: z.string(),
 });
 
-export const CrawlerConfigSchema = z.object({
-  source: z
-    .union([HtmlSourceConfigSchema, WordPressSourceConfigSchema])
-    .optional(),
-  page_range: PageRangeSchema.optional(),
-  date_range: DateRangeSchema.optional(),
-  category: z.string().optional(),
-  notify: z.boolean().default(false),
-  is_update: z.boolean().default(false),
-  use_multi_threading: z.boolean().default(false),
-  max_workers: z.number().int().positive().default(5),
-  direction: UpdateDirectionSchema.default("forward"),
+export const WordPressSourceConfigSchema = BaseSourceSchema.extend({
+  sourceKind: z.literal("wordpress"),
+  sourceDate: SourceDateSchema.default(SourceDateSchema.parse({ format: "yyyy-LL-dd'T'HH:mm:ss" })),
 });
 
-export const FetchConfigSchema = z.object({
-  client: ClientConfigSchema.default(ClientConfigSchema.parse({})),
-  crawler: CrawlerConfigSchema.default(CrawlerConfigSchema.parse({})),
+export const ArticleMetadataSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  url: z.url().optional(),
 });
 
-export const SourcesConfigSchema = z.object({
-  html: z.array(HtmlSourceConfigSchema).default([]),
-  wordpress: z.array(WordPressSourceConfigSchema).default([]),
+export const ArticleTokenStatisticsSchema = z.object({
+  title: z.number().int().nonnegative().default(0),
+  body: z.number().int().nonnegative().default(0),
+  excerpt: z.number().int().nonnegative().default(0),
+  categories: z.number().int().nonnegative().default(0),
 });
 
-export const PipelineConfigSchema = z.object({
-  paths: ProjectPathsSchema.default(resolveProjectPaths(process.cwd())),
-  logging: LoggingConfigSchema.default(LoggingConfigSchema.parse({})),
-  fetch: FetchConfigSchema.default(FetchConfigSchema.parse({})),
-  sources: z
-    .union([SourcesConfigSchema, z.undefined()])
-    .transform((value) => createSourcesConfig(value ?? {})),
+export const ArticleSchema = z.object({
+  title: z.string(),
+  link: z.url(),
+  body: z.string(),
+  categories: z.array(z.string()).default([]),
+  source: z.string(),
+  timestamp: z.number().int(),
+  metadata: ArticleMetadataSchema.optional(),
+  tokenStatistics: ArticleTokenStatisticsSchema.optional(),
 });
 
-export type UpdateDirection = z.infer<typeof UpdateDirectionSchema>;
-export type SourceKind = z.infer<typeof SourceKindSchema>;
-export type SourceDate = z.infer<typeof SourceDateSchema>;
-export type SourceSelectors = z.infer<typeof SourceSelectorsSchema>;
+export type ArticleMetadata = z.infer<typeof ArticleMetadataSchema>;
+export type Article = z.infer<typeof ArticleSchema>;
+export type DateRange = z.infer<typeof DateRangeSchema>;
+export type PageRange = z.infer<typeof PageRangeSchema>;
 export type HtmlSourceConfig = z.infer<typeof HtmlSourceConfigSchema>;
 export type WordPressSourceConfig = z.infer<typeof WordPressSourceConfigSchema>;
 export type AnySourceConfig = HtmlSourceConfig | WordPressSourceConfig;
-export type DateRange = z.infer<typeof DateRangeSchema>;
-export type PageRange = z.infer<typeof PageRangeSchema>;
 
 export interface CreateDateRangeOptions {
   format?: string;
   separator?: string;
 }
-export type SourcesConfig = z.infer<typeof SourcesConfigSchema> & {
-  find: (sourceId: string) => AnySourceConfig | undefined;
-};
-export type ProjectPaths = z.infer<typeof ProjectPathsSchema>;
-export type LoggingConfig = z.infer<typeof LoggingConfigSchema>;
-export type ClientConfig = z.infer<typeof ClientConfigSchema>;
-export type CrawlerConfig = z.infer<typeof CrawlerConfigSchema> & {
-  source?: AnySourceConfig;
-};
-export type FetchConfig = z.infer<typeof FetchConfigSchema>;
-export type PipelineConfig = z.infer<typeof PipelineConfigSchema>;

@@ -1,93 +1,20 @@
-import { parseArgs } from "node:util";
-
 import { logger } from "@basango/logger";
 
-import { PipelineConfigManager } from "@/config";
-import { createQueueManager, createQueueSettings } from "@/process/async/queue";
+import { createQueueManager } from "@/process/async/queue";
 import { startWorker } from "@/process/async/worker";
-
-interface WorkerCliOptions {
-  env: string;
-  queue?: string[];
-  concurrency?: string;
-  "redis-url"?: string;
-  help?: boolean;
-}
-
-const usage = `
-    Usage: bun run src/scripts/worker [options]
-    
-    Options:
-      --env <env>              Environment to load (default: development)
-      -q, --queue <name>       Queue name to listen on (repeatable)
-      --concurrency <number>   Number of concurrent jobs per worker
-      --redis-url <url>        Override Redis connection URL
-      -h, --help               Show this message
-`;
-
-const parseCliArgs = (): WorkerCliOptions => {
-  const { values } = parseArgs({
-    options: {
-      env: { type: "string", default: "development" },
-      queue: { type: "string", multiple: true, short: "q" },
-      concurrency: { type: "string" },
-      "redis-url": { type: "string" },
-      help: { type: "boolean", short: "h" },
-    },
-  });
-
-  return values as WorkerCliOptions;
-};
-
-const parseConcurrency = (value?: string): number | undefined => {
-  if (!value) {
-    return undefined;
-  }
-
-  const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed) || parsed <= 0) {
-    throw new Error(`Invalid concurrency value: ${value}`);
-  }
-
-  return parsed;
-};
+import { parseWorkerCliArgs } from "@/scripts/utils";
 
 const main = async (): Promise<void> => {
-  const options = parseCliArgs();
+  const options = parseWorkerCliArgs();
 
-  if (options.help) {
-    console.log(usage);
-    return;
-  }
-
-  const env = options.env ?? "development";
-  const manager = new PipelineConfigManager({ env });
-  manager.setupLogging(manager.get(env));
-
-  let concurrency: number | undefined;
-  try {
-    concurrency = parseConcurrency(options.concurrency);
-  } catch (error) {
-    logger.error(
-      error instanceof Error ? error : { error },
-      "Invalid concurrency value provided",
-    );
-    process.exitCode = 1;
-    return;
-  }
-  const settings = options["redis-url"]
-    ? createQueueSettings({ redis_url: options["redis-url"] })
-    : undefined;
-  const queueManager = createQueueManager({ settings });
-
-  const queueNames = options.queue?.length
-    ? options.queue.map((name) => queueManager.queueName(name))
+  const manager = createQueueManager();
+  const queues = options.queue?.length
+    ? options.queue.map((name) => manager.queueName(name))
     : undefined;
 
   const handle = startWorker({
-    queueManager,
-    queueNames,
-    concurrency,
+    queueManager: manager,
+    queueNames: queues,
   });
 
   const shutdown = async (signal: NodeJS.Signals) => {
@@ -95,26 +22,14 @@ const main = async (): Promise<void> => {
     try {
       await handle.close();
     } finally {
-      await queueManager.close();
+      await manager.close();
       process.exit(0);
     }
   };
 
-  process.once("SIGINT", (signal) => {
-    void shutdown(signal);
-  });
-  process.once("SIGTERM", (signal) => {
-    void shutdown(signal);
-  });
-
-  logger.info(
-    {
-      env,
-      queueNames: queueNames ?? queueManager.iterQueueNames(),
-      concurrency: concurrency ?? "default",
-    },
-    "Crawler workers started",
-  );
+  process.once("SIGINT", (signal) => void shutdown(signal));
+  process.once("SIGTERM", (signal) => void shutdown(signal));
+  logger.info({ queueNames: queues }, "Crawler workers started");
 };
 
 void main();

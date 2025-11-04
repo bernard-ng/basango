@@ -101,7 +101,7 @@ export const sources = pgTable(
       sql`lower
           (${table.name})`,
     ),
-    uniqueIndex("unq_source_url").using(
+    uniqueIndex("unq_sourceUrl").using(
       "btree",
       sql`lower
           (${table.url})`,
@@ -113,7 +113,7 @@ export const articles = pgTable(
   "article",
   {
     id: uuid("id").notNull().defaultRandom().primaryKey(),
-    sourceId: uuid("source_id").notNull(),
+    sourceId: uuid("sourceId").notNull(),
     title: varchar("title", { length: 1024 }).notNull(),
     body: text("body").notNull(),
     hash: varchar("hash", { length: 32 }).notNull(),
@@ -143,7 +143,7 @@ export const articles = pgTable(
     ),
   },
   (table) => [
-    index("article_source_id_idx").on(table.sourceId),
+    index("article_sourceId_idx").on(table.sourceId),
     index("idx_article_published_at").using("btree", table.publishedAt.desc()),
     index("idx_article_published_id").using(
       "btree",
@@ -152,16 +152,16 @@ export const articles = pgTable(
     ),
     unique("unq_article_hash").on(table.hash),
     index("gin_article_tsv").using("gin", table.tsv),
-    index("gin_article_link_trgm").using("gin", table.link.op("gin_trgm_ops")),
-    index("gin_article_title_trgm").using(
+    index("gin_articleLink_trgm").using("gin", table.link.op("gin_trgm_ops")),
+    index("gin_articleTitle_trgm").using(
       "gin",
       table.title.op("gin_trgm_ops"),
     ),
-    index("gin_article_categories").using("gin", table.categories),
+    index("gin_articleCategories").using("gin", table.categories),
     foreignKey({
       columns: [table.sourceId],
       foreignColumns: [sources.id],
-      name: "article_source_id_fkey",
+      name: "article_sourceId_fkey",
     }).onDelete("cascade"),
     {
       kind: "check",
@@ -288,12 +288,12 @@ export const followedSources = pgTable(
   {
     id: uuid("id").notNull().defaultRandom().primaryKey(),
     followerId: uuid("follower_id").notNull(),
-    sourceId: uuid("source_id").notNull(),
+    sourceId: uuid("sourceId").notNull(),
     createdAt: timestamp("created_at", { mode: "string" }).notNull(),
   },
   (table) => [
     index("followed_source_follower_idx").on(table.followerId),
-    index("followed_source_source_idx").on(table.sourceId),
+    index("followed_source_sourceIdx").on(table.sourceId),
     index("idx_followed_source_follower_created").using(
       "btree",
       table.followerId,
@@ -307,7 +307,7 @@ export const followedSources = pgTable(
     foreignKey({
       columns: [table.sourceId],
       foreignColumns: [sources.id],
-      name: "followed_source_source_id_fkey",
+      name: "followed_source_sourceId_fkey",
     }).onDelete("cascade"),
   ],
 );
