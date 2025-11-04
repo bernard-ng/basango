@@ -53,12 +53,7 @@ export const articleSentimentEnum = pgEnum("article_sentiment", [
   "negative",
 ]);
 
-export const biasEnum = pgEnum("bias", [
-  "neutral",
-  "slightly",
-  "partisan",
-  "extreme",
-]);
+export const biasEnum = pgEnum("bias", ["neutral", "slightly", "partisan", "extreme"]);
 
 export const reliabilityEnum = pgEnum("reliability", [
   "trusted",
@@ -68,16 +63,14 @@ export const reliabilityEnum = pgEnum("reliability", [
   "unreliable",
 ]);
 
-export const transparencyEnum = pgEnum("transparency", [
-  "high",
-  "medium",
-  "low",
-]);
+export const transparencyEnum = pgEnum("transparency", ["high", "medium", "low"]);
 
-export const verificationTokenPurposeEnum = pgEnum(
-  "verification_token_purpose",
-  ["confirm_account", "password_reset", "unlock_account", "delete_account"],
-);
+export const verificationTokenPurposeEnum = pgEnum("verification_token_purpose", [
+  "confirm_account",
+  "password_reset",
+  "unlock_account",
+  "delete_account",
+]);
 
 export const sources = pgTable(
   "source",
@@ -87,9 +80,7 @@ export const sources = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     displayName: varchar("display_name", { length: 255 }),
     description: varchar("description", { length: 1024 }),
-    createdAt: timestamp("created_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "string" }),
     bias: biasEnum("bias").notNull().default("neutral"),
     reliability: reliabilityEnum("reliability").notNull().default("reliable"),
@@ -121,9 +112,7 @@ export const articles = pgTable(
     sentiment: articleSentimentEnum("sentiment").notNull().default("neutral"),
     metadata: jsonb("metadata"),
     tokenStatistics: jsonb("token_statistics"),
-    image: varchar("image", { length: 1024 }).generatedAlwaysAs(
-      () => sql`(metadata->>'image')`,
-    ),
+    image: varchar("image", { length: 1024 }).generatedAlwaysAs(() => sql`(metadata->>'image')`),
     excerpt: varchar("excerpt", { length: 255 }).generatedAlwaysAs(
       () => sql`((left(body, 200) || '...'))`,
     ),
@@ -145,18 +134,11 @@ export const articles = pgTable(
   (table) => [
     index("article_sourceId_idx").on(table.sourceId),
     index("idx_article_published_at").using("btree", table.publishedAt.desc()),
-    index("idx_article_published_id").using(
-      "btree",
-      table.publishedAt.desc(),
-      table.id.desc(),
-    ),
+    index("idx_article_published_id").using("btree", table.publishedAt.desc(), table.id.desc()),
     unique("unq_article_hash").on(table.hash),
     index("gin_article_tsv").using("gin", table.tsv),
     index("gin_articleLink_trgm").using("gin", table.link.op("gin_trgm_ops")),
-    index("gin_articleTitle_trgm").using(
-      "gin",
-      table.title.op("gin_trgm_ops"),
-    ),
+    index("gin_articleTitle_trgm").using("gin", table.title.op("gin_trgm_ops")),
     index("gin_articleCategories").using("gin", table.categories),
     foreignKey({
       columns: [table.sourceId],
@@ -212,11 +194,7 @@ export const bookmarks = pgTable(
   },
   (table) => [
     index("bookmark_user_id_idx").on(table.userId),
-    index("idx_bookmark_user_created").using(
-      "btree",
-      table.userId,
-      table.createdAt.desc(),
-    ),
+    index("idx_bookmark_user_created").using("btree", table.userId, table.createdAt.desc()),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [users.id],
@@ -265,11 +243,7 @@ export const comments = pgTable(
   (table) => [
     index("comment_user_id_idx").on(table.userId),
     index("comment_article_id_idx").on(table.articleId),
-    index("idx_comment_article_created").using(
-      "btree",
-      table.articleId,
-      table.createdAt.desc(),
-    ),
+    index("idx_comment_article_created").using("btree", table.articleId, table.createdAt.desc()),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [users.id],
@@ -321,10 +295,7 @@ export const loginAttempts = pgTable(
   },
   (table) => [
     index("login_attempt_user_id_idx").on(table.userId),
-    index("idx_login_attempt_created_at").using(
-      "btree",
-      table.createdAt.desc(),
-    ),
+    index("idx_login_attempt_created_at").using("btree", table.createdAt.desc()),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [users.id],
@@ -351,11 +322,7 @@ export const loginHistories = pgTable(
   },
   (table) => [
     index("login_history_user_id_idx").on(table.userId),
-    index("idx_login_history_created_at").using(
-      "btree",
-      table.userId,
-      table.createdAt.desc(),
-    ),
+    index("idx_login_history_created_at").using("btree", table.userId, table.createdAt.desc()),
     index("login_history_ip_address_idx").on(table.ipAddress),
     foreignKey({
       columns: [table.userId],
@@ -368,9 +335,7 @@ export const loginHistories = pgTable(
 export const refreshTokens = pgTable(
   "refresh_tokens",
   {
-    id: integer("id")
-      .generatedAlwaysAsIdentity({ name: "refresh_tokens_id_seq" })
-      .primaryKey(),
+    id: integer("id").generatedAlwaysAsIdentity({ name: "refresh_tokens_id_seq" }).primaryKey(),
     refreshToken: varchar("refresh_token", { length: 128 }).notNull(),
     username: varchar("username", { length: 255 }).notNull(),
     validUntil: timestamp("valid", { mode: "string" }).notNull(),
@@ -389,10 +354,7 @@ export const verificationTokens = pgTable(
   },
   (table) => [
     index("verification_token_user_id_idx").on(table.userId),
-    index("idx_verification_token_created_at").using(
-      "btree",
-      table.createdAt.desc(),
-    ),
+    index("idx_verification_token_created_at").using("btree", table.createdAt.desc()),
     uniqueIndex("unq_verification_token_user_purpose")
       .on(table.userId, table.purpose)
       .where(sql`token IS NOT NULL`),
@@ -437,19 +399,16 @@ export const bookmarksRelations = relations(bookmarks, ({ one, many }) => ({
   articles: many(bookmarkArticles),
 }));
 
-export const bookmarkArticlesRelations = relations(
-  bookmarkArticles,
-  ({ one }) => ({
-    bookmark: one(bookmarks, {
-      fields: [bookmarkArticles.bookmarkId],
-      references: [bookmarks.id],
-    }),
-    article: one(articles, {
-      fields: [bookmarkArticles.articleId],
-      references: [articles.id],
-    }),
+export const bookmarkArticlesRelations = relations(bookmarkArticles, ({ one }) => ({
+  bookmark: one(bookmarks, {
+    fields: [bookmarkArticles.bookmarkId],
+    references: [bookmarks.id],
   }),
-);
+  article: one(articles, {
+    fields: [bookmarkArticles.articleId],
+    references: [articles.id],
+  }),
+}));
 
 export const commentsRelations = relations(comments, ({ one }) => ({
   article: one(articles, {
@@ -462,19 +421,16 @@ export const commentsRelations = relations(comments, ({ one }) => ({
   }),
 }));
 
-export const followedSourcesRelations = relations(
-  followedSources,
-  ({ one }) => ({
-    follower: one(users, {
-      fields: [followedSources.followerId],
-      references: [users.id],
-    }),
-    source: one(sources, {
-      fields: [followedSources.sourceId],
-      references: [sources.id],
-    }),
+export const followedSourcesRelations = relations(followedSources, ({ one }) => ({
+  follower: one(users, {
+    fields: [followedSources.followerId],
+    references: [users.id],
   }),
-);
+  source: one(sources, {
+    fields: [followedSources.sourceId],
+    references: [sources.id],
+  }),
+}));
 
 export const loginAttemptsRelations = relations(loginAttempts, ({ one }) => ({
   user: one(users, {
@@ -490,12 +446,9 @@ export const loginHistoriesRelations = relations(loginHistories, ({ one }) => ({
   }),
 }));
 
-export const verificationTokensRelations = relations(
-  verificationTokens,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [verificationTokens.userId],
-      references: [users.id],
-    }),
+export const verificationTokensRelations = relations(verificationTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [verificationTokens.userId],
+    references: [users.id],
   }),
-);
+}));

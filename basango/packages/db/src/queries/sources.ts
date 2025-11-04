@@ -67,9 +67,7 @@ export interface SourceStatisticsRow {
   articleMetadataAvailable: number;
 }
 
-export async function getSourceStatisticsList(
-  db: Database,
-): Promise<SourceStatisticsRow[]> {
+export async function getSourceStatisticsList(db: Database): Promise<SourceStatisticsRow[]> {
   const rows = await db
     .select({
       sourceId: sources.id,
@@ -111,8 +109,7 @@ async function selectPublicationBoundary(
     conditions.push(sql`${params.category} = ANY(${articles.categories})`);
   }
 
-  const whereClause =
-    conditions.length > 1 ? and(...conditions) : conditions[0];
+  const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
 
   const [result] = await db
     .select({
@@ -181,9 +178,7 @@ export async function getSourceOverviewList(
     );
   }
 
-  const rows = await query
-    .orderBy(desc(sources.createdAt), desc(sources.id))
-    .limit(page.limit + 1);
+  const rows = await query.orderBy(desc(sources.createdAt), desc(sources.id)).limit(page.limit + 1);
 
   return buildPaginationResult(rows, page, {
     id: "sourceId",
@@ -200,10 +195,7 @@ function createBackwardDateRange(days: number): { start: number; end: number } {
   return { start, end };
 }
 
-async function fetchPublicationGraph(
-  db: Database,
-  sourceId: string,
-): Promise<PublicationEntry[]> {
+async function fetchPublicationGraph(db: Database, sourceId: string): Promise<PublicationEntry[]> {
   const range = createBackwardDateRange(PUBLICATION_GRAPH_DAYS);
 
   const rows = await db
@@ -239,11 +231,7 @@ async function fetchPublicationGraph(
   const start = new Date(range.start * 1000);
   const end = new Date(range.end * 1000);
 
-  for (
-    let date = new Date(start.getTime());
-    date < end;
-    date.setUTCDate(date.getUTCDate() + 1)
-  ) {
+  for (let date = new Date(start.getTime()); date < end; date.setUTCDate(date.getUTCDate() + 1)) {
     const day = date.toISOString().slice(0, 10);
     entries.push({ day, count: counts.get(day) ?? 0 });
   }
@@ -251,10 +239,7 @@ async function fetchPublicationGraph(
   return entries;
 }
 
-async function fetchCategoryShares(
-  db: Database,
-  sourceId: string,
-): Promise<CategoryShare[]> {
+async function fetchCategoryShares(db: Database, sourceId: string): Promise<CategoryShare[]> {
   const rows = await db
     .select({
       categories: sql<string | null>`array_to_string
@@ -273,18 +258,13 @@ async function fetchCategoryShares(
     }
   }
 
-  const total = Array.from(counts.values()).reduce(
-    (acc, value) => acc + value,
-    0,
-  );
+  const total = Array.from(counts.values()).reduce((acc, value) => acc + value, 0);
 
-  const shares: CategoryShare[] = Array.from(counts.entries()).map(
-    ([category, count]) => ({
-      category,
-      count,
-      percentage: total > 0 ? Math.round((count / total) * 10000) / 100 : 0,
-    }),
-  );
+  const shares: CategoryShare[] = Array.from(counts.entries()).map(([category, count]) => ({
+    category,
+    count,
+    percentage: total > 0 ? Math.round((count / total) * 10000) / 100 : 0,
+  }));
 
   shares.sort((a, b) => b.count - a.count);
   return shares;
