@@ -1,12 +1,11 @@
 import { setTimeout as delay } from "node:timers/promises";
-
+import { FetchClientConfig } from "@/config";
 import {
   DEFAULT_RETRY_AFTER_HEADER,
   DEFAULT_USER_AGENT,
   TRANSIENT_HTTP_STATUSES,
 } from "@/constants";
 import { UserAgents } from "@/http/user-agent";
-import { FetchClientConfig } from "@/config";
 
 export type HttpHeaders = Record<string, string>;
 export type HttpParams = Record<string, string | number | boolean | null | undefined>;
@@ -72,7 +71,7 @@ const buildUrl = (url: string, params?: HttpParams): string => {
  */
 const computeBackoff = (config: FetchClientConfig, attempt: number): number => {
   const base = Math.min(
-    config.backoffInitial * Math.pow(config.backoffMultiplier, attempt),
+    config.backoffInitial * config.backoffMultiplier ** attempt,
     config.backoffMax,
   );
   const jitter = Math.random() * base * 0.25;
@@ -172,11 +171,11 @@ export class SyncHttpClient extends BaseHttpClient {
 
         const headers = this.buildHeaders(options.headers);
         const init: RequestInit = {
-          method,
-          headers,
           body: options.data as BodyInit | undefined,
-          signal: controller.signal,
+          headers,
+          method,
           redirect: this.config.followRedirects ? "follow" : "manual",
+          signal: controller.signal,
         };
 
         if (options.json !== undefined) {

@@ -8,7 +8,7 @@
     "incremental": false,
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
-    "module": "NodeNext",
+    "module": "esnext",
     "moduleDetection": "force",
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,

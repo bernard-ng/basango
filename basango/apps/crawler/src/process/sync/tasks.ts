@@ -1,13 +1,13 @@
-import { resolveSourceConfig } from "@/utils";
+import logger from "@basango/logger";
 import {
-  closePersistors,
   CrawlingOptions,
+  closePersistors,
   createPersistors,
   resolveCrawlerConfig,
 } from "@/process/crawler";
-import logger from "@basango/logger";
-import { WordPressCrawler } from "@/process/parsers/wordpress";
 import { HtmlCrawler } from "@/process/parsers/html";
+import { WordPressCrawler } from "@/process/parsers/wordpress";
+import { resolveSourceConfig } from "@/utils";
 
 export const runSyncCrawl = async (options: CrawlingOptions): Promise<void> => {
   const source = resolveSourceConfig(options.sourceId);

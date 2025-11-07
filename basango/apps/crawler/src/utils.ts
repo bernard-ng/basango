@@ -1,19 +1,20 @@
+import { format, getUnixTime, isMatch, parse } from "date-fns";
 import type { RedisOptions } from "ioredis";
 import { get_encoding, TiktokenEncoding } from "tiktoken";
-import { format, getUnixTime, isMatch, parse } from "date-fns";
-
+import { config } from "@/config";
+import { DEFAULT_DATE_FORMAT } from "@/constants";
 import {
   AnySourceConfig,
   CreateDateRangeOptions,
   DateRange,
   DateRangeSchema,
   DateRangeSpecSchema,
+  HtmlSourceConfig,
   PageRange,
   PageRangeSchema,
   PageRangeSpecSchema,
+  WordPressSourceConfig,
 } from "@/schema";
-import { DEFAULT_DATE_FORMAT } from "@/constants";
-import { config } from "@/config";
 
 /**
  * Resolve a source configuration by its ID.
@@ -21,8 +22,8 @@ import { config } from "@/config";
  */
 export const resolveSourceConfig = (id: string): AnySourceConfig => {
   const source =
-    config.sources.html.find((s) => s.sourceId === id) ||
-    config.sources.wordpress.find((s) => s.sourceId === id);
+    config.sources.html.find((s: HtmlSourceConfig) => s.sourceId === id) ||
+    config.sources.wordpress.find((s: WordPressSourceConfig) => s.sourceId === id);
 
   if (source === undefined) {
     throw new Error(`Source '${id}' not found in configuration`);
@@ -41,10 +42,10 @@ export const parseRedisUrl = (url: string): RedisOptions => {
   }
   const parsed = new URL(url);
   return {
-    host: parsed.hostname,
-    port: Number(parsed.port || 6379),
-    password: parsed.password || undefined,
     db: Number(parsed.pathname?.replace("/", "") || 0),
+    host: parsed.hostname,
+    password: parsed.password || undefined,
+    port: Number(parsed.port || 6379),
   };
 };
 
@@ -112,8 +113,8 @@ export const createDateRange = (
   const endDate = parseDate(parsedSpec.endRaw, format);
 
   const range = {
-    start: getUnixTime(startDate),
     end: getUnixTime(endDate),
+    start: getUnixTime(startDate),
   };
 
   return DateRangeSchema.parse(range);

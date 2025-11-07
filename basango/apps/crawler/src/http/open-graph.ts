@@ -1,9 +1,8 @@
 import { parse } from "node-html-parser";
-
+import { config } from "@/config";
 import { OPEN_GRAPH_USER_AGENT } from "@/constants";
 import { SyncHttpClient } from "@/http/http-client";
 import { UserAgents } from "@/http/user-agent";
-import { config } from "@/config";
 import { ArticleMetadata } from "@/schema";
 
 /**
@@ -47,8 +46,8 @@ export class OpenGraph {
     const provider = new UserAgents(true, OPEN_GRAPH_USER_AGENT);
 
     this.client = new SyncHttpClient(settings, {
-      userAgentProvider: provider,
       defaultHeaders: { "User-Agent": provider.og() },
+      userAgentProvider: provider,
     });
   }
 
@@ -94,9 +93,9 @@ export class OpenGraph {
     }
 
     return {
-      title,
       description,
       image,
+      title,
       url: canonical,
     };
   }

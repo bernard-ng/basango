@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { loadConfig } from "@devscast/config";
+import { loadConfig as defineConfig } from "@devscast/config";
 import { z } from "zod";
 import {
   DateRangeSchema,
@@ -13,49 +13,49 @@ import {
 export const PROJECT_DIR = path.resolve(__dirname, "../");
 
 export const PipelineConfigSchema = z.object({
-  paths: z.object({
-    root: z.string().default(PROJECT_DIR),
-    data: z.string().default(path.join(PROJECT_DIR, "data", "dataset")),
-    config: z.string().default(path.join(PROJECT_DIR, "config")),
-  }),
   fetch: z.object({
-    client: z.object({
-      timeout: z.number().positive().default(20),
-      userAgent: z.string().default("Basango/0.1 (+https://github.com/bernard-ng/basango)"),
-      followRedirects: z.boolean().default(true),
-      verifySsl: z.boolean().default(true),
-      rotate: z.boolean().default(true),
-      maxRetries: z.number().int().nonnegative().default(3),
-      backoffInitial: z.number().nonnegative().default(1),
-      backoffMultiplier: z.number().positive().default(2),
-      backoffMax: z.number().nonnegative().default(30),
-      respectRetryAfter: z.boolean().default(true),
-    }),
-    crawler: z.object({
-      source: z.union([HtmlSourceConfigSchema, WordPressSourceConfigSchema]).optional(),
-      pageRange: PageRangeSchema.optional(),
-      dateRange: DateRangeSchema.optional(),
-      category: z.string().optional(),
-      notify: z.boolean().default(false),
-      isUpdate: z.boolean().default(false),
-      useMultiThreading: z.boolean().default(false),
-      maxWorkers: z.number().int().positive().default(5),
-      direction: UpdateDirectionSchema.default("forward"),
-    }),
     async: z.object({
-      redisUrl: z.string().default("redis://localhost:6379/0"),
       prefix: z.string().default("basango:crawler:queue"),
-      ttl: z.object({
-        default: z.number().int().positive().default(600),
-        result: z.number().int().nonnegative().default(3600),
-        failure: z.number().int().nonnegative().default(3600),
-      }),
       queues: z.object({
-        listing: z.string().default("listing"),
         details: z.string().default("details"),
+        listing: z.string().default("listing"),
         processing: z.string().default("processing"),
       }),
+      redisUrl: z.string().default("redis://localhost:6379/0"),
+      ttl: z.object({
+        default: z.number().int().positive().default(600),
+        failure: z.number().int().nonnegative().default(3600),
+        result: z.number().int().nonnegative().default(3600),
+      }),
     }),
+    client: z.object({
+      backoffInitial: z.number().nonnegative().default(1),
+      backoffMax: z.number().nonnegative().default(30),
+      backoffMultiplier: z.number().positive().default(2),
+      followRedirects: z.boolean().default(true),
+      maxRetries: z.number().int().nonnegative().default(3),
+      respectRetryAfter: z.boolean().default(true),
+      rotate: z.boolean().default(true),
+      timeout: z.number().positive().default(20),
+      userAgent: z.string().default("Basango/0.1 (+https://github.com/bernard-ng/basango)"),
+      verifySsl: z.boolean().default(true),
+    }),
+    crawler: z.object({
+      category: z.string().optional(),
+      dateRange: DateRangeSchema.optional(),
+      direction: UpdateDirectionSchema.default("forward"),
+      isUpdate: z.boolean().default(false),
+      maxWorkers: z.number().int().positive().default(5),
+      notify: z.boolean().default(false),
+      pageRange: PageRangeSchema.optional(),
+      source: z.union([HtmlSourceConfigSchema, WordPressSourceConfigSchema]).optional(),
+      useMultiThreading: z.boolean().default(false),
+    }),
+  }),
+  paths: z.object({
+    config: z.string().default(path.join(PROJECT_DIR, "config")),
+    data: z.string().default(path.join(PROJECT_DIR, "data", "datasets")),
+    root: z.string().default(PROJECT_DIR),
   }),
   sources: z.object({
     html: z.array(HtmlSourceConfigSchema).default([]),
@@ -63,12 +63,12 @@ export const PipelineConfigSchema = z.object({
   }),
 });
 
-export const { config, env } = loadConfig({
-  schema: PipelineConfigSchema,
+export const { config, env } = defineConfig({
   cwd: process.cwd(),
   env: {
     path: path.join(PROJECT_DIR, ".env"),
   },
+  schema: PipelineConfigSchema,
   sources: [
     path.join(PROJECT_DIR, "config", "pipeline.json"),
     path.join(PROJECT_DIR, "config", "sources.json"),

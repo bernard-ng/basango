@@ -1,18 +1,17 @@
 import { logger } from "@basango/logger";
-import { HTMLElement } from "node-html-parser";
 import { getUnixTime, isMatch as isDateMatch, parse as parseDateFns } from "date-fns";
-
-import { isTimestampInRange, createAbsoluteUrl } from "@/utils";
-import { persist, Persistor } from "@/process/persistence";
-import { BaseCrawler } from "@/process/parsers/base";
+import { HTMLElement } from "node-html-parser";
 import TurndownService from "turndown";
-import { DateRange, HtmlSourceConfig } from "@/schema";
 import { FetchCrawlerConfig } from "@/config";
+import { BaseCrawler } from "@/process/parsers/base";
+import { Persistor, persist } from "@/process/persistence";
+import { DateRange, HtmlSourceConfig } from "@/schema";
+import { createAbsoluteUrl, isTimestampInRange } from "@/utils";
 
 const md = new TurndownService({
+  bulletListMarker: "-",
   headingStyle: "atx",
   hr: "---",
-  bulletListMarker: "-",
 });
 
 /**
@@ -136,7 +135,7 @@ export class HtmlCrawler extends BaseCrawler {
 
     if (dateRange && !isTimestampInRange(dateRange, timestamp)) {
       logger.info(
-        { title: titleText, link, date: rawDate, timestamp },
+        { date: rawDate, link, timestamp, title: titleText },
         "Skipping article outside date range",
       );
       return null;
@@ -144,12 +143,12 @@ export class HtmlCrawler extends BaseCrawler {
 
     const enriched = await this.enrichWithOpenGraph(
       {
-        title: titleText,
-        link,
         body,
         categories,
+        link,
         source: this.source.sourceId,
         timestamp,
+        title: titleText,
       },
       link,
     );
@@ -172,7 +171,7 @@ export class HtmlCrawler extends BaseCrawler {
    * Get the pagination range (start and end page numbers).
    */
   async getPagination(): Promise<{ start: number; end: number }> {
-    return { start: 0, end: await this.getLastPage() };
+    return { end: await this.getLastPage(), start: 0 };
   }
 
   /**
@@ -187,7 +186,7 @@ export class HtmlCrawler extends BaseCrawler {
       const links = this.extractAll(root, this.source.sourceSelectors.pagination);
       if (!links.length) return 1;
       const last = links[links.length - 1]!;
-      const href = (last as any).getAttribute?.("href") as string | null;
+      const href = last.getAttribute("href") as string | null;
       if (!href) return 1;
 
       // Heuristic: prefer a number in the href, else "page" query param
@@ -246,12 +245,10 @@ export class HtmlCrawler extends BaseCrawler {
     if (!target) return null;
 
     const href =
-      (target.getAttribute?.("href") as string | null) ??
-      ((target as any).getAttribute?.("data-href") as string | null) ??
-      ((target as any).getAttribute?.("src") as string | null);
+      target.getAttribute("href") ?? target.getAttribute("data-href") ?? target.getAttribute("src");
+
     if (!href) return null;
-    const absolute = createAbsoluteUrl(this.source.sourceUrl, href);
-    return absolute;
+    return createAbsoluteUrl(this.source.sourceUrl, href);
   }
 
   /**
@@ -265,10 +262,10 @@ export class HtmlCrawler extends BaseCrawler {
     if (!target) return null;
 
     // If it's an image, prefer alt/title
-    const tag = (target as any).tagName?.toLowerCase?.() as string | undefined;
+    const tag = target.tagName.toLowerCase();
     if (tag === "img") {
-      const alt = (target as any).getAttribute?.("alt") as string | null;
-      const title = (target as any).getAttribute?.("title") as string | null;
+      const alt = target.getAttribute("alt");
+      const title = target.getAttribute("title");
       const pick = (alt ?? title ?? "").trim();
       if (pick.length > 0) return pick;
     }

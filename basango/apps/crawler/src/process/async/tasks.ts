@@ -1,12 +1,11 @@
 import { logger } from "@basango/logger";
-
+import * as handlers from "@/process/async/handlers";
+import { createQueueManager } from "@/process/async/queue";
 import {
   DetailsTaskPayloadSchema,
   ListingTaskPayloadSchema,
   ProcessingTaskPayloadSchema,
 } from "@/process/async/schemas";
-import { createQueueManager } from "@/process/async/queue";
-import * as handlers from "@/process/async/handlers";
 import { CrawlingOptions } from "@/process/crawler";
 
 export const collectListing = async (payload: unknown): Promise<number> => {
@@ -41,10 +40,10 @@ export const forwardForProcessing = async (payload: unknown): Promise<unknown> =
 
 export const scheduleAsyncCrawl = async (options: CrawlingOptions): Promise<string> => {
   const payload = ListingTaskPayloadSchema.parse({
-    sourceId: options.sourceId,
-    pageRange: options.pageRange,
-    dateRange: options.dateRange,
     category: options.category,
+    dateRange: options.dateRange,
+    pageRange: options.pageRange,
+    sourceId: options.sourceId,
   });
 
   const manager = createQueueManager();
