@@ -1,0 +1,31 @@
+{
+  "name": "@basango/crawler",
+  "private": true,
+  "dependencies": {
+    "@basango/logger": "workspace:*",
+    "@devscast/config": "^1.0.3",
+    "bullmq": "^4.18.3",
+    "date-fns": "^3.6.0",
+    "ioredis": "^5.8.2",
+    "node-html-parser": "^7.0.1",
+    "tiktoken": "^1.0.22",
+    "turndown": "^7.2.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/turndown": "^5.0.6",
+    "vitest": "^4.0.7"
+  },
+  "scripts": {
+    "crawler:async": "bun run src/scripts/queue.ts",
+    "crawler:sync": "bun run src/scripts/crawl.ts",
+    "crawler:worker": "bun run src/scripts/worker.ts",
+    "clean": "rm -rf .turbo node_modules",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run"
+  },
+  "type": "module"
+}

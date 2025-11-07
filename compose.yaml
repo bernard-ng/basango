@@ -10,7 +10,7 @@ services:
       - "3306:3306"
     volumes:
       - ./var/volumes/mariadb:/var/lib/mysql:rw
-      - ./var/volumes/backend-var:/var/www/var
+      - ./var/volumes/api-legacy-var:/var/www/var
     networks:
       - basango_network
   
@@ -49,11 +49,11 @@ services:
       - basango_network
 
   nginx:
-    build: ./docker/nginx
+    build: .docker/nginx
     ports:
       - "8000:80"
     volumes:
-      - ./projects/backend/public:/var/www/public:delegated
+      - ./projects/api-legacy/public:/var/www/public:delegated
     depends_on:
       - php
     networks:
@@ -61,9 +61,9 @@ services:
 
   php:
     user: '${USER_ID:-1000}:${GROUP_ID:-1000}'
-    build: ./docker/php
+    build: .docker/php
     volumes:
-      - ./projects/backend:/var/www:delegated
+      - ./projects/api-legacy:/var/www:delegated
     depends_on:
       - mariadb
       - postgres
@@ -110,7 +110,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./var/volumes/backend-var
+      device: ./var/volumes/api-legacy-var
   redis_data:
     driver: local
     driver_opts:
