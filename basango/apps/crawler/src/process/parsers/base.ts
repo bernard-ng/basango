@@ -1,9 +1,8 @@
-import { parse as parseHtml, HTMLElement } from "node-html-parser";
-
+import { HTMLElement, parse as parseHtml } from "node-html-parser";
+import { config, FetchCrawlerConfig } from "@/config";
 import { SyncHttpClient } from "@/http/http-client";
 import { OpenGraph } from "@/http/open-graph";
 import type { Persistor } from "@/process/persistence";
-import { config, FetchCrawlerConfig } from "@/config";
 import { AnySourceConfig, Article } from "@/schema";
 
 export interface CrawlerOptions {
@@ -51,8 +50,8 @@ export abstract class BaseCrawler {
   protected textContent(node: HTMLElement | null | undefined): string | null {
     if (!node) return null;
     // innerText keeps spacing similar to browser rendering
-    const value = (node as any).innerText ?? node.text;
-    const text = typeof value === "string" ? value.trim() : String(value ?? "").trim();
+    const value = node.innerText ?? node.text;
+    const text = value.trim();
     return text.length ? text : null;
   }
 
@@ -64,7 +63,7 @@ export abstract class BaseCrawler {
   protected extractFirst(root: HTMLElement, selector?: string | null): HTMLElement | null {
     if (!selector) return null;
     try {
-      return (root as any).querySelector?.(selector) ?? null;
+      return root.querySelector(selector) ?? null;
     } catch {
       return null;
     }
@@ -78,7 +77,7 @@ export abstract class BaseCrawler {
   protected extractAll(root: HTMLElement, selector?: string | null): HTMLElement[] {
     if (!selector) return [];
     try {
-      return ((root as any).querySelectorAll?.(selector) ?? []) as HTMLElement[];
+      return root.querySelectorAll(selector);
     } catch {
       return [];
     }

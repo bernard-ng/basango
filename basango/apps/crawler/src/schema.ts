@@ -5,8 +5,8 @@ export const SourceKindSchema = z.enum(["wordpress", "html"]);
 
 export const DateRangeSchema = z
   .object({
-    start: z.number().int(),
     end: z.number().int(),
+    start: z.number().int(),
   })
   .superRefine((value, ctx) => {
     if (value.start === 0 || value.end === 0) {
@@ -25,8 +25,8 @@ export const DateRangeSchema = z
 
 export const PageRangeSchema = z
   .object({
-    start: z.number().int().min(0),
     end: z.number().int().min(0),
+    start: z.number().int().min(0),
   })
   .superRefine((value, ctx) => {
     if (value.end < value.start) {
@@ -43,8 +43,8 @@ export const PageRangeSpecSchema = z
   .transform((spec) => {
     const [startText, endText] = spec.split(":");
     return {
-      start: Number.parseInt(String(startText), 10),
       end: Number.parseInt(String(endText), 10),
+      start: Number.parseInt(String(startText), 10),
     };
   });
 
@@ -53,7 +53,7 @@ export const DateRangeSpecSchema = z
   .regex(/.+:.+/, "Expected start:end format")
   .transform((spec) => {
     const [startRaw, endRaw] = spec.split(":");
-    return { startRaw: String(startRaw), endRaw: String(endRaw) };
+    return { endRaw: String(endRaw), startRaw: String(startRaw) };
   });
 
 export const SourceDateSchema = z.object({
@@ -63,57 +63,57 @@ export const SourceDateSchema = z.object({
 });
 
 const BaseSourceSchema = z.object({
-  sourceId: z.string(),
-  sourceUrl: z.url(),
-  sourceDate: SourceDateSchema,
-  sourceKind: SourceKindSchema,
   categories: z.array(z.string()).default([]),
-  supportsCategories: z.boolean().default(false),
   requiresDetails: z.boolean().default(false),
   requiresRateLimit: z.boolean().default(false),
+  sourceDate: SourceDateSchema,
+  sourceId: z.string(),
+  sourceKind: SourceKindSchema,
+  sourceUrl: z.url(),
+  supportsCategories: z.boolean().default(false),
 });
 
 export const HtmlSourceConfigSchema = BaseSourceSchema.extend({
+  paginationTemplate: z.string(),
   sourceKind: z.literal("html"),
   sourceSelectors: z.object({
+    articleBody: z.string(),
+    articleCategories: z.string().optional(),
+    articleDate: z.string(),
+    articleLink: z.string(),
     articles: z.string(),
     articleTitle: z.string(),
-    articleLink: z.string(),
-    articleBody: z.string(),
-    articleDate: z.string(),
-    articleCategories: z.string().optional(),
     pagination: z.string().default("ul.pagination > li a"),
   }),
-  paginationTemplate: z.string(),
 });
 
 export const WordPressSourceConfigSchema = BaseSourceSchema.extend({
-  sourceKind: z.literal("wordpress"),
   sourceDate: SourceDateSchema.default(SourceDateSchema.parse({ format: "yyyy-LL-dd'T'HH:mm:ss" })),
+  sourceKind: z.literal("wordpress"),
 });
 
 export const ArticleMetadataSchema = z.object({
-  title: z.string().optional(),
   description: z.string().optional(),
   image: z.string().optional(),
+  title: z.string().optional(),
   url: z.url().optional(),
 });
 
 export const ArticleTokenStatisticsSchema = z.object({
-  title: z.number().int().nonnegative().default(0),
   body: z.number().int().nonnegative().default(0),
-  excerpt: z.number().int().nonnegative().default(0),
   categories: z.number().int().nonnegative().default(0),
+  excerpt: z.number().int().nonnegative().default(0),
+  title: z.number().int().nonnegative().default(0),
 });
 
 export const ArticleSchema = z.object({
-  title: z.string(),
-  link: z.url(),
   body: z.string(),
   categories: z.array(z.string()).default([]),
+  link: z.url(),
+  metadata: ArticleMetadataSchema.optional(),
   source: z.string(),
   timestamp: z.number().int(),
-  metadata: ArticleMetadataSchema.optional(),
+  title: z.string(),
   tokenStatistics: ArticleTokenStatisticsSchema.optional(),
 });
 

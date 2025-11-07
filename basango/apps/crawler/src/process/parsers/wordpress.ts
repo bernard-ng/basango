@@ -1,15 +1,14 @@
 import { logger } from "@basango/logger";
-
-import { DateRange, PageRange, WordPressSourceConfig } from "@/schema";
-import { BaseCrawler } from "@/process/parsers/base";
-import { persist, Persistor } from "@/process/persistence";
 import TurndownService from "turndown";
 import { FetchCrawlerConfig } from "@/config";
+import { BaseCrawler } from "@/process/parsers/base";
+import { Persistor, persist } from "@/process/persistence";
+import { DateRange, PageRange, WordPressSourceConfig } from "@/schema";
 
 const md = new TurndownService({
+  bulletListMarker: "-",
   headingStyle: "atx",
   hr: "---",
-  bulletListMarker: "-",
 });
 
 interface WordPressPost {
@@ -59,7 +58,7 @@ export class WordPressCrawler extends BaseCrawler {
         const data = (await response.json()) as unknown;
         const articles = Array.isArray(data) ? (data as WordPressPost[]) : [];
         if (!Array.isArray(data)) {
-          logger.warn({ type: typeof data, page }, "Unexpected WordPress payload type");
+          logger.warn({ page, type: typeof data }, "Unexpected WordPress payload type");
         }
 
         for (const entry of articles) {
@@ -132,7 +131,7 @@ export class WordPressCrawler extends BaseCrawler {
       const { isTimestampInRange } = await import("@/utils");
       if (!isTimestampInRange(dateRange, timestamp)) {
         logger.info(
-          { title, link, date: data.date, timestamp },
+          { date: data.date, link, timestamp, title },
           "Skipping article outside date range",
         );
         return null;
@@ -141,12 +140,12 @@ export class WordPressCrawler extends BaseCrawler {
 
     const enriched = await this.enrichWithOpenGraph(
       {
-        title,
-        link,
         body,
         categories,
+        link,
         source: this.source.sourceId,
         timestamp,
+        title,
       },
       link,
     );
@@ -169,11 +168,11 @@ export class WordPressCrawler extends BaseCrawler {
         response.headers.get(WordPressCrawler.TOTAL_POSTS_HEADER) ?? "0",
         10,
       );
-      logger.info({ posts, pages }, "WordPress pagination");
+      logger.info({ pages, posts }, "WordPress pagination");
       const end = Number.isFinite(pages) && pages > 0 ? pages : 1;
-      return { start: 1, end };
+      return { end, start: 1 };
     } catch {
-      return { start: 1, end: 1 };
+      return { end: 1, start: 1 };
     }
   }
 

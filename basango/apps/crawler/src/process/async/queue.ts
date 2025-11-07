@@ -1,8 +1,7 @@
 import { randomUUID } from "node:crypto";
-
-import IORedis from "ioredis";
 import { JobsOptions, Queue, QueueOptions } from "bullmq";
-
+import IORedis from "ioredis";
+import { config, FetchAsyncConfig } from "@/config";
 import {
   DetailsTaskPayload,
   DetailsTaskPayloadSchema,
@@ -12,7 +11,6 @@ import {
   ProcessingTaskPayloadSchema,
 } from "@/process/async/schemas";
 import { parseRedisUrl } from "@/utils";
-import { config, FetchAsyncConfig } from "@/config";
 
 export interface QueueBackend<T = unknown> {
   add: (name: string, data: T, opts?: JobsOptions) => Promise<{ id: string }>;
@@ -26,7 +24,11 @@ export type QueueFactory = (
 
 const defaultQueueFactory: QueueFactory = (queueName, settings, connection) => {
   const redisConnection =
-    connection ?? new IORedis(settings.redisUrl, parseRedisUrl(settings.redisUrl));
+    connection ??
+    new IORedis(settings.redisUrl, {
+      ...parseRedisUrl(settings.redisUrl),
+      maxRetriesPerRequest: null,
+    });
   const options: QueueOptions = {
     connection: redisConnection,
     prefix: settings.prefix,
@@ -65,23 +67,29 @@ export const createQueueManager = (options: CreateQueueManagerOptions = {}): Que
   const settings = config.fetch.async;
 
   const connection =
-    options.connection ?? new IORedis(settings.redisUrl, parseRedisUrl(settings.redisUrl));
+    options.connection ??
+    new IORedis(settings.redisUrl, {
+      ...parseRedisUrl(settings.redisUrl),
+      maxRetriesPerRequest: null,
+    });
   const factory = options.queueFactory ?? defaultQueueFactory;
 
   const ensureQueue = (queueName: string) => factory(queueName, settings, connection);
 
   return {
-    settings,
-    connection,
-    enqueueListing: (payload) => {
-      const data = ListingTaskPayloadSchema.parse(payload);
-      const queue = ensureQueue(settings.queues.listing);
-      return queue.add("collect_listing", data);
+    close: async () => {
+      await connection.quit();
     },
+    connection,
     enqueueArticle: (payload) => {
       const data = DetailsTaskPayloadSchema.parse(payload);
       const queue = ensureQueue(settings.queues.details);
       return queue.add("collect_article", data);
+    },
+    enqueueListing: (payload) => {
+      const data = ListingTaskPayloadSchema.parse(payload);
+      const queue = ensureQueue(settings.queues.listing);
+      return queue.add("collect_listing", data);
     },
     enqueueProcessed: (payload) => {
       const data = ProcessingTaskPayloadSchema.parse(payload);
@@ -94,8 +102,6 @@ export const createQueueManager = (options: CreateQueueManagerOptions = {}): Que
       `${settings.prefix}:${settings.queues.processing}`,
     ],
     queueName: (suffix: string) => `${settings.prefix}:${suffix}`,
-    close: async () => {
-      await connection.quit();
-    },
+    settings,
   };
 };

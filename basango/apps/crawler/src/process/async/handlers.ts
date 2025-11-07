@@ -1,20 +1,19 @@
 import { logger } from "@basango/logger";
 
 import { config, env } from "@/config";
-import { Article, HtmlSourceConfig, SourceKindSchema, WordPressSourceConfig } from "@/schema";
-import { createDateRange, formatDateRange, formatPageRange, resolveSourceConfig } from "@/utils";
+import { SyncHttpClient } from "@/http/http-client";
+import { createQueueManager, QueueManager } from "@/process/async/queue";
 import {
   DetailsTaskPayload,
   ListingTaskPayload,
   ProcessingTaskPayload,
 } from "@/process/async/schemas";
-import { createQueueManager, QueueManager } from "@/process/async/queue";
+import { resolveCrawlerConfig } from "@/process/crawler";
 import { HtmlCrawler } from "@/process/parsers/html";
 import { WordPressCrawler } from "@/process/parsers/wordpress";
 import { JsonlPersistor } from "@/process/persistence";
-import { SyncHttpClient } from "@/http/http-client";
-
-import { resolveCrawlerConfig } from "@/process/crawler";
+import { Article, HtmlSourceConfig, SourceKindSchema, WordPressSourceConfig } from "@/schema";
+import { createDateRange, formatDateRange, formatPageRange, resolveSourceConfig } from "@/utils";
 
 export const collectHtmlListing = async (
   payload: ListingTaskPayload,
@@ -40,10 +39,10 @@ export const collectHtmlListing = async (
         if (!url) continue;
 
         await manager.enqueueArticle({
-          url,
-          sourceId: payload.sourceId,
           category: payload.category,
           dateRange: createDateRange(payload.dateRange),
+          sourceId: payload.sourceId,
+          url,
         } as DetailsTaskPayload);
         queued += 1;
       }
@@ -79,11 +78,11 @@ export const collectWordPressListing = async (
         if (!url) continue;
 
         await manager.enqueueArticle({
-          url,
-          data,
-          sourceId: payload.sourceId,
           category: payload.category,
+          data,
           dateRange: createDateRange(payload.dateRange),
+          sourceId: payload.sourceId,
+          url,
         } as DetailsTaskPayload);
         queued += 1;
       }
@@ -98,10 +97,10 @@ export const collectWordPressListing = async (
 export const collectArticle = async (payload: DetailsTaskPayload): Promise<unknown> => {
   const source = resolveSourceConfig(payload.sourceId);
   const settings = resolveCrawlerConfig(source, {
-    pageRange: payload.pageRange ? formatPageRange(payload.pageRange) : undefined,
-    dateRange: payload.dateRange ? formatDateRange(payload.dateRange) : undefined,
-    sourceId: payload.sourceId,
     category: payload.category,
+    dateRange: payload.dateRange ? formatDateRange(payload.dateRange) : undefined,
+    pageRange: payload.pageRange ? formatPageRange(payload.pageRange) : undefined,
+    sourceId: payload.sourceId,
   });
   const persistors = [
     new JsonlPersistor({

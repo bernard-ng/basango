@@ -1,5 +1,5 @@
-import IORedis from "ioredis";
 import { QueueEvents, Worker } from "bullmq";
+import IORedis from "ioredis";
 
 import { QueueFactory, QueueManager } from "@/process/async/queue";
 import { collectArticle, collectListing, forwardForProcessing } from "@/process/async/tasks";
@@ -43,8 +43,8 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
         }
       },
       {
-        connection,
         concurrency: options.concurrency ?? 5,
+        connection,
       },
     );
 
@@ -60,8 +60,6 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
   }
 
   return {
-    workers,
-    events,
     close: async () => {
       await Promise.all(workers.map((worker) => worker.close()));
       await Promise.all(events.map((event) => event.close()));
@@ -70,5 +68,7 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
         await manager.close();
       }
     },
+    events,
+    workers,
   };
 };

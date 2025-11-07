@@ -2,25 +2,25 @@ import { z } from "zod";
 import { ArticleSchema, DateRangeSchema, PageRangeSchema } from "@/schema";
 
 export const ListingTaskPayloadSchema = z.object({
-  sourceId: z.string(),
-  pageRange: z.string().optional(),
-  dateRange: z.string().optional(),
   category: z.string().optional(),
+  dateRange: z.string().optional(),
+  pageRange: z.string().optional(),
+  sourceId: z.string(),
 });
 
 export const DetailsTaskPayloadSchema = z.object({
-  sourceId: z.string(),
-  url: z.url(),
+  category: z.string().optional(),
   data: z.any().optional(),
+  dateRange: DateRangeSchema.optional(),
   page: z.number().int().nonnegative().optional(),
   pageRange: PageRangeSchema.optional(),
-  dateRange: DateRangeSchema.optional(),
-  category: z.string().optional(),
+  sourceId: z.string(),
+  url: z.url(),
 });
 
 export const ProcessingTaskPayloadSchema = z.object({
-  sourceId: z.string(),
   article: ArticleSchema,
+  sourceId: z.string(),
 });
 
 export type ListingTaskPayload = z.infer<typeof ListingTaskPayloadSchema>;

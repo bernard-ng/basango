@@ -1,11 +1,11 @@
 {
-  "extends": "@basango/tsconfig/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
+  "extends": "@basango/tsconfig/base.json",
   "include": ["src"],
   "references": []
 }

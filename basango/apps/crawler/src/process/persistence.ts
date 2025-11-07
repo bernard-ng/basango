@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+import logger from "@basango/logger";
 import { Article } from "@/schema";
 import { countTokens } from "@/utils";
-import logger from "@basango/logger";
 
 export interface Persistor {
   persist(record: Article): Promise<void> | void;
@@ -16,14 +16,38 @@ export interface PersistorOptions {
   encoding?: BufferEncoding;
 }
 
+const sanitize = (text: string): string => {
+  if (!text) return text;
+
+  let s = text.replace(/\u00A0/g, " "); // remove NBSP
+  s = s.replace(" ", " "); // remove other NBSP
+  s = s.replace(" ", " "); // remove NARROW NO-BREAK SPACE
+  s = s.replace(/\u200B/g, ""); // remove ZERO WIDTH SPACE
+  s = s.replace(/\u200C/g, ""); // remove ZERO WIDTH NON-JOINER
+  s = s.replace(/\u200D/g, ""); // remove ZERO WIDTH JOINER
+  s = s.replace(/\uFEFF/g, ""); // remove ZERO WIDTH NO-BREAK SPACE
+  s = s.replace(/\r\n/g, "\n"); // normalize CRLF to LF
+  s = s.replace(/\n{2,}/g, "\n"); // collapse multiple newlines to one
+  // s = s.replace(/[ \t]{2,}/g, " "); // collapse multiple spaces/tabs
+
+  return s.trim();
+};
+
 export const persist = async (payload: Article, persistors: Persistor[]): Promise<Article> => {
-  const article = {
+  const data = {
     ...payload,
+    body: sanitize(payload.body),
+    categories: payload.categories.map(sanitize),
+    title: sanitize(payload.title),
+  };
+
+  const article = {
+    ...data,
     tokenStatistics: {
-      title: countTokens(payload.title),
       body: countTokens(payload.body),
-      excerpt: countTokens(payload.body.substring(0, 200)),
       categories: countTokens(payload.categories.join(",")),
+      excerpt: countTokens(payload.body.substring(0, 200)),
+      title: countTokens(payload.title),
     },
   } as Article;
 
@@ -65,10 +89,7 @@ export class JsonlPersistor implements Persistor {
     const payload = `${JSON.stringify(record)}\n`;
 
     this.pending = this.pending.then(async () => {
-      fs.writeFileSync(this.filePath, payload, {
-        encoding: this.encoding,
-        mode: "a",
-      });
+      fs.appendFileSync(this.filePath, payload, { encoding: this.encoding });
     });
 
     return this.pending;

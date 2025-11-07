@@ -9,8 +9,8 @@ export const CRAWLING_USAGE = `
     Usage: bun run crawl:[async|sync] -- --sourceId <id> [options]
     
     Options:
-      --page <range>        Optional page range filter (e.g. 1:5)
-      --date <range>        Optional date range filter (e.g. 2024-01-01:2024-01-31)
+      --pageRange <range>   Optional page range filter (e.g. 1:5)
+      --dateRange <range>   Optional date range filter (e.g. 2024-01-01:2024-01-31)
       --category <slug>     Optional category to crawl
       -h, --help            Show this message
 `;
@@ -18,7 +18,7 @@ export const CRAWLING_USAGE = `
 export const parseWorkerCliArgs = (): WorkerCliOptions => {
   const { values } = parseArgs({
     options: {
-      queue: { type: "string", multiple: true, short: "q" },
+      queue: { multiple: true, short: "q", type: "string" },
     },
   });
 
@@ -28,10 +28,10 @@ export const parseWorkerCliArgs = (): WorkerCliOptions => {
 export const parseCrawlingCliArgs = (): CrawlingOptions => {
   const { values } = parseArgs({
     options: {
-      sourceId: { type: "string" },
-      page: { type: "string" },
-      date: { type: "string" },
       category: { type: "string" },
+      dateRange: { type: "string" },
+      pageRange: { type: "string" },
+      sourceId: { type: "string" },
     },
   });
 
