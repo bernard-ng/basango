@@ -6,11 +6,11 @@ defaults:
 on:
   push:
     paths:
-      - "projects/mobile/**"
+      - "../../basango/apps/mobile/**"
       - ".github/workflows/mobile_*.yaml"
   pull_request:
     paths:
-      - "projects/mobile/**"
+      - "../../basango/apps/mobile/**"
       - ".github/workflows/mobile_*.yaml"
 
 jobs:

@@ -1,4 +1,7 @@
-# Basango: Towards a scalable and intelligent system for Congolese News curation
+# Basango
+## Towards a scalable and intelligent system for Congolese News curation
+
+---
 
 [![backend audit](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_audit.yaml)
 [![backend deploy](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/backend_deploy.yaml)
@@ -8,6 +11,8 @@
 [![crawler quality](https://github.com/bernard-ng/basango/actions/workflows/crawler_quality.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_quality.yml)
 [![crawler tests](https://github.com/bernard-ng/basango/actions/workflows/crawler_tests.yml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/crawler_tests.yml)
 [![mobile quality](https://github.com/bernard-ng/basango/actions/workflows/mobile_quality.yaml/badge.svg)](https://github.com/bernard-ng/basango/actions/workflows/mobile_quality.yaml)
+
+---
 
 | Scope             | Link                                      |
 |-------------------|-------------------------------------------|
@@ -38,5 +43,5 @@ To ensure quality and reliability, the dataset prioritizes reputable news source
 | congoactu.net        | +10k     | https://www.congoactu.net/           |
 
 ### Acknowledgment:
-The compilation and curation of the "Basango" were conducted by Bernard Ngandu with the primary objective of facilitating research and analysis related to the Democratic Republic of Congo. 
+The compilation and curation of the "Basango" were conducted by Bernard Ngandu with the primary objective of facilitating research and analysis related to the Democratic Republic of Congo.
 I do not own the content of the articles, and all rights belong to the respective publishers. The dataset is intended for non-commercial research purposes only.

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "extends": "@basango/typescript-config/base.json",
+  "include": ["src"],
+  "references": []
+}

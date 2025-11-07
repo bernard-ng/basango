@@ -1,0 +1,8 @@
+{
+  "name": "@basango/typescript-config",
+  "private": true,
+  "license": "PROPRIETARY",
+  "publishConfig": {
+    "access": "public"
+  }
+}

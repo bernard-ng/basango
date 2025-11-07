@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "expo.vscode-expo-tools",
+    "bradlc.vscode-tailwindcss",
+    "expo.vscode-expo-tools",
+    "yoavbls.pretty-ts-errors"
+  ]
+}

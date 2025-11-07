@@ -1,7 +1,7 @@
-name: backend tests
+name: api-legacy tests
 defaults:
   run:
-    working-directory: projects/backend
+    working-directory: projects/api-legacy
 
 on:
   workflow_call:
@@ -9,13 +9,13 @@ on:
     branches-ignore:
       - main
     paths:
-      - "projects/backend/**"
+      - "../../basango/apps/api-legacy/**"
       - ".github/workflows/backend_*.yaml"
   pull_request:
     branches-ignore:
       - main
     paths:
-      - "projects/backend/**"
+      - "../../basango/apps/api-legacy/**"
       - ".github/workflows/backend_*.yaml"
 jobs:
   functional:

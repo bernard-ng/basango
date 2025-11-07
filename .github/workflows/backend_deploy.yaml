@@ -1,14 +1,14 @@
-name: backend deploy
+name: api-legacy deploy
 defaults:
   run:
-    working-directory: projects/backend
+    working-directory: projects/api-legacy
 
 on:
   push:
     branches:
       - main
     paths:
-      - "projects/backend/**"
+      - "../../basango/apps/api-legacy/**"
       - ".github/workflows/backend_*.yaml"
 jobs:
   audit:

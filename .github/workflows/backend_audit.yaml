@@ -1,7 +1,7 @@
-name: backend audit
+name: api-legacy audit
 defaults:
   run:
-    working-directory: projects/backend
+    working-directory: projects/api-legacy
 
 on:
   workflow_call:
@@ -9,13 +9,13 @@ on:
     branches-ignore:
       - main
     paths:
-      - "projects/backend/**"
+      - "../../basango/apps/api-legacy/**"
       - ".github/workflows/backend_*.yaml"
   pull_request:
     branches-ignore:
       - main
     paths:
-      - "projects/backend/**"
+      - "../../basango/apps/api-legacy/**"
       - ".github/workflows/backend_*.yaml"
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.COMPOSER_CACHE_DIR }}
-          key: php8.4-composer-${{ hashFiles('projects/backend/composer.lock') }}
+          key: php8.4-composer-${{ hashFiles('projects/api-legacy/composer.lock') }}
           restore-keys: |
             php8.4-composer-latest-
       - name: Update composer
