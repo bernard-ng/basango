@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+
 import * as schema from "@/schema";
 
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -21,7 +22,7 @@ const pool = new Pool({
 export const getConnectionPoolStats = () => {
   const stats = {
     active: Math.max(0, (pool.totalCount ?? 0) - (pool.idleCount ?? 0)),
-    ended: (pool as any).ended ?? false,
+    ended: pool.ended ?? false,
     idle: pool.idleCount ?? 0,
     name: "primary",
     total: pool.options.max ?? 0,

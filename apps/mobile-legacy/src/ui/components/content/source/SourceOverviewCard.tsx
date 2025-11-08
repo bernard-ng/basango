@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { GetProps, styled, XStack, YStack } from "tamagui";
+import { GetProps, XStack, YStack, styled } from "tamagui";
 
 import { SourceOverview } from "@/api/schema/feed-management/source";
 import { SourceFollowButton } from "@/ui/components/content/source/SourceFollowButton";

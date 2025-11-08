@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-
 import ContentLoader, { Circle, Rect } from "react-content-loader/native";
 import { FlatList } from "react-native";
 import { YStack } from "tamagui";

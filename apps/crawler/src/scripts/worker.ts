@@ -8,9 +8,7 @@ const main = async (): Promise<void> => {
   const options = parseWorkerCliArgs();
 
   const manager = createQueueManager();
-  const queues = options.queue?.length
-    ? options.queue.map((name) => manager.queueName(name))
-    : undefined;
+  const queues = options.queue?.length ? options.queue : undefined;
 
   const handle = startWorker({
     queueManager: manager,

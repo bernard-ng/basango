@@ -1,4 +1,5 @@
 import { parse } from "node-html-parser";
+
 import { config } from "@/config";
 import { OPEN_GRAPH_USER_AGENT } from "@/constants";
 import { SyncHttpClient } from "@/http/http-client";

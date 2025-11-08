@@ -1,6 +1,5 @@
 import React from "react";
-
-import { styled, View, XStack } from "tamagui";
+import { View, XStack, styled } from "tamagui";
 
 import { Text } from "@/ui/components/typography";
 

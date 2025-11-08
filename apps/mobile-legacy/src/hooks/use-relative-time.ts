@@ -1,4 +1,4 @@
-import { formatDistanceToNowStrict, Locale } from "date-fns";
+import { Locale, formatDistanceToNowStrict } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useEffect, useState } from "react";
 

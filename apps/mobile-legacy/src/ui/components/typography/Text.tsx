@@ -1,5 +1,4 @@
 import type React from "react";
-
 import { Paragraph, ParagraphProps } from "tamagui";
 
 export const Text = (props: React.PropsWithChildren<ParagraphProps>) => {

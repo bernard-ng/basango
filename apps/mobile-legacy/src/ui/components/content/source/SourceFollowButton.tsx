@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-
 import { ActivityIndicator, Alert } from "react-native";
 import { Button, GetProps } from "tamagui";
 

@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { styled, YStack } from "tamagui";
+import { YStack, styled } from "tamagui";
 
 import { ScreenHeading } from "@/ui/components/layout/ScreenHeading";
 import { ScreenSection } from "@/ui/components/layout/ScreenSection";

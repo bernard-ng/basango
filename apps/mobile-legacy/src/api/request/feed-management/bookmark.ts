@@ -1,8 +1,8 @@
 import { endpoint } from "@/api/endpoint";
 import {
   Bookmark,
-  BookmarkedArticle,
   BookmarkPayload,
+  BookmarkedArticle,
 } from "@/api/schema/feed-management/bookmark";
 import {
   ArticleFilters,

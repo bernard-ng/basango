@@ -39,7 +39,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**/apps", "**/packages", "!/apps/api-legacy", "!/apps/mobile-legacy"]
+    "includes": ["**", "!apps/mobile-legacy", "!apps/api-legacy"]
   },
   "formatter": {
     "enabled": true,

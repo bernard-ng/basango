@@ -1,8 +1,6 @@
 {
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+    "extends": ["@commitlint/config-conventional"]
   },
   "config": {
     "commitizen": {
@@ -85,14 +83,8 @@
     "preset": "jest-expo"
   },
   "lint-staged": {
-    "*.ts": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.tsx": [
-      "prettier --write",
-      "eslint --fix"
-    ]
+    "*.ts": ["prettier --write", "eslint --fix"],
+    "*.tsx": ["prettier --write", "eslint --fix"]
   },
   "main": "expo-router/entry",
   "name": "drc-news",
