@@ -1,5 +1,6 @@
 import logger from "@basango/logger";
-import { config, FetchCrawlerConfig } from "@/config";
+
+import { FetchCrawlerConfig, config } from "@/config";
 import { JsonlPersistor, Persistor } from "@/process/persistence";
 import { AnySourceConfig } from "@/schema";
 import { createDateRange, createPageRange } from "@/utils";

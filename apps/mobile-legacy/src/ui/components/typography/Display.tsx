@@ -1,5 +1,4 @@
 import type React from "react";
-
 import { H2, ParagraphProps } from "tamagui";
 
 export const Display = (props: React.PropsWithChildren<ParagraphProps>) => {

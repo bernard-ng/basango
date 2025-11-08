@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
+
 import { JobsOptions, Queue, QueueOptions } from "bullmq";
 import IORedis from "ioredis";
-import { config, FetchAsyncConfig } from "@/config";
+
+import { FetchAsyncConfig, config } from "@/config";
 import {
   DetailsTaskPayload,
   DetailsTaskPayloadSchema,
@@ -97,9 +99,9 @@ export const createQueueManager = (options: CreateQueueManagerOptions = {}): Que
       return queue.add("forward_for_processing", data);
     },
     iterQueueNames: () => [
-      `${settings.prefix}:${settings.queues.listing}`,
-      `${settings.prefix}:${settings.queues.details}`,
-      `${settings.prefix}:${settings.queues.processing}`,
+      settings.queues.listing,
+      settings.queues.details,
+      settings.queues.processing,
     ],
     queueName: (suffix: string) => `${settings.prefix}:${suffix}`,
     settings,

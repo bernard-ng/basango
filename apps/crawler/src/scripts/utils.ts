@@ -1,4 +1,5 @@
 import { parseArgs } from "node:util";
+
 import { CrawlingOptions } from "@/process/crawler";
 
 interface WorkerCliOptions {
@@ -6,13 +7,12 @@ interface WorkerCliOptions {
 }
 
 export const CRAWLING_USAGE = `
-    Usage: bun run crawl:[async|sync] -- --sourceId <id> [options]
+    Usage: bun run crawler:[async|sync] -- --sourceId <id> [options]
     
     Options:
       --pageRange <range>   Optional page range filter (e.g. 1:5)
       --dateRange <range>   Optional date range filter (e.g. 2024-01-01:2024-01-31)
       --category <slug>     Optional category to crawl
-      -h, --help            Show this message
 `;
 
 export const parseWorkerCliArgs = (): WorkerCliOptions => {

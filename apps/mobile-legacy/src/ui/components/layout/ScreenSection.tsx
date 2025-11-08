@@ -1,6 +1,6 @@
 import { ArrowRight } from "@tamagui/lucide-icons";
 import { Href, Link } from "expo-router";
-import { GetProps, Paragraph, styled, XStack } from "tamagui";
+import { GetProps, Paragraph, XStack, styled } from "tamagui";
 
 import { Text } from "@/ui/components/typography";
 

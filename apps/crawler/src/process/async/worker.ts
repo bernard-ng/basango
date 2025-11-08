@@ -45,6 +45,7 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
       {
         concurrency: options.concurrency ?? 5,
         connection,
+        prefix: manager.settings.prefix,
       },
     );
 
@@ -53,7 +54,10 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
       worker.on("error", (err) => options.onError?.(err as Error));
     }
 
-    const queueEvents = new QueueEvents(queueName, { connection });
+    const queueEvents = new QueueEvents(queueName, {
+      connection,
+      prefix: manager.settings.prefix,
+    });
 
     workers.push(worker);
     events.push(queueEvents);

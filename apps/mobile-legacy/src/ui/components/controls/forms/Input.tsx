@@ -5,10 +5,10 @@ import {
   GetProps,
   Label,
   SizeTokens,
-  styled,
   Input as TamaguiInput,
   XStack,
   YStack,
+  styled,
 } from "tamagui";
 
 import { Caption } from "@/ui/components/typography";

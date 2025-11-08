@@ -4,11 +4,11 @@ import { and, desc, eq, lt, sql } from "drizzle-orm";
 import type { Database } from "@/client";
 import { bookmarkArticles, bookmarks } from "@/schema";
 import {
+  type PageRequest,
+  type PaginationMeta,
   buildPaginationResult,
   createPageState,
   decodeCursor,
-  type PageRequest,
-  type PaginationMeta,
 } from "@/utils/pagination";
 
 export interface BookmarkRow {

@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-
 import { FlatList, FlatListProps } from "react-native";
 import { Paragraph, XStack, YStack } from "tamagui";
 

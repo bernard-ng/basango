@@ -1,4 +1,4 @@
-import { GetProps, Label, styled, TextArea as TamaguiTextArea, XStack, YStack } from "tamagui";
+import { GetProps, Label, TextArea as TamaguiTextArea, XStack, YStack, styled } from "tamagui";
 
 import { withController } from "@/ui/components/controls/forms/withController";
 import { Caption } from "@/ui/components/typography";

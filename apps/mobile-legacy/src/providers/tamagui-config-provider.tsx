@@ -1,5 +1,4 @@
 import type React from "react";
-
 import { TamaguiProvider } from "tamagui";
 
 import { config } from "~/tamagui.config";

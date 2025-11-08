@@ -1,4 +1,5 @@
 import { setTimeout as delay } from "node:timers/promises";
+
 import { FetchClientConfig } from "@/config";
 import {
   DEFAULT_RETRY_AFTER_HEADER,

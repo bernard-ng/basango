@@ -1,9 +1,16 @@
 import { logger } from "@basango/logger";
 import TurndownService from "turndown";
+
 import { FetchCrawlerConfig } from "@/config";
+import {
+  ArticleOutOfDateRangeError,
+  InvalidArticleError,
+  UnsupportedSourceKindError,
+} from "@/errors";
 import { BaseCrawler } from "@/process/parsers/base";
 import { Persistor, persist } from "@/process/persistence";
-import { DateRange, PageRange, WordPressSourceConfig } from "@/schema";
+import { Article, DateRange, PageRange, WordPressSourceConfig } from "@/schema";
+import { isTimestampInRange } from "@/utils";
 
 const md = new TurndownService({
   bulletListMarker: "-",
@@ -38,7 +45,9 @@ export class WordPressCrawler extends BaseCrawler {
     super(settings, options);
 
     if (!settings.source || settings.source.sourceKind !== "wordpress") {
-      throw new Error("HtmlCrawler requires a source of kind 'wordpress'");
+      throw new UnsupportedSourceKindError(
+        "WordPressCrawler requires a source of kind 'wordpress'",
+      );
     }
     this.source = this.settings.source as WordPressSourceConfig;
   }
@@ -50,29 +59,31 @@ export class WordPressCrawler extends BaseCrawler {
     const pageRange = this.settings.pageRange ?? (await this.getPagination());
     const dateRange = this.settings.dateRange;
 
-    let stop = false;
     for (let page = pageRange.start; page <= pageRange.end; page += 1) {
-      const endpoint = this.postsEndpoint(page);
+      const endpoint = this.buildEndpointUrl(page);
+
       try {
         const response = await this.http.get(endpoint);
-        const data = (await response.json()) as unknown;
-        const articles = Array.isArray(data) ? (data as WordPressPost[]) : [];
-        if (!Array.isArray(data)) {
-          logger.warn({ page, type: typeof data }, "Unexpected WordPress payload type");
-        }
+        const articles = (await response.json()) as WordPressPost[];
 
-        for (const entry of articles) {
-          const saved = await this.fetchOne(entry, dateRange);
-          if (saved === null) {
-            stop = true;
-            break;
+        for (const node of articles) {
+          try {
+            await this.fetchOne(node, dateRange);
+          } catch (error: unknown) {
+            if (error instanceof ArticleOutOfDateRangeError) {
+              logger.info(
+                { url: node.link },
+                "Article out of date range, stopping further processing",
+              );
+              break;
+            }
+
+            logger.error({ error, url: node.link }, "Failed to process WordPress article");
           }
         }
       } catch (error) {
-        logger.error({ error, page }, "> page %s => [failed]", page);
-        continue;
+        logger.error({ error, page }, `Failed to fetch WordPress page ${page}`);
       }
-      if (stop) break;
     }
   }
 
@@ -95,7 +106,7 @@ export class WordPressCrawler extends BaseCrawler {
    * @param input - Decoded JSON object or raw JSON string
    * @param dateRange - Optional date range for filtering
    */
-  async fetchOne(input: unknown, dateRange?: DateRange | null) {
+  async fetchOne(input: unknown, dateRange?: DateRange | null): Promise<Article> {
     // input can be the decoded JSON object or a raw JSON string
     let data: WordPressPost | null = null;
     try {
@@ -110,35 +121,29 @@ export class WordPressCrawler extends BaseCrawler {
     }
 
     if (!data || typeof data !== "object") {
-      throw new Error("Unexpected WordPress payload type");
+      throw new InvalidArticleError("Unexpected WordPress payload type");
     }
 
     const link = data.link;
     if (!link) {
-      logger.error("Skipping WordPress article without link");
-      return null;
+      throw new InvalidArticleError("Missing article link");
     }
 
-    const titleHtml = data.title?.rendered ?? "";
-    const bodyHtml = data.content?.rendered ?? "";
-    const title = this.textContent(this.parseHtml(titleHtml)) ?? data.slug ?? "Untitled";
-    const body = md.turndown(bodyHtml);
+    const title =
+      this.textContent(this.parseHtml(data.title?.rendered ?? "")) ?? data.slug ?? "Untitled";
+    const body = md.turndown(data.content?.rendered ?? "");
     const timestamp = this.computeTimestamp(data.date);
     const categories = await this.mapCategories(data.categories ?? []);
 
-    // date range skip as in HTML crawler
-    if (dateRange) {
-      const { isTimestampInRange } = await import("@/utils");
-      if (!isTimestampInRange(dateRange, timestamp)) {
-        logger.info(
-          { date: data.date, link, timestamp, title },
-          "Skipping article outside date range",
-        );
-        return null;
-      }
+    if (dateRange && !isTimestampInRange(dateRange, timestamp)) {
+      throw new ArticleOutOfDateRangeError("Article outside date range", {
+        link,
+        timestamp,
+        title,
+      });
     }
 
-    const enriched = await this.enrichWithOpenGraph(
+    const article = await this.enrichWithOpenGraph(
       {
         body,
         categories,
@@ -150,7 +155,7 @@ export class WordPressCrawler extends BaseCrawler {
       link,
     );
 
-    return await persist(enriched, this.persistors);
+    return await persist(article, this.persistors);
   }
 
   /**
@@ -188,7 +193,7 @@ export class WordPressCrawler extends BaseCrawler {
    * Construct posts endpoint URL for a given page.
    * @param page - Page number
    */
-  postsEndpoint(page: number): string {
+  buildEndpointUrl(page: number): string {
     return `${this.baseUrl()}wp-json/wp/v2/posts?${WordPressCrawler.POST_QUERY}&page=${page}&per_page=100`;
   }
 

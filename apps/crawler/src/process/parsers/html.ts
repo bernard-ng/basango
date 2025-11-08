@@ -2,10 +2,17 @@ import { logger } from "@basango/logger";
 import { getUnixTime, isMatch as isDateMatch, parse as parseDateFns } from "date-fns";
 import { HTMLElement } from "node-html-parser";
 import TurndownService from "turndown";
+
 import { FetchCrawlerConfig } from "@/config";
+import {
+  ArticleOutOfDateRangeError,
+  InvalidArticleError,
+  InvalidSourceSelectorsError,
+  UnsupportedSourceKindError,
+} from "@/errors";
 import { BaseCrawler } from "@/process/parsers/base";
 import { Persistor, persist } from "@/process/persistence";
-import { DateRange, HtmlSourceConfig } from "@/schema";
+import { Article, DateRange, HtmlSourceConfig } from "@/schema";
 import { createAbsoluteUrl, isTimestampInRange } from "@/utils";
 
 const md = new TurndownService({
@@ -32,13 +39,13 @@ const safeRegExp = (pattern?: string | null): RegExp | null => {
  */
 export class HtmlCrawler extends BaseCrawler {
   readonly source: HtmlSourceConfig;
-  private currentArticleUrl: string | null = null;
+  private currentNode: string | null = null;
 
   constructor(settings: FetchCrawlerConfig, options: { persistors?: Persistor[] } = {}) {
     super(settings, options);
 
     if (!settings.source || settings.source.sourceKind !== "html") {
-      throw new Error("HtmlCrawler requires a source of kind 'html'");
+      throw new UnsupportedSourceKindError("HtmlCrawler requires a source of kind 'html'");
     }
     this.source = this.settings.source as HtmlSourceConfig;
   }
@@ -46,69 +53,64 @@ export class HtmlCrawler extends BaseCrawler {
   async fetch(): Promise<void> {
     const pageRange = this.settings.pageRange ?? (await this.getPagination());
     const dateRange = this.settings.dateRange;
+    const selectors = this.source.sourceSelectors;
 
-    const articleSelector = this.source.sourceSelectors.articles;
-    if (!articleSelector) {
-      logger.error(
-        { source: this.source.sourceId },
-        "No article selector configured for HTML source",
-      );
-      return;
+    if (!selectors.articles) {
+      throw new InvalidSourceSelectorsError("No article selector configured for HTML source");
     }
 
-    let stop = false;
     for (let page = pageRange.start; page <= pageRange.end; page += 1) {
-      const pageUrl = this.buildPageUrl(page);
+      const endpoint = this.buildEndpointUrl(page);
       let html: string;
+
       try {
-        html = await this.crawl(pageUrl);
+        html = await this.crawl(endpoint);
       } catch (error) {
-        logger.error({ error, page, pageUrl }, "> page %s => [failed]", page);
+        logger.error({ endpoint, error, page }, `Failed to crawl page ${page}`);
         continue;
       }
 
       const root = this.parseHtml(html);
-      const articles = this.extractAll(root, articleSelector);
+      const articles = this.extractAll(root, selectors.articles);
       if (!articles.length) {
-        logger.info({ page }, "No articles found on page");
+        logger.error({ page }, "No articles found on page");
         continue;
       }
 
       for (const node of articles) {
         try {
-          this.currentArticleUrl = this.extractLink(node);
-          let targetHtml = node.toString();
+          this.currentNode = this.extractLink(node);
+          let nodeHtml = node.toString();
 
           if (this.source.requiresDetails) {
-            if (!this.currentArticleUrl) {
-              logger.debug({ page }, "Skipping article without link for details");
+            if (!this.currentNode) {
+              logger.error({ page }, "Skipping article without link for details");
               continue;
             }
+
             try {
-              targetHtml = await this.crawl(this.currentArticleUrl);
-            } catch (err) {
-              logger.error(
-                { error: err, url: this.currentArticleUrl },
-                "Failed to fetch detail page",
-              );
+              nodeHtml = await this.crawl(this.currentNode);
+            } catch (error) {
+              logger.error({ error, url: this.currentNode }, "Failed to fetch detail page");
               continue;
             }
           }
 
-          const saved = await this.fetchOne(targetHtml, dateRange);
-          // stop early on first out-of-range if pages are sorted by date desc
-          if (saved === null) {
-            stop = true;
+          await this.fetchOne(nodeHtml, dateRange);
+        } catch (error: unknown) {
+          if (error instanceof ArticleOutOfDateRangeError) {
+            logger.info(
+              { url: this.currentNode },
+              "Article out of date range, stopping further processing",
+            );
             break;
           }
-        } catch (error) {
-          logger.error({ error, pageUrl }, "Failed to process article on page");
+
+          logger.error({ error, url: this.currentNode }, "Failed to process HTML article");
         } finally {
-          this.currentArticleUrl = null;
+          this.currentNode = null;
         }
       }
-
-      if (stop) break;
     }
   }
 
@@ -117,43 +119,43 @@ export class HtmlCrawler extends BaseCrawler {
    * @param html - The HTML content of the article
    * @param dateRange - Optional date range for filtering
    */
-  async fetchOne(html: string, dateRange?: DateRange | null) {
+  async fetchOne(html: string, dateRange?: DateRange | null): Promise<Article> {
     const root = this.parseHtml(html);
-    const sel = this.source.sourceSelectors;
+    const selectors = this.source.sourceSelectors;
 
-    const titleText = this.extractText(root, sel.articleTitle) ?? "Untitled";
-    const link = this.currentArticleUrl ?? this.extractLink(root);
+    const title = this.extractText(root, selectors.articleTitle) ?? "Untitled";
+    const link = this.currentNode ?? this.extractLink(root);
     if (!link) {
-      logger.warn({ title: titleText }, "Skipping article without link");
-      return null;
+      throw new InvalidArticleError("Missing article link");
     }
 
-    const body = this.extractBody(root, sel.articleBody);
-    const categories = this.extractCategories(root, sel.articleCategories);
-    const rawDate = this.extractText(root, sel.articleDate);
-    const timestamp = this.computeTimestamp(rawDate);
+    const body = this.extractBody(root, selectors.articleBody);
+    const categories = this.extractCategories(root, selectors.articleCategories);
+    const date = this.extractText(root, selectors.articleDate);
+    const timestamp = this.computeTimestamp(date);
 
     if (dateRange && !isTimestampInRange(dateRange, timestamp)) {
-      logger.info(
-        { date: rawDate, link, timestamp, title: titleText },
-        "Skipping article outside date range",
-      );
-      return null;
+      throw new ArticleOutOfDateRangeError("Article outside date range", {
+        date,
+        link,
+        timestamp,
+        title,
+      });
     }
 
-    const enriched = await this.enrichWithOpenGraph(
+    const data = await this.enrichWithOpenGraph(
       {
         body,
         categories,
         link,
         source: this.source.sourceId,
         timestamp,
-        title: titleText,
+        title,
       },
       link,
     );
 
-    return await persist(enriched, this.persistors);
+    return await persist(data, this.persistors);
   }
 
   /**
@@ -211,7 +213,7 @@ export class HtmlCrawler extends BaseCrawler {
    * Build the URL for a given page number.
    * @param page - The page number
    */
-  buildPageUrl(page: number): string {
+  buildEndpointUrl(page: number): string {
     let template = this.applyCategory(this.source.paginationTemplate);
     if (template.includes("{page}")) {
       template = template.replace("{page}", String(page));

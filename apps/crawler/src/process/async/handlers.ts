@@ -1,17 +1,17 @@
 import { logger } from "@basango/logger";
 
 import { config, env } from "@/config";
+import { UnsupportedSourceKindError } from "@/errors";
 import { SyncHttpClient } from "@/http/http-client";
-import { createQueueManager, QueueManager } from "@/process/async/queue";
+import { QueueManager, createQueueManager } from "@/process/async/queue";
 import {
   DetailsTaskPayload,
   ListingTaskPayload,
   ProcessingTaskPayload,
 } from "@/process/async/schemas";
-import { resolveCrawlerConfig } from "@/process/crawler";
+import { createPersistors, resolveCrawlerConfig } from "@/process/crawler";
 import { HtmlCrawler } from "@/process/parsers/html";
 import { WordPressCrawler } from "@/process/parsers/wordpress";
-import { JsonlPersistor } from "@/process/persistence";
 import { Article, HtmlSourceConfig, SourceKindSchema, WordPressSourceConfig } from "@/schema";
 import { createDateRange, formatDateRange, formatPageRange, resolveSourceConfig } from "@/utils";
 
@@ -30,7 +30,7 @@ export const collectHtmlListing = async (
 
   let queued = 0;
   for (let page = pageRange.start; page <= pageRange.end; page += 1) {
-    const target = crawler.buildPageUrl(page) ?? `${source.sourceUrl}`;
+    const target = crawler.buildEndpointUrl(page) ?? `${source.sourceUrl}`;
 
     try {
       const items = await crawler.fetchLinks(target, source.sourceSelectors.articles);
@@ -69,7 +69,7 @@ export const collectWordPressListing = async (
 
   let queued = 0;
   for (let page = pageRange.start; page <= pageRange.end; page += 1) {
-    const url = crawler.postsEndpoint(page);
+    const url = crawler.buildEndpointUrl(page);
 
     try {
       const entries = await crawler.fetchLinks(url);
@@ -94,7 +94,10 @@ export const collectWordPressListing = async (
   return queued;
 };
 
-export const collectArticle = async (payload: DetailsTaskPayload): Promise<unknown> => {
+export const collectArticle = async (
+  payload: DetailsTaskPayload,
+  manager: QueueManager = createQueueManager(),
+): Promise<unknown> => {
   const source = resolveSourceConfig(payload.sourceId);
   const settings = resolveCrawlerConfig(source, {
     category: payload.category,
@@ -102,26 +105,30 @@ export const collectArticle = async (payload: DetailsTaskPayload): Promise<unkno
     pageRange: payload.pageRange ? formatPageRange(payload.pageRange) : undefined,
     sourceId: payload.sourceId,
   });
-  const persistors = [
-    new JsonlPersistor({
-      directory: config.paths.data,
-      sourceId: String(source.sourceId),
-    }),
-  ];
+  const persistors = createPersistors(source);
 
   if (source.sourceKind === SourceKindSchema.enum.html) {
-    if (!payload.url) throw new Error("Missing article url");
     const crawler = new HtmlCrawler(settings, { persistors });
     const html = await crawler.crawl(payload.url);
-    return await crawler.fetchOne(html, settings.dateRange);
+
+    const article = await crawler.fetchOne(html, settings.dateRange);
+    await manager.enqueueProcessed({
+      article,
+      sourceId: payload.sourceId,
+    } as ProcessingTaskPayload);
   }
 
   if (source.sourceKind === SourceKindSchema.enum.wordpress) {
     const crawler = new WordPressCrawler(settings, { persistors });
-    return await crawler.fetchOne(payload.data ?? {}, settings.dateRange);
+
+    const article = await crawler.fetchOne(payload.data ?? {}, settings.dateRange);
+    await manager.enqueueProcessed({
+      article,
+      sourceId: payload.sourceId,
+    } as ProcessingTaskPayload);
   }
 
-  throw new Error(`Unsupported source kind`);
+  throw new UnsupportedSourceKindError(`Unsupported source kind`);
 };
 
 export const forwardForProcessing = async (payload: ProcessingTaskPayload): Promise<Article> => {
