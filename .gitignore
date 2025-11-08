@@ -71,3 +71,6 @@ build/
 wheels/
 *.egg-info
 .venv/
+
+# apps/crawler/.gitignore
+apps/crawler/data/
