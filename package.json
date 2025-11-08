@@ -57,8 +57,6 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/crawler/*",
-    "apps/dashboard/*",
-    "apps/mobile/*"
+    "apps/*"
   ]
 }
