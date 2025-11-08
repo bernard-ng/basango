@@ -1,19 +1,4 @@
 {
-  "name": "@basango/db",
-  "private": true,
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "typecheck": "tsc --noEmit"
-  },
-  "exports": {
-    "./client": "./src/client.ts",
-    "./schema": "./src/schema.ts",
-    "./utils": "./src/utils/index.ts",
-    "./queries": "./src/queries/index.ts"
-  },
   "dependencies": {
     "@basango/logger": "workspace:*",
     "@date-fns/utc": "^2.1.1",
@@ -26,5 +11,17 @@
     "@types/pg": "^8.15.6",
     "drizzle-kit": "^0.31.6",
     "typescript": "catalog:"
+  },
+  "exports": {
+    "./client": "./src/client.ts",
+    "./queries": "./src/queries/index.ts",
+    "./schema": "./src/schema.ts",
+    "./utils": "./src/utils/index.ts"
+  },
+  "name": "@basango/db",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "typecheck": "tsc --noEmit"
   }
 }

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { ScrollView, YStack } from "tamagui";
 
 import { useArticleOverviewList } from "@/api/request/feed-management/article";
@@ -13,39 +11,42 @@ import { ScreenView } from "@/ui/components/layout";
 import { Heading } from "@/ui/components/typography";
 
 export default function Index() {
-    const { data: articles, isLoading: articlesLoading } = useArticleOverviewList({ limit: 10 });
-    const { data: sources, isLoading: sourcesLoading } = useSourceOverviewList();
-    const articleOverviews: ArticleOverview[] = useFlattenedItems(articles);
-    const sourcesOverviews: SourceOverview[] = useFlattenedItems(sources);
+  const { data: articles, isLoading: articlesLoading } = useArticleOverviewList({ limit: 10 });
+  const { data: sources, isLoading: sourcesLoading } = useSourceOverviewList();
+  const articleOverviews: ArticleOverview[] = useFlattenedItems(articles);
+  const sourcesOverviews: SourceOverview[] = useFlattenedItems(sources);
 
-    return (
-        <ScreenView paddingBottom={0}>
-            <Heading>Actualités</Heading>
-            <ScrollView contentContainerStyle={{ paddingBottom: 0 }}>
-                <YStack gap="$4">
-                    <YStack gap="$2">
-                        <ScreenView.Section title="Tendances" forwardLink="/(authed)/(tabs)/articles/trending" />
+  return (
+    <ScreenView paddingBottom={0}>
+      <Heading>Actualités</Heading>
+      <ScrollView contentContainerStyle={{ paddingBottom: 0 }}>
+        <YStack gap="$4">
+          <YStack gap="$2">
+            <ScreenView.Section
+              forwardLink="/(authed)/(tabs)/articles/trending"
+              title="Tendances"
+            />
 
-                        {articlesLoading && <ArticleSkeletonList displayMode="card" horizontal={true} />}
-                        {!articlesLoading && (
-                            <ArticleList
-                                data={articleOverviews}
-                                refreshing={articlesLoading}
-                                displayMode="card"
-                                horizontal={true}
-                            />
-                        )}
-                    </YStack>
-                    <YStack gap="$2">
-                        <ScreenView.Section title="Nos sources" forwardLink="/(authed)/(tabs)/sources" />
+            {articlesLoading && <ArticleSkeletonList displayMode="card" horizontal={true} />}
+            {!articlesLoading && (
+              <ArticleList
+                data={articleOverviews}
+                displayMode="card"
+                horizontal={true}
+                refreshing={articlesLoading}
+              />
+            )}
+          </YStack>
+          <YStack gap="$2">
+            <ScreenView.Section forwardLink="/(authed)/(tabs)/sources" title="Nos sources" />
 
-                        {sourcesLoading && <SourceSkeletonList horizontal={true} />}
-                        {!sourcesLoading && (
-                            <SourceList data={sourcesOverviews} refreshing={sourcesLoading} horizontal={true} />
-                        )}
-                    </YStack>
-                </YStack>
-            </ScrollView>
-        </ScreenView>
-    );
+            {sourcesLoading && <SourceSkeletonList horizontal={true} />}
+            {!sourcesLoading && (
+              <SourceList data={sourcesOverviews} horizontal={true} refreshing={sourcesLoading} />
+            )}
+          </YStack>
+        </YStack>
+      </ScrollView>
+    </ScreenView>
+  );
 }

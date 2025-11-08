@@ -17,10 +17,10 @@ export async function getUserProfile(
 ): Promise<UserProfileRow | null> {
   const [row] = await db
     .select({
+      user_created_at: users.createdAt,
+      user_email: users.email,
       user_id: users.id,
       user_name: users.name,
-      user_email: users.email,
-      user_created_at: users.createdAt,
       user_updated_at: users.updatedAt,
     })
     .from(users)

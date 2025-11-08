@@ -4,8 +4,15 @@ import { View } from "tamagui";
 import { Caption } from "@/ui/components/typography";
 
 export const LoadingView = () => (
-    <View flex={1} padding="$4" backgroundColor="$background" alignItems="center" justifyContent="center" gap="$4">
-        <ActivityIndicator />
-        <Caption>Chargement...</Caption>
-    </View>
+  <View
+    alignItems="center"
+    backgroundColor="$background"
+    flex={1}
+    gap="$4"
+    justifyContent="center"
+    padding="$4"
+  >
+    <ActivityIndicator />
+    <Caption>Chargement...</Caption>
+  </View>
 );

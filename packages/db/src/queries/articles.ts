@@ -133,16 +133,16 @@ export async function* getArticlesForExport(
 
   let query = db
     .select({
-      articleId: articles.id,
-      articleTitle: articles.title,
-      articleLink: articles.link,
+      articleBody: articles.body,
       articleCategories: sql<string | null>`array_to_string
           (${articles.categories}, ',')`,
-      articleBody: articles.body,
-      articleSource: sources.name,
-      articleHash: articles.hash,
-      articlePublishedAt: articles.publishedAt,
       articleCrawledAt: articles.crawledAt,
+      articleHash: articles.hash,
+      articleId: articles.id,
+      articleLink: articles.link,
+      articlePublishedAt: articles.publishedAt,
+      articleSource: sources.name,
+      articleTitle: articles.title,
     })
     .from(articles)
     .innerJoin(sources, eq(articles.sourceId, sources.id));
@@ -180,9 +180,9 @@ function normalizeArticleFilters(filters?: ArticleFilters): NormalizedArticleFil
   const trimmedCategory = filters?.category?.trim();
 
   return {
-    search: trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
     category: trimmedCategory && trimmedCategory.length > 0 ? trimmedCategory : undefined,
     dateRange: filters?.dateRange ?? null,
+    search: trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined,
     sortDirection: filters?.sortDirection ?? "desc",
   };
 }
@@ -255,22 +255,22 @@ async function fetchArticleOverview(
   const bookmarkExpression = buildBookmarkExistsExpression(options.userId);
 
   const selectFields = {
+    article_excerpt: articles.excerpt,
     article_id: articles.id,
-    articleTitle: articles.title,
-    articleLink: articles.link,
+    article_image: articles.image,
+    article_is_bookmarked: bookmarkExpression,
+    article_published_at: articles.publishedAt,
+    article_reading_time: articles.readingTime,
     articleCategories: sql<string | null>`array_to_string
         (${articles.categories}, ',')`,
-    article_excerpt: articles.excerpt,
-    article_published_at: articles.publishedAt,
-    article_image: articles.image,
-    article_reading_time: articles.readingTime,
-    sourceId: sources.id,
+    articleLink: articles.link,
+    articleTitle: articles.title,
+    source_created_at: sources.createdAt,
     source_display_name: sources.displayName,
     source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-    sourceUrl: sources.url,
     source_name: sources.name,
-    source_created_at: sources.createdAt,
-    article_is_bookmarked: bookmarkExpression,
+    sourceId: sources.id,
+    sourceUrl: sources.url,
   } satisfies Record<string, SQL | AnyColumn>;
 
   let query = db
@@ -321,8 +321,8 @@ async function fetchArticleOverview(
   const rows = await query.orderBy(...orderings).limit(options.page.limit + 1);
 
   return buildPaginationResult(rows, options.page, {
-    id: "article_id",
     date: "article_published_at",
+    id: "article_id",
   });
 }
 
@@ -338,9 +338,9 @@ export async function getArticleOverviewList(
   const filters = normalizeArticleFilters(params.filters);
 
   return fetchArticleOverview(db, {
-    userId: params.userId,
-    page,
     filters,
+    page,
+    userId: params.userId,
   });
 }
 
@@ -357,10 +357,10 @@ export async function getSourceArticleOverviewList(
   const filters = normalizeArticleFilters(params.filters);
 
   return fetchArticleOverview(db, {
-    userId: params.userId,
-    page,
-    filters,
     baseConditions: [eq(sources.id, params.sourceId)],
+    filters,
+    page,
+    userId: params.userId,
   });
 }
 
@@ -384,22 +384,22 @@ export async function getBookmarkedArticleList(
   ];
 
   const selectFields = {
+    article_excerpt: articles.excerpt,
     article_id: articles.id,
-    articleTitle: articles.title,
-    articleLink: articles.link,
+    article_image: articles.image,
+    article_is_bookmarked: sql<boolean>`true`,
+    article_published_at: articles.publishedAt,
+    article_reading_time: articles.readingTime,
     articleCategories: sql<string | null>`array_to_string
         (${articles.categories}, ',')`,
-    article_excerpt: articles.excerpt,
-    article_published_at: articles.publishedAt,
-    article_image: articles.image,
-    article_reading_time: articles.readingTime,
-    sourceId: sources.id,
+    articleLink: articles.link,
+    articleTitle: articles.title,
+    source_created_at: sources.createdAt,
     source_display_name: sources.displayName,
     source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-    sourceUrl: sources.url,
     source_name: sources.name,
-    source_created_at: sources.createdAt,
-    article_is_bookmarked: sql<boolean>`true`,
+    sourceId: sources.id,
+    sourceUrl: sources.url,
   } satisfies Record<string, SQL | AnyColumn>;
 
   let query = db
@@ -452,8 +452,8 @@ export async function getBookmarkedArticleList(
   const rows = await query.orderBy(...orderings).limit(page.limit + 1);
 
   return buildPaginationResult(rows, page, {
-    id: "article_id",
     date: "article_published_at",
+    id: "article_id",
   });
 }
 
@@ -465,33 +465,33 @@ export async function getArticleDetails(
 
   const [row] = await db
     .select({
+      article_bias: articles.bias,
+      article_crawled_at: articles.crawledAt,
+      article_hash: articles.hash,
       article_id: articles.id,
-      articleTitle: articles.title,
-      articleLink: articles.link,
+      article_is_bookmarked: bookmarkExpression,
+      article_metadata: articles.metadata,
+      article_published_at: articles.publishedAt,
+      article_reading_time: articles.readingTime,
+      article_reliability: articles.reliability,
+      article_sentiment: articles.sentiment,
+      article_transparency: articles.transparency,
+      article_updated_at: articles.updatedAt,
+      articleBody: articles.body,
       articleCategories: sql<string | null>`array_to_string
           (${articles.categories}, ',')`,
-      articleBody: articles.body,
-      article_hash: articles.hash,
-      article_published_at: articles.publishedAt,
-      article_crawled_at: articles.crawledAt,
-      article_updated_at: articles.updatedAt,
-      article_bias: articles.bias,
-      article_reliability: articles.reliability,
-      article_transparency: articles.transparency,
-      article_sentiment: articles.sentiment,
-      article_metadata: articles.metadata,
-      article_reading_time: articles.readingTime,
-      sourceId: sources.id,
-      source_name: sources.name,
-      source_description: sources.description,
-      sourceUrl: sources.url,
-      source_updated_at: sources.updatedAt,
-      source_display_name: sources.displayName,
+      articleLink: articles.link,
+      articleTitle: articles.title,
       source_bias: sources.bias,
+      source_description: sources.description,
+      source_display_name: sources.displayName,
+      source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
+      source_name: sources.name,
       source_reliability: sources.reliability,
       source_transparency: sources.transparency,
-      source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-      article_is_bookmarked: bookmarkExpression,
+      source_updated_at: sources.updatedAt,
+      sourceId: sources.id,
+      sourceUrl: sources.url,
     })
     .from(articles)
     .innerJoin(sources, eq(articles.sourceId, sources.id))
@@ -520,10 +520,10 @@ export async function getArticleCommentList(
 
   let query = db
     .select({
-      comment_id: comments.id,
       comment_content: comments.content,
-      comment_sentiment: comments.sentiment,
       comment_created_at: comments.createdAt,
+      comment_id: comments.id,
+      comment_sentiment: comments.sentiment,
       user_id: users.id,
       user_name: users.name,
     })
@@ -541,7 +541,7 @@ export async function getArticleCommentList(
     .limit(page.limit + 1);
 
   return buildPaginationResult(rows, page, {
-    id: "comment_id",
     date: "comment_created_at",
+    id: "comment_id",
   });
 }

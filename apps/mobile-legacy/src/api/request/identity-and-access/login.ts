@@ -3,13 +3,13 @@ import { LoginPayload, LoginResponse } from "@/api/schema/identity-and-access/lo
 import { useGetQuery, usePostQuery } from "@/api/shared";
 
 export const useLogin = () => {
-    return usePostQuery<LoginPayload, LoginResponse>(endpoint.identityAndAccess.login);
+  return usePostQuery<LoginPayload, LoginResponse>(endpoint.identityAndAccess.login);
 };
 
 export const useLogout = () => {
-    return usePostQuery(endpoint.identityAndAccess.logout);
+  return usePostQuery(endpoint.identityAndAccess.logout);
 };
 
 export const useUnlockAccount = (token: string) => {
-    return useGetQuery(endpoint.identityAndAccess.unlockAccount(token));
+  return useGetQuery(endpoint.identityAndAccess.unlockAccount(token));
 };

@@ -6,34 +6,34 @@ import { ScreenView } from "@/ui/components/layout";
 import { Caption, Display, Text } from "@/ui/components/typography";
 
 export default function Welcome() {
-    const router = useRouter();
+  const router = useRouter();
 
-    return (
-        <ScreenView justifyContent="center">
-            <AppIcon width={120} height={120} />
-            <YStack width="100%" gap="$6">
-                <YStack gap="$3">
-                    <Display textAlign="center">Bienvenue sur Basango</Display>
-                    <Text textAlign="center" lineHeight="$1" marginTop="auto">
-                        La première plateforme d&#39;actualités intelligente qui vous aide à rester informé sur
-                        congolaise et internationale.
-                    </Text>
-                </YStack>
+  return (
+    <ScreenView justifyContent="center">
+      <AppIcon height={120} width={120} />
+      <YStack gap="$6" width="100%">
+        <YStack gap="$3">
+          <Display textAlign="center">Bienvenue sur Basango</Display>
+          <Text lineHeight="$1" marginTop="auto" textAlign="center">
+            La première plateforme d&#39;actualités intelligente qui vous aide à rester informé sur
+            congolaise et internationale.
+          </Text>
+        </YStack>
 
-                <YStack gap="$4">
-                    <Button onPress={() => router.push("/signin")} theme="accent" fontWeight="bold">
-                        Se connecter
-                    </Button>
-                    <Link href="/signup" asChild>
-                        <Text textAlign="center">Ouvrir un compte</Text>
-                    </Link>
-                </YStack>
+        <YStack gap="$4">
+          <Button fontWeight="bold" onPress={() => router.push("/signin")} theme="accent">
+            Se connecter
+          </Button>
+          <Link asChild href="/signup">
+            <Text textAlign="center">Ouvrir un compte</Text>
+          </Link>
+        </YStack>
 
-                <Caption textAlign="center">
-                    En continuant, vous acceptez les conditions d&#39;utilisation de Basango et reconnaissez avoir lu
-                    notre politique de confidentialité.
-                </Caption>
-            </YStack>
-        </ScreenView>
-    );
+        <Caption textAlign="center">
+          En continuant, vous acceptez les conditions d&#39;utilisation de Basango et reconnaissez
+          avoir lu notre politique de confidentialité.
+        </Caption>
+      </YStack>
+    </ScreenView>
+  );
 }

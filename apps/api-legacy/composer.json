@@ -1,141 +1,135 @@
 {
-    "type": "project",
-    "license": "proprietary",
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "require": {
-        "php": ">=8.4",
-        "ext-ctype": "*",
-        "ext-dom": "*",
-        "ext-iconv": "*",
-        "cweagans/composer-patches": "^1.7.3",
-        "doctrine/dbal": "^3.9.4",
-        "doctrine/doctrine-bundle": "^2.13.2",
-        "doctrine/doctrine-migrations-bundle": "^3.4.1",
-        "doctrine/orm": "^3.3.1",
-        "geoip2/geoip2": "^3.1",
-        "gesdinet/jwt-refresh-token-bundle": "^1.4",
-        "knplabs/knp-paginator-bundle": "^6.7",
-        "league/csv": "^9.21",
-        "lexik/jwt-authentication-bundle": "^3.1",
-        "martin-georgiev/postgresql-for-doctrine": "^3.5",
-        "matomo/device-detector": "^6.4",
-        "phpdocumentor/reflection-docblock": "^5.6",
-        "phpstan/phpdoc-parser": "^2.1",
-        "sentry/sentry-symfony": "^5.2",
-        "symfony/console": "7.2.*",
-        "symfony/css-selector": "7.2.*",
-        "symfony/dom-crawler": "7.2.*",
-        "symfony/dotenv": "7.2.*",
-        "symfony/flex": "^2.4.7",
-        "symfony/framework-bundle": "7.2.*",
-        "symfony/http-client": "7.2.*",
-        "symfony/mailer": "7.2.*",
-        "symfony/messenger": "7.2.*",
-        "symfony/monolog-bundle": "^3.10",
-        "symfony/property-access": "7.2.*",
-        "symfony/property-info": "7.2.*",
-        "symfony/runtime": "7.2.*",
-        "symfony/security-bundle": "7.2.*",
-        "symfony/serializer": "7.2.*",
-        "symfony/stopwatch": "7.2.*",
-        "symfony/twig-bundle": "7.2.*",
-        "symfony/uid": "7.2.*",
-        "symfony/validator": "7.2.*",
-        "symfony/yaml": "7.2.*",
-        "twig/extra-bundle": "^2.12|^3.19",
-        "twig/twig": "^2.12|^3.19",
-        "webmozart/assert": "^1.11"
-    },
-    "require-dev": {
-        "behat/behat": "^3.22",
-        "deptrac/deptrac": "^2.0.7",
-        "doctrine/doctrine-fixtures-bundle": "^4.1",
-        "friends-of-behat/symfony-extension": "^2.6",
-        "phpstan/phpstan": "^2.1.12",
-        "phpstan/phpstan-doctrine": "^2.0",
-        "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "^12.1.1",
-        "rector/rector": "^2.0.12",
-        "shipmonk/composer-dependency-analyser": "^1.8.2",
-        "symfony/maker-bundle": "^1.62.1",
-        "symfony/web-profiler-bundle": "7.2.*",
-        "symplify/easy-coding-standard": "^12.1.13",
-        "tomasvotruba/class-leak": "^1.2.7"
-    },
-    "config": {
-        "allow-plugins": {
-            "php-http/discovery": true,
-            "symfony/flex": true,
-            "symfony/runtime": true,
-            "cweagans/composer-patches": true
-        },
-        "sort-packages": true
-    },
-    "autoload": {
-        "psr-4": {
-            "Basango\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        }
-    },
-    "replace": {
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php72": "*",
-        "symfony/polyfill-php73": "*",
-        "symfony/polyfill-php74": "*",
-        "symfony/polyfill-php80": "*",
-        "symfony/polyfill-php81": "*"
-    },
-    "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
-        ],
-        "app:cs": [
-            "./vendor/bin/ecs check",
-            "bin/console lint:yaml config --parse-tags",
-            "bin/console lint:twig templates",
-            "bin/console lint:container",
-            "./vendor/bin/phpstan analyse --memory-limit=-1 --configuration=phpstan.dist.neon",
-            "./vendor/bin/rector --dry-run"
-        ],
-        "app:tests": [
-            "APP_ENV=test ./vendor/bin/phpunit"
-        ],
-        "app:behat": [
-            "APP_ENV=test bin/console doctrine:database:create",
-            "APP_ENV=test bin/console doctrine:migration:migrate --no-interaction --allow-no-migration --all-or-nothing",
-            "APP_ENV=test ./vendor/bin/behat --format=progress --no-interaction"
-        ],
-        "app:env": [
-            "APP_RUNTIME_ENV=prod bin/console secrets:decrypt-to-local --force",
-            "bin/console dotenv:dump prod"
-        ]
-    },
-    "conflict": {
-        "symfony/symfony": "*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": false,
-            "require": "7.2.*"
-        },
-        "patches": {
-            "symfony/monolog-bundle": {
-                "support telegram topic in configuration": "./patches/monolog-telegram-configuration.patch",
-                "support telegram topic in extension": "./patches/monolog-telegram-extension.patch"
-            }
-        }
+  "autoload": {
+    "psr-4": {
+      "Basango\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "cweagans/composer-patches": true,
+      "php-http/discovery": true,
+      "symfony/flex": true,
+      "symfony/runtime": true
+    },
+    "sort-packages": true
+  },
+  "conflict": {
+    "symfony/symfony": "*"
+  },
+  "extra": {
+    "patches": {
+      "symfony/monolog-bundle": {
+        "support telegram topic in configuration": "./patches/monolog-telegram-configuration.patch",
+        "support telegram topic in extension": "./patches/monolog-telegram-extension.patch"
+      }
+    },
+    "symfony": {
+      "allow-contrib": false,
+      "require": "7.2.*"
+    }
+  },
+  "license": "proprietary",
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "replace": {
+    "symfony/polyfill-ctype": "*",
+    "symfony/polyfill-iconv": "*",
+    "symfony/polyfill-php72": "*",
+    "symfony/polyfill-php73": "*",
+    "symfony/polyfill-php74": "*",
+    "symfony/polyfill-php80": "*",
+    "symfony/polyfill-php81": "*"
+  },
+  "require": {
+    "cweagans/composer-patches": "^1.7.3",
+    "doctrine/dbal": "^3.9.4",
+    "doctrine/doctrine-bundle": "^2.13.2",
+    "doctrine/doctrine-migrations-bundle": "^3.4.1",
+    "doctrine/orm": "^3.3.1",
+    "ext-ctype": "*",
+    "ext-dom": "*",
+    "ext-iconv": "*",
+    "geoip2/geoip2": "^3.1",
+    "gesdinet/jwt-refresh-token-bundle": "^1.4",
+    "knplabs/knp-paginator-bundle": "^6.7",
+    "league/csv": "^9.21",
+    "lexik/jwt-authentication-bundle": "^3.1",
+    "martin-georgiev/postgresql-for-doctrine": "^3.5",
+    "matomo/device-detector": "^6.4",
+    "php": ">=8.4",
+    "phpdocumentor/reflection-docblock": "^5.6",
+    "phpstan/phpdoc-parser": "^2.1",
+    "sentry/sentry-symfony": "^5.2",
+    "symfony/console": "7.2.*",
+    "symfony/css-selector": "7.2.*",
+    "symfony/dom-crawler": "7.2.*",
+    "symfony/dotenv": "7.2.*",
+    "symfony/flex": "^2.4.7",
+    "symfony/framework-bundle": "7.2.*",
+    "symfony/http-client": "7.2.*",
+    "symfony/mailer": "7.2.*",
+    "symfony/messenger": "7.2.*",
+    "symfony/monolog-bundle": "^3.10",
+    "symfony/property-access": "7.2.*",
+    "symfony/property-info": "7.2.*",
+    "symfony/runtime": "7.2.*",
+    "symfony/security-bundle": "7.2.*",
+    "symfony/serializer": "7.2.*",
+    "symfony/stopwatch": "7.2.*",
+    "symfony/twig-bundle": "7.2.*",
+    "symfony/uid": "7.2.*",
+    "symfony/validator": "7.2.*",
+    "symfony/yaml": "7.2.*",
+    "twig/extra-bundle": "^2.12|^3.19",
+    "twig/twig": "^2.12|^3.19",
+    "webmozart/assert": "^1.11"
+  },
+  "require-dev": {
+    "behat/behat": "^3.22",
+    "deptrac/deptrac": "^2.0.7",
+    "doctrine/doctrine-fixtures-bundle": "^4.1",
+    "friends-of-behat/symfony-extension": "^2.6",
+    "phpstan/phpstan": "^2.1.12",
+    "phpstan/phpstan-doctrine": "^2.0",
+    "phpstan/phpstan-symfony": "^2.0",
+    "phpunit/phpunit": "^12.1.1",
+    "rector/rector": "^2.0.12",
+    "shipmonk/composer-dependency-analyser": "^1.8.2",
+    "symfony/maker-bundle": "^1.62.1",
+    "symfony/web-profiler-bundle": "7.2.*",
+    "symplify/easy-coding-standard": "^12.1.13",
+    "tomasvotruba/class-leak": "^1.2.7"
+  },
+  "scripts": {
+    "app:behat": [
+      "APP_ENV=test bin/console doctrine:database:create",
+      "APP_ENV=test bin/console doctrine:migration:migrate --no-interaction --allow-no-migration --all-or-nothing",
+      "APP_ENV=test ./vendor/bin/behat --format=progress --no-interaction"
+    ],
+    "app:cs": [
+      "./vendor/bin/ecs check",
+      "bin/console lint:yaml config --parse-tags",
+      "bin/console lint:twig templates",
+      "bin/console lint:container",
+      "./vendor/bin/phpstan analyse --memory-limit=-1 --configuration=phpstan.dist.neon",
+      "./vendor/bin/rector --dry-run"
+    ],
+    "app:env": [
+      "APP_RUNTIME_ENV=prod bin/console secrets:decrypt-to-local --force",
+      "bin/console dotenv:dump prod"
+    ],
+    "app:tests": ["APP_ENV=test ./vendor/bin/phpunit"],
+    "auto-scripts": {
+      "assets:install %PUBLIC_DIR%": "symfony-cmd",
+      "cache:clear": "symfony-cmd"
+    },
+    "post-install-cmd": ["@auto-scripts"],
+    "post-update-cmd": ["@auto-scripts"]
+  },
+  "type": "project"
 }

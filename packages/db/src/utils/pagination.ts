@@ -53,7 +53,7 @@ export function createPageState(request: PageRequest = {}): PageState {
   const cursor = request.cursor ?? null;
   const offset = (page - 1) * limit;
 
-  return { page, limit, cursor, offset };
+  return { cursor, limit, offset, page };
 }
 
 export function encodeCursor(
@@ -111,9 +111,9 @@ export function buildPaginationResult<T extends Record<string, unknown>>(
     data,
     pagination: {
       current: page.page,
-      limit: page.limit,
       cursor,
       hasNext,
+      limit: page.limit,
     },
   };
 }

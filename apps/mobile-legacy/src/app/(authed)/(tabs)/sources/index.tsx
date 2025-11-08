@@ -5,15 +5,15 @@ import { SourceList, SourceSkeletonList } from "@/ui/components/content/source";
 import { ScreenView } from "@/ui/components/layout";
 
 export default function Sources() {
-    const { data, isLoading } = useSourceOverviewList();
-    const sources: SourceOverview[] = useFlattenedItems(data);
+  const { data, isLoading } = useSourceOverviewList();
+  const sources: SourceOverview[] = useFlattenedItems(data);
 
-    return (
-        <ScreenView>
-            <ScreenView.Heading title="Sources" />
+  return (
+    <ScreenView>
+      <ScreenView.Heading title="Sources" />
 
-            {isLoading && <SourceSkeletonList horizontal={false} />}
-            {!isLoading && <SourceList data={sources} horizontal={false} />}
-        </ScreenView>
-    );
+      {isLoading && <SourceSkeletonList horizontal={false} />}
+      {!isLoading && <SourceList data={sources} horizontal={false} />}
+    </ScreenView>
+  );
 }

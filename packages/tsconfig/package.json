@@ -1,7 +1,7 @@
 {
-  "name": "@basango/typescript-config",
-  "private": true,
   "license": "PROPRIETARY",
+  "name": "@basango/tsconfig",
+  "private": true,
   "publishConfig": {
     "access": "public"
   }
