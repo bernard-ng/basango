@@ -21,9 +21,6 @@
     "crawler:async": "bun run src/scripts/queue.ts",
     "crawler:sync": "bun run src/scripts/crawl.ts",
     "crawler:worker": "bun run src/scripts/worker.ts",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
     "test": "vitest --run",
     "typecheck": "tsc --noEmit"
   },

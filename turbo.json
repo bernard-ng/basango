@@ -21,10 +21,6 @@
       "inputs": ["$TURBO_DEFAULT$", ".env"],
       "persistent": true
     },
-    "format": {},
-    "lint": {
-      "dependsOn": ["^topo"]
-    },
     "start": {
       "cache": false
     },
