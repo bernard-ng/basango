@@ -1,42 +1,41 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-
 import * as Network from "expo-network";
 import { NetworkStateEvent } from "expo-network";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 type NetworkState = {
-    isConnected: boolean;
+  isConnected: boolean;
 };
 
 const NetworkContext = createContext<NetworkState>({
-    isConnected: true,
+  isConnected: true,
 });
 
 export const useNetwork = () => useContext(NetworkContext);
 
 export const NetworkProvider = ({ children }: React.PropsWithChildren) => {
-    const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
 
-    useEffect(() => {
-        let subscription: { remove: () => any };
+  useEffect(() => {
+    let subscription: { remove: () => any };
 
-        const subscribeToNetworkChanges = async () => {
-            const state = await Network.getNetworkStateAsync();
-            updateConnection(state);
+    const subscribeToNetworkChanges = async () => {
+      const state = await Network.getNetworkStateAsync();
+      updateConnection(state);
 
-            subscription = Network.addNetworkStateListener(updateConnection);
-        };
+      subscription = Network.addNetworkStateListener(updateConnection);
+    };
 
-        const updateConnection = (state: NetworkStateEvent) => {
-            const connected = state.isConnected && state.isInternetReachable === true;
-            setIsConnected(connected === undefined ? false : connected);
-        };
+    const updateConnection = (state: NetworkStateEvent) => {
+      const connected = state.isConnected && state.isInternetReachable === true;
+      setIsConnected(connected === undefined ? false : connected);
+    };
 
-        subscribeToNetworkChanges();
+    subscribeToNetworkChanges();
 
-        return () => {
-            subscription && subscription.remove();
-        };
-    }, []);
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
 
-    return <NetworkContext.Provider value={{ isConnected }}>{children}</NetworkContext.Provider>;
+  return <NetworkContext.Provider value={{ isConnected }}>{children}</NetworkContext.Provider>;
 };

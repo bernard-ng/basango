@@ -1,6 +1,4 @@
 {
-  "name": "@basango/crawler",
-  "private": true,
   "dependencies": {
     "@basango/logger": "workspace:*",
     "@devscast/config": "^1.0.3",
@@ -16,16 +14,18 @@
     "@types/turndown": "^5.0.6",
     "vitest": "^4.0.7"
   },
+  "name": "@basango/crawler",
+  "private": true,
   "scripts": {
+    "clean": "rm -rf .turbo node_modules",
     "crawler:async": "bun run src/scripts/queue.ts",
     "crawler:sync": "bun run src/scripts/crawl.ts",
     "crawler:worker": "bun run src/scripts/worker.ts",
-    "clean": "rm -rf .turbo node_modules",
     "format": "biome format --write .",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module"
 }

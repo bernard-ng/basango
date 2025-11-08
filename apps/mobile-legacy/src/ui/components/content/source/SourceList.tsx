@@ -10,43 +10,43 @@ const HorizontalSeparator = () => <XStack width="$1" />;
 const VerticalSeparator = () => <YStack height="$0.5" />;
 
 type SourceOverviewListProps = Omit<FlatListProps<SourceOverview>, "renderItem"> & {
-    data: SourceOverview[];
-    horizontal?: boolean;
-    infiniteScroll?: boolean;
+  data: SourceOverview[];
+  horizontal?: boolean;
+  infiniteScroll?: boolean;
 };
 
 type SourceOverviewListComponent = React.FC<SourceOverviewListProps> & {
-    HorizontalSeparator: typeof HorizontalSeparator;
-    VerticalSeparator: typeof VerticalSeparator;
+  HorizontalSeparator: typeof HorizontalSeparator;
+  VerticalSeparator: typeof VerticalSeparator;
 };
 
 const keyExtractor = (item: SourceOverview) => item.name;
 
 const SourceList: SourceOverviewListComponent = (props: SourceOverviewListProps) => {
-    const { data, horizontal = false, ...rest } = props;
+  const { data, horizontal = false, ...rest } = props;
 
-    const renderItem = useCallback(
-        ({ item }: { item: SourceOverview }) => {
-            return <SourceOverviewCard data={item} horizontal={horizontal} />;
-        },
-        [horizontal]
-    );
+  const renderItem = useCallback(
+    ({ item }: { item: SourceOverview }) => {
+      return <SourceOverviewCard data={item} horizontal={horizontal} />;
+    },
+    [horizontal],
+  );
 
-    return (
-        <FlatList
-            {...rest}
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={keyExtractor}
-            ItemSeparatorComponent={horizontal ? HorizontalSeparator : VerticalSeparator}
-            horizontal={horizontal}
-            showsHorizontalScrollIndicator={false}
-            initialNumToRender={5}
-            onEndReachedThreshold={0.5}
-            removeClippedSubviews={true}
-            ListEmptyComponent={() => <Paragraph>Pas de sources disponibles pour le moment.</Paragraph>}
-        />
-    );
+  return (
+    <FlatList
+      {...rest}
+      data={data}
+      horizontal={horizontal}
+      ItemSeparatorComponent={horizontal ? HorizontalSeparator : VerticalSeparator}
+      initialNumToRender={5}
+      keyExtractor={keyExtractor}
+      ListEmptyComponent={() => <Paragraph>Pas de sources disponibles pour le moment.</Paragraph>}
+      onEndReachedThreshold={0.5}
+      removeClippedSubviews={true}
+      renderItem={renderItem}
+      showsHorizontalScrollIndicator={false}
+    />
+  );
 };
 
 SourceList.HorizontalSeparator = HorizontalSeparator;

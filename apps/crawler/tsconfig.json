@@ -5,7 +5,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "extends": "@basango/typescript-config/base.json",
+  "extends": "@basango/tsconfig/base.json",
   "include": ["src"],
   "references": []
 }

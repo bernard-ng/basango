@@ -1,10 +1,4 @@
 {
-  "name": "@basango/ui",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "lint": "eslint . --max-warnings 0"
-  },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
@@ -18,20 +12,26 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@basango/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.1.11",
     "@turbo/gen": "^2.5.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@basango/typescript-config": "workspace:*",
     "tailwindcss": "^4.1.11",
     "typescript": "catalog:"
   },
   "exports": {
-    "./globals.css": "./src/styles/globals.css",
-    "./postcss.config": "./postcss.config.mjs",
-    "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
-  }
+    "./globals.css": "./src/styles/globals.css",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./lib/*": "./src/lib/*.ts",
+    "./postcss.config": "./postcss.config.mjs"
+  },
+  "name": "@basango/ui",
+  "private": true,
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "type": "module"
 }

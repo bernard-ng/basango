@@ -1,23 +1,23 @@
 {
-  "name": "@basango/dashboard",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
   "dependencies": {
+    "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "next": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "typescript": "catalog:",
+    "@tailwindcss/postcss": "^4",
     "@types/bun": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "catalog:"
+  },
+  "name": "@basango/dashboard",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "eslint",
+    "start": "next start"
   }
 }

@@ -40,13 +40,13 @@ export async function getBookmarkList(
 
   let query = db
     .select({
-      bookmark_id: bookmarks.id,
-      bookmark_name: bookmarks.name,
-      bookmark_description: bookmarks.description,
-      bookmark_created_at: bookmarks.createdAt,
-      bookmark_updated_at: bookmarks.updatedAt,
       bookmark_articles_count: sql<number>`count(${bookmarkArticles.articleId})`,
+      bookmark_created_at: bookmarks.createdAt,
+      bookmark_description: bookmarks.description,
+      bookmark_id: bookmarks.id,
       bookmark_is_public: bookmarks.isPublic,
+      bookmark_name: bookmarks.name,
+      bookmark_updated_at: bookmarks.updatedAt,
     })
     .from(bookmarks)
     .leftJoin(bookmarkArticles, eq(bookmarkArticles.bookmarkId, bookmarks.id))

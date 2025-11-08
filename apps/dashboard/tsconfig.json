@@ -1,5 +1,4 @@
 {
-  "extends": "@basango/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -12,12 +11,7 @@
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "next.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "extends": "@basango/tsconfig/nextjs.json",
+  "include": ["next-env.d.ts", "next.config.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }

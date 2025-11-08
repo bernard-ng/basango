@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Link } from "expo-router";
 import { Card, XStack, YStack } from "tamagui";
 
@@ -10,36 +8,36 @@ import { SourceReferencePill } from "@/ui/components/content/source/SourceRefere
 import { Caption, Text } from "@/ui/components/typography";
 
 type ArticleMagazineCardProps = {
-    data: ArticleOverview;
+  data: ArticleOverview;
 };
 
 export const ArticleMagazineCard = (props: ArticleMagazineCardProps) => {
-    const { data } = props;
-    const relativeTime = useRelativeTime(data.publishedAt);
+  const { data } = props;
+  const relativeTime = useRelativeTime(data.publishedAt);
 
-    return (
-        <Card width="100%" backgroundColor="transparent" borderRadius="$4" padding={0}>
-            <Link href={`/(authed)/(tabs)/articles/${data.id}`}>
-                <XStack flexDirection="row" gap="$3" alignItems="center">
-                    <YStack flex={1} gap="$2">
-                        <Text numberOfLines={2} fontWeight="600" fontSize="$5">
-                            {data.title}
-                        </Text>
-                        <Text size="$3" numberOfLines={2} color="$colorHover">
-                            {data.excerpt}
-                        </Text>
-                    </YStack>
+  return (
+    <Card backgroundColor="transparent" borderRadius="$4" padding={0} width="100%">
+      <Link href={`/(authed)/(tabs)/articles/${data.id}`}>
+        <XStack alignItems="center" flexDirection="row" gap="$3">
+          <YStack flex={1} gap="$2">
+            <Text fontSize="$5" fontWeight="600" numberOfLines={2}>
+              {data.title}
+            </Text>
+            <Text color="$colorHover" numberOfLines={2} size="$3">
+              {data.excerpt}
+            </Text>
+          </YStack>
 
-                    {data.image && <ArticleCoverImage uri={data.image} width={120} height={90} />}
-                </XStack>
-            </Link>
+          {data.image && <ArticleCoverImage height={90} uri={data.image} width={120} />}
+        </XStack>
+      </Link>
 
-            <YStack marginTop="$3">
-                <XStack justifyContent="space-between" alignItems="center">
-                    <SourceReferencePill data={data.source} />
-                    <Caption>{relativeTime}</Caption>
-                </XStack>
-            </YStack>
-        </Card>
-    );
+      <YStack marginTop="$3">
+        <XStack alignItems="center" justifyContent="space-between">
+          <SourceReferencePill data={data.source} />
+          <Caption>{relativeTime}</Caption>
+        </XStack>
+      </YStack>
+    </Card>
+  );
 };

@@ -1,40 +1,43 @@
 {
   "expo": {
-    "name": "basango",
-    "slug": "basango",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./src/assets/images/logo.png",
-    "scheme": "basango",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "githubUrl": "https://github.com/bernard-ng/basango",
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "dev.ngandu.basango"
-    },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/logo.png",
         "backgroundColor": "#ffffff",
+        "foregroundImage": "./src/assets/images/logo.png",
         "package": "dev.ngandu.basango"
       },
       "package": "dev.ngandu.basango"
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./src/assets/images/logo.png"
+    "experiments": {
+      "typedRoutes": true
     },
+    "extra": {
+      "eas": {
+        "projectId": "57281e7a-46e3-4aac-8715-5165fa0bf560"
+      },
+      "router": {
+        "origin": false
+      }
+    },
+    "githubUrl": "https://github.com/bernard-ng/basango",
+    "icon": "./src/assets/images/logo.png",
+    "ios": {
+      "bundleIdentifier": "dev.ngandu.basango",
+      "supportsTablet": true
+    },
+    "name": "basango",
+    "newArchEnabled": true,
+    "orientation": "portrait",
+    "owner": "bernard-ng",
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
+          "backgroundColor": "#ffffff",
           "image": "./src/assets/images/logo.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "resizeMode": "contain"
         }
       ],
       "expo-build-properties",
@@ -42,23 +45,20 @@
       [
         "@sentry/react-native/expo",
         {
-          "url": "https://glitchtip.devscast.tech/",
+          "organization": "devscast-software",
           "project": "basango",
-          "organization": "devscast-software"
+          "url": "https://glitchtip.devscast.tech/"
         }
       ]
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "57281e7a-46e3-4aac-8715-5165fa0bf560"
-      }
-    },
-    "owner": "bernard-ng"
+    "scheme": "basango",
+    "slug": "basango",
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.0",
+    "web": {
+      "bundler": "metro",
+      "favicon": "./src/assets/images/logo.png",
+      "output": "static"
+    }
   }
 }

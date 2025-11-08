@@ -2,6 +2,7 @@ import type { SQL } from "drizzle-orm";
 import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 
 import type { Database } from "@/client";
+import { PUBLICATION_GRAPH_DAYS, SOURCE_IMAGE_BASE } from "@/constant";
 import { articles, followedSources, sources } from "@/schema";
 import {
   buildPaginationResult,
@@ -10,7 +11,6 @@ import {
   type PageRequest,
   type PaginationMeta,
 } from "@/utils/pagination";
-import { PUBLICATION_GRAPH_DAYS, SOURCE_IMAGE_BASE } from "@/constant";
 
 export interface SourceOverviewRow {
   sourceId: string;
@@ -70,14 +70,14 @@ export interface SourceStatisticsRow {
 export async function getSourceStatisticsList(db: Database): Promise<SourceStatisticsRow[]> {
   const rows = await db
     .select({
-      sourceId: sources.id,
-      sourceName: sources.name,
-      sourceCrawledAt: sql<string | null>`max
-          (${articles.crawledAt})`,
-      articlesCount: sql<number>`count
-          (${articles.id})`,
       articleMetadataAvailable: sql<number>`sum
           (CASE WHEN ${articles.metadata} IS NOT NULL THEN 1 ELSE 0 END)`,
+      articlesCount: sql<number>`count
+          (${articles.id})`,
+      sourceCrawledAt: sql<string | null>`max
+          (${articles.crawledAt})`,
+      sourceId: sources.id,
+      sourceName: sources.name,
     })
     .from(sources)
     .leftJoin(articles, eq(articles.sourceId, sources.id))
@@ -85,11 +85,11 @@ export async function getSourceStatisticsList(db: Database): Promise<SourceStati
     .orderBy(sources.name.asc());
 
   return rows.map((row) => ({
+    articleMetadataAvailable: Number(row.articleMetadataAvailable ?? 0),
+    articlesCount: Number(row.articlesCount ?? 0),
+    sourceCrawledAt: row.sourceCrawledAt,
     sourceId: row.sourceId,
     sourceName: row.sourceName,
-    sourceCrawledAt: row.sourceCrawledAt,
-    articlesCount: Number(row.articlesCount ?? 0),
-    articleMetadataAvailable: Number(row.articleMetadataAvailable ?? 0),
   }));
 }
 
@@ -158,13 +158,13 @@ export async function getSourceOverviewList(
 
   let query = db
     .select({
-      sourceId: sources.id,
+      source_created_at: sources.createdAt,
       source_display_name: sources.displayName,
       source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
-      sourceUrl: sources.url,
-      source_name: sources.name,
-      source_created_at: sources.createdAt,
       source_is_followed: followExpression,
+      source_name: sources.name,
+      sourceId: sources.id,
+      sourceUrl: sources.url,
     })
     .from(sources);
 
@@ -181,8 +181,8 @@ export async function getSourceOverviewList(
   const rows = await query.orderBy(desc(sources.createdAt), desc(sources.id)).limit(page.limit + 1);
 
   return buildPaginationResult(rows, page, {
-    id: "sourceId",
     date: "source_created_at",
+    id: "sourceId",
   });
 }
 
@@ -192,7 +192,7 @@ function createBackwardDateRange(days: number): { start: number; end: number } {
   const startDate = new Date(now.getTime() - days * 86_400_000);
   const start = Math.floor(startDate.getTime() / 1000);
 
-  return { start, end };
+  return { end, start };
 }
 
 async function fetchPublicationGraph(db: Database, sourceId: string): Promise<PublicationEntry[]> {
@@ -200,10 +200,10 @@ async function fetchPublicationGraph(db: Database, sourceId: string): Promise<Pu
 
   const rows = await db
     .select({
-      day: sql<string>`date
-          (${articles.publishedAt})`,
       count: sql<number>`count
           (${articles.id})`,
+      day: sql<string>`date
+          (${articles.publishedAt})`,
     })
     .from(articles)
     .where(eq(articles.sourceId, sourceId))
@@ -233,7 +233,7 @@ async function fetchPublicationGraph(db: Database, sourceId: string): Promise<Pu
 
   for (let date = new Date(start.getTime()); date < end; date.setUTCDate(date.getUTCDate() + 1)) {
     const day = date.toISOString().slice(0, 10);
-    entries.push({ day, count: counts.get(day) ?? 0 });
+    entries.push({ count: counts.get(day) ?? 0, day });
   }
 
   return entries;
@@ -278,20 +278,8 @@ export async function getSourceDetails(
 
   const [row] = await db
     .select({
-      sourceId: sources.id,
-      source_name: sources.name,
-      source_description: sources.description,
-      sourceUrl: sources.url,
-      source_updated_at: sources.updatedAt,
-      source_display_name: sources.displayName,
-      source_bias: sources.bias,
-      source_reliability: sources.reliability,
-      source_transparency: sources.transparency,
-      source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
       articles_count: sql<number>`count
           (${articles.id})`,
-      source_crawled_at: sql<string | null>`max
-          (${articles.crawledAt})`,
       articles_metadata_available: sql<number>`count
           (*)
           FILTER (WHERE
@@ -300,7 +288,19 @@ export async function getSourceDetails(
           NOT
           NULL
           )`,
+      source_bias: sources.bias,
+      source_crawled_at: sql<string | null>`max
+          (${articles.crawledAt})`,
+      source_description: sources.description,
+      source_display_name: sources.displayName,
+      source_image: sql<string>`('${SOURCE_IMAGE_BASE}' || ${sources.name} || '.png')`,
       source_is_followed: followExpression,
+      source_name: sources.name,
+      source_reliability: sources.reliability,
+      source_transparency: sources.transparency,
+      source_updated_at: sources.updatedAt,
+      sourceId: sources.id,
+      sourceUrl: sources.url,
     })
     .from(sources)
     .leftJoin(articles, eq(articles.sourceId, sources.id))
@@ -328,12 +328,12 @@ export async function getSourceDetails(
   ]);
 
   return {
+    categoryShares,
+    publicationGraph,
     source: {
       ...row,
       articles_count: Number(row.articles_count ?? 0),
       articles_metadata_available: Number(row.articles_metadata_available ?? 0),
     },
-    publicationGraph,
-    categoryShares,
   };
 }

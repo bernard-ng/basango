@@ -1,5 +1,4 @@
 {
-  "editor.defaultFormatter": "biomejs.biome",
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
@@ -10,21 +9,20 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "editor.codeActionsOnSave": {
-    "quickfix.biome": "explicit",
     "source.organizeImports.biome": "explicit",
-    "source.fixAll": "explicit",
-    "source.organizeImports": "explicit",
-    "source.sortMembers": "explicit"
+    "source.fixAll.biome": "explicit"
   },
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
+  "files.autoSave": "onFocusChange",
+  "search.exclude": {
+    "**/node_modules": true
+  },
+  "terminal.integrated.localEchoStyle": "dim",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.autoImportFileExcludePatterns": [
     "next/router.d.ts",
     "next/dist/client/router.d.ts"
   ],
-  "terminal.integrated.localEchoStyle": "dim",
-  "search.exclude": {
-    "**/node_modules": true
-  }
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

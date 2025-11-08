@@ -1,49 +1,4 @@
 {
-  "name": "drc-news",
-  "main": "expo-router/entry",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
-    "test": "jest --watchAll",
-    "============= EAS BUILD =============": "",
-    "build:ios:dev": "eas build --profile development --platform ios",
-    "build:ios:sim": "eas build --profile dev-sim --platform ios",
-    "build:ios:prev": "eas build --profile preview --platform ios",
-    "build:ios:e2e": "eas build --profile ios-e2e --platform ios",
-    "build:android:dev": "eas build --profile development --platform android",
-    "build:android:sim": "eas build --profile dev-sim --platform android",
-    "build:android:prev": "eas build --profile preview --platform android",
-    "build:android:e2e": "eas build --profile android-e2e --platform android",
-    "build:android:prod": "eas build --profile production --platform android",
-    "build:ios:prod": "eas build --profile production --platform ios",
-    "===================== EAS SUBMIT =====================": "",
-    "eas:android:submit": "eas submit -p android --profile production",
-    "eas:ios:submit": "eas submit -p ios --profile production",
-    "=========== CODE STYLE ============": "",
-    "check-types": "tsc --noEmit",
-    "check": "prettier src --check",
-    "format": "prettier src --write",
-    "lint:check": "eslint src --debug",
-    "lint:fix": "eslint src --fix",
-    "============= HUSKY =============": "",
-    "prepare": "husky",
-    "commit": "cz",
-    "============= MISCELLANEOUS =============": "",
-    "delete:dstore": "find  -name '.DS_Store' -type f -delete"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.tsx": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
@@ -53,12 +8,6 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
-  },
-  "jest": {
-    "preset": "jest-expo"
-  },
-  "overrides": {
-    "globals": "14.0.0"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.3.0",
@@ -132,5 +81,56 @@
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.tsx": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "main": "expo-router/entry",
+  "name": "drc-news",
+  "overrides": {
+    "globals": "14.0.0"
+  },
+  "private": true,
+  "scripts": {
+    "=========== CODE STYLE ============": "",
+    "============= EAS BUILD =============": "",
+    "============= HUSKY =============": "",
+    "============= MISCELLANEOUS =============": "",
+    "===================== EAS SUBMIT =====================": "",
+    "android": "expo run:android",
+    "build:android:dev": "eas build --profile development --platform android",
+    "build:android:e2e": "eas build --profile android-e2e --platform android",
+    "build:android:prev": "eas build --profile preview --platform android",
+    "build:android:prod": "eas build --profile production --platform android",
+    "build:android:sim": "eas build --profile dev-sim --platform android",
+    "build:ios:dev": "eas build --profile development --platform ios",
+    "build:ios:e2e": "eas build --profile ios-e2e --platform ios",
+    "build:ios:prev": "eas build --profile preview --platform ios",
+    "build:ios:prod": "eas build --profile production --platform ios",
+    "build:ios:sim": "eas build --profile dev-sim --platform ios",
+    "check": "prettier src --check",
+    "check-types": "tsc --noEmit",
+    "commit": "cz",
+    "delete:dstore": "find  -name '.DS_Store' -type f -delete",
+    "eas:android:submit": "eas submit -p android --profile production",
+    "eas:ios:submit": "eas submit -p ios --profile production",
+    "format": "prettier src --write",
+    "ios": "expo run:ios",
+    "lint:check": "eslint src --debug",
+    "lint:fix": "eslint src --fix",
+    "prepare": "husky",
+    "start": "expo start",
+    "test": "jest --watchAll",
+    "web": "expo start --web"
+  },
+  "version": "1.0.0"
 }

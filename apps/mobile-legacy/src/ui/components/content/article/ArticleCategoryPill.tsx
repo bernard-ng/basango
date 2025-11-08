@@ -1,13 +1,11 @@
-import React from "react";
-
 import { Caption } from "@/ui/components/typography";
 
 type ArticleCategoryPillProps = {
-    category: string;
+  category: string;
 };
 
 export const ArticleCategoryPill = (props: ArticleCategoryPillProps) => {
-    const { category } = props;
+  const { category } = props;
 
-    return <Caption>{category}</Caption>;
+  return <Caption>{category}</Caption>;
 };

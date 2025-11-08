@@ -5,14 +5,14 @@ export const logger = pino({
   // Use pretty printing in development, structured JSON in production
   ...(process.env.NODE_ENV !== "production" && {
     transport: {
-      target: "pino-pretty",
       options: {
         colorize: true,
-        translateTime: "HH:MM:ss",
+        hideObject: false,
         ignore: "pid,hostname",
         messageFormat: true,
-        hideObject: false,
+        translateTime: "HH:MM:ss",
       },
+      target: "pino-pretty",
     },
   }),
 });

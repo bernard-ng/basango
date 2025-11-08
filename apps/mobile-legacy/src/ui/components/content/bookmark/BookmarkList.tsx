@@ -10,58 +10,66 @@ import { BookmarkEmptyState } from "@/ui/components/content/bookmark/BookmarkEmp
 const VerticalSeparator = () => <YStack height="$0.75" />;
 
 const LoadingIndicator = () => (
-    <>
-        <YStack height="$1" />
-        <ActivityIndicator />
-        <YStack height="$1" />
-    </>
+  <>
+    <YStack height="$1" />
+    <ActivityIndicator />
+    <YStack height="$1" />
+  </>
 );
 
 type BookmarkListProps = Omit<FlatListProps<Bookmark>, "renderItem"> & {
-    data: Bookmark[];
-    infiniteScroll?: boolean;
-    hasNextPage?: boolean;
-    isFetchingNextPage?: boolean;
-    fetchNextPage?: () => void;
+  data: Bookmark[];
+  infiniteScroll?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage?: () => void;
 };
 
 type BookmarkListComponent = React.FC<BookmarkListProps> & {
-    VerticalSeparator: typeof VerticalSeparator;
-    LoadingIndicator: typeof LoadingIndicator;
+  VerticalSeparator: typeof VerticalSeparator;
+  LoadingIndicator: typeof LoadingIndicator;
 };
 
 const keyExtractor = (item: Bookmark) => item.id;
 
 const renderItem = ({ item }: { item: Bookmark }) => {
-    return <BookmarkCard data={item} />;
+  return <BookmarkCard data={item} />;
 };
 
 const BookmarkList: BookmarkListComponent = (props: BookmarkListProps) => {
-    const { data, infiniteScroll = false, hasNextPage, isFetchingNextPage, fetchNextPage, refreshing, ...rest } = props;
+  const {
+    data,
+    infiniteScroll = false,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refreshing,
+    ...rest
+  } = props;
 
-    const handleOnEndReached = useCallback(async () => {
-        if (infiniteScroll && hasNextPage && !isFetchingNextPage && fetchNextPage) {
-            fetchNextPage();
-        }
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage, infiniteScroll]);
+  const handleOnEndReached = useCallback(async () => {
+    if (infiniteScroll && hasNextPage && !isFetchingNextPage && fetchNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, infiniteScroll]);
 
-    return (
-        <FlatList
-            {...rest}
-            data={data}
-            renderItem={renderItem}
-            onEndReached={handleOnEndReached}
-            keyExtractor={keyExtractor}
-            ItemSeparatorComponent={VerticalSeparator}
-            showsHorizontalScrollIndicator={false}
-            initialNumToRender={5}
-            onEndReachedThreshold={0.5}
-            removeClippedSubviews={true}
-            refreshing={refreshing}
-            ListEmptyComponent={<BookmarkEmptyState />}
-            ListFooterComponent={infiniteScroll && refreshing ? LoadingIndicator : undefined}
-        />
-    );
+  return (
+    <FlatList
+      {...rest}
+      data={data}
+      ItemSeparatorComponent={VerticalSeparator}
+      initialNumToRender={5}
+      keyExtractor={keyExtractor}
+      ListEmptyComponent={<BookmarkEmptyState />}
+      ListFooterComponent={infiniteScroll && refreshing ? LoadingIndicator : undefined}
+      onEndReached={handleOnEndReached}
+      onEndReachedThreshold={0.5}
+      refreshing={refreshing}
+      removeClippedSubviews={true}
+      renderItem={renderItem}
+      showsHorizontalScrollIndicator={false}
+    />
+  );
 };
 
 BookmarkList.VerticalSeparator = VerticalSeparator;

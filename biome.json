@@ -1,12 +1,45 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.1/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
+  "$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":BUN:", ":NODE:"],
+              ":BLANK_LINE:",
+              [":PACKAGE:", ":URL:", ":PACKAGE_WITH_PROTOCOL:"],
+              ":BLANK_LINE:",
+              [":ALIAS:"],
+              ":BLANK_LINE:",
+              [":PATH:"]
+            ],
+            "identifierOrder": "lexicographic"
+          }
+        },
+        "useSortedAttributes": "on",
+        "useSortedKeys": "on",
+        "useSortedProperties": "on"
+      }
+    },
+    "enabled": true
+  },
+  "css": {
+    "formatter": {
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineEnding": "lf",
+      "lineWidth": 120,
+      "quoteStyle": "double"
+    },
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": true,
+    "includes": ["**/apps", "**/packages", "!/apps/api-legacy", "!/apps/mobile-legacy"]
   },
   "formatter": {
     "enabled": true,
@@ -15,34 +48,28 @@
     "lineEnding": "lf",
     "lineWidth": 100
   },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "style": {
-        "useImportType": "off",
-        "noNonNullAssertion": "off"
-      },
-      "correctness": {
-        "noUnusedImports": "on",
-        "useImportExtensions": "off"
-      }
-    }
-  },
   "javascript": {
     "formatter": {
       "quoteStyle": "double"
     }
   },
-  "assist": {
+  "linter": {
     "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "on",
-        "useSortedKeys": "on",
-        "useSortedAttributes": "on",
-        "useSortedProperties": "on"
+    "rules": {
+      "correctness": {
+        "noUnusedImports": "on",
+        "useImportExtensions": "off"
+      },
+      "recommended": true,
+      "style": {
+        "noNonNullAssertion": "off",
+        "useImportType": "off"
       }
     }
+  },
+  "vcs": {
+    "clientKind": "git",
+    "enabled": true,
+    "useIgnoreFile": true
   }
 }
