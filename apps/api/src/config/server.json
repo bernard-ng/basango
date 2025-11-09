@@ -1,5 +1,0 @@
-{
-  "host": "%env(BASANGO_API_HOST)%",
-  "port": "%env(number:BASANGO_API_PORT)%",
-  "version": "1.0.0"
-}

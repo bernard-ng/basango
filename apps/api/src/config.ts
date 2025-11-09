@@ -11,7 +11,7 @@ const ServerConfigurationSchema = z.object({
     allowMethods: z.array(z.string()).optional(),
     exposeHeaders: z.array(z.string()).optional(),
     maxAge: z.number().int().min(0).optional(),
-    origin: z.array(z.string()).default([]),
+    origin: z.string(), //z.array(z.string()).default([]),
   }),
   server: z.object({
     host: z.string().default("localhost"),
