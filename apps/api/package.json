@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@basango/db": "workspace:*",
+    "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@hono/node-server": "^1.19.6",
     "@hono/zod-openapi": "^1.1.4",
@@ -8,24 +9,19 @@
     "@trpc/server": "^11.7.1",
     "ai": "^5.0.89",
     "camelcase-keys": "^10.0.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "catalog:",
     "hono": "^4.10.4",
     "hono-rate-limiter": "^0.4.2",
     "jose": "^6.1.0",
-    "zod": "^4.1.12",
+    "zod": "catalog:",
     "zod-openapi": "^5.4.3"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.17",
-    "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
   },
   "name": "@basango/api",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js"
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module"
 }

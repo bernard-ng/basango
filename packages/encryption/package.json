@@ -1,0 +1,9 @@
+{
+  "main": "src/index.ts",
+  "name": "@basango/encryption",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "typecheck": "tsc --noEmit"
+  }
+}

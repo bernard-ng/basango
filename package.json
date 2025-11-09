@@ -21,12 +21,17 @@
       "path": "cz-conventional-changelog"
     }
   },
+  "dependencies": {
+    "@devscast/config": "^1.0.3"
+  },
   "devDependencies": {
     "@basango/tsconfig": "workspace:*",
     "@biomejs/biome": "^2.3.1",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@manypkg/cli": "^0.25.1",
+    "@types/bun": "^1.3.2",
+    "@types/node": "^24.10.0",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",

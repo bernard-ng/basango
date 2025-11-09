@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { md5 } from "@basango/encryption";
 import logger from "@basango/logger";
 
 import { Article } from "@/schema";
@@ -45,11 +46,12 @@ export const persist = async (payload: Article, persistors: Persistor[]): Promis
 
   const article = {
     ...data,
+    hash: md5(data.link),
     tokenStatistics: {
-      body: countTokens(payload.body),
-      categories: countTokens(payload.categories.join(",")),
-      excerpt: countTokens(payload.body.substring(0, 200)),
-      title: countTokens(payload.title),
+      body: countTokens(data.body),
+      categories: countTokens(data.categories.join(",")),
+      excerpt: countTokens(data.body.substring(0, 200)),
+      title: countTokens(data.title),
     },
   } as Article;
 
