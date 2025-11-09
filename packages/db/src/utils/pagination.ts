@@ -1,5 +1,11 @@
 import { Buffer } from "node:buffer";
 
+import {
+  PAGINATION_DEFAULT_LIMIT,
+  PAGINATION_DEFAULT_PAGE,
+  PAGINATION_MAX_LIMIT,
+} from "@/constants";
+
 export type SortDirection = "asc" | "desc";
 
 export interface PageRequest {
@@ -27,27 +33,23 @@ export interface PaginationMeta {
   hasNext: boolean;
 }
 
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 5;
-const MAX_LIMIT = 100;
-
 export function createPageState(request: PageRequest = {}): PageState {
   const page =
     Number.isFinite(request.page) && (request.page ?? 0) > 0
       ? Math.trunc(request.page!)
-      : DEFAULT_PAGE;
+      : PAGINATION_DEFAULT_PAGE;
 
   let limit =
     Number.isFinite(request.limit) && (request.limit ?? 0) > 0
       ? Math.trunc(request.limit!)
-      : DEFAULT_LIMIT;
+      : PAGINATION_DEFAULT_LIMIT;
 
-  if (limit < DEFAULT_LIMIT) {
-    limit = DEFAULT_LIMIT;
+  if (limit < PAGINATION_DEFAULT_LIMIT) {
+    limit = PAGINATION_DEFAULT_LIMIT;
   }
 
-  if (limit > MAX_LIMIT) {
-    limit = MAX_LIMIT;
+  if (limit > PAGINATION_MAX_LIMIT) {
+    limit = PAGINATION_MAX_LIMIT;
   }
 
   const cursor = request.cursor ?? null;
@@ -91,29 +93,4 @@ export function decodeCursor(cursor?: string | null): CursorPayload | null {
   } catch {
     return null;
   }
-}
-
-export function buildPaginationResult<T extends Record<string, unknown>>(
-  rows: T[],
-  page: PageState,
-  keyset: { id: string; date?: string | null },
-): { data: T[]; pagination: PaginationMeta } {
-  const hasNext = rows.length > page.limit;
-  const data = hasNext ? rows.slice(0, page.limit) : rows;
-
-  let cursor: string | null = null;
-  if (data.length > 0) {
-    const lastRow = data[data.length - 1];
-    cursor = encodeCursor(lastRow, keyset);
-  }
-
-  return {
-    data,
-    pagination: {
-      current: page.page,
-      cursor,
-      hasNext,
-      limit: page.limit,
-    },
-  };
 }

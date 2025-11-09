@@ -3,6 +3,7 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
+import { config, env } from "@/config";
 import { checkHealth } from "@/utils/health";
 
 const app = new OpenAPIHono();
@@ -12,19 +13,11 @@ app.use(secureHeaders());
 app.use(
   "*",
   cors({
-    allowHeaders: [
-      "Authorization",
-      "Content-Type",
-      "accept-language",
-      "x-trpc-source",
-      "x-user-locale",
-      "x-user-timezone",
-      "x-user-country",
-    ],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    exposeHeaders: ["Content-Length"],
-    maxAge: 86400,
-    origin: process.env.BASANGO_API_ALLOWED_ORIGINS?.split(",") ?? [],
+    allowHeaders: config.cors.allowedHeaders,
+    allowMethods: config.cors.allowMethods,
+    exposeHeaders: config.cors.exposeHeaders,
+    maxAge: config.cors.maxAge,
+    origin: config.cors.origin,
   }),
 );
 
@@ -54,7 +47,7 @@ app.doc("/openapi", {
     description: "Basango is a platform that leverages AI to revolutionize news curation.",
     license: {
       name: "AGPL-3.0 license",
-      url: "https://github.com/midday-ai/midday/blob/main/LICENSE",
+      url: "https://github.com/bernard-ng/basango/blob/main/LICENSE",
     },
     title: "Basango API",
     version: "0.0.1",
@@ -79,7 +72,13 @@ app.openAPIRegistry.registerComponent("securitySchemes", "token", {
   description: "Default authentication mechanism",
   scheme: "bearer",
   type: "http",
-  "x-speakeasy-example": "BASANGO_API_KEY",
+  "x-speakeasy-example": env("BASANGO_API_KEY"),
 });
 
 app.get("/", Scalar({ pageTitle: "Basango API", theme: "saturn", url: "/openapi" }));
+
+export default {
+  fetch: app.fetch,
+  hostname: config.server.host,
+  port: config.server.port,
+};

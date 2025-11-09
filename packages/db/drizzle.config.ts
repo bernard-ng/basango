@@ -1,10 +1,13 @@
-import type { Config } from "drizzle-kit";
+import { createEnvAccessor } from "@devscast/config";
+import { defineConfig } from "drizzle-kit";
 
-export default {
+const env = createEnvAccessor(["BASANGO_DATABASE_URL"] as const);
+
+export default defineConfig({
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: env("BASANGO_DATABASE_URL"),
   },
   dialect: "postgresql",
   out: "./migrations",
   schema: "./src/schema.ts",
-} satisfies Config;
+});

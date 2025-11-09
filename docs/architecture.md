@@ -9,6 +9,7 @@ Structure
 - packages/
   - logger: `@basango/logger` (pino wrapper)
   - db: `@basango/db` (Drizzle + Postgres)
+  - encryption: `@basango/encryption` (encryption utils)
   - ui: `@basango/ui` (shared UI, package.json in `packages/ui/src`)
   - tsconfig: `@basango/tsconfig` (shared TS configs)
 

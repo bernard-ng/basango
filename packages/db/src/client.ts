@@ -14,11 +14,20 @@ const connectionConfig = {
 };
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL ?? process.env.DATABASE_PRIMARY_URL!,
+  connectionString: process.env.BASANGO_DATABASE_URL!,
   ...connectionConfig,
 });
 
-// Lightweight connection pool monitoring (single pool)
+/**
+ * Retrieves runtime statistics for the database connection pool.
+ *
+ * This function reads internal pool and connection configuration values and returns
+ * a snapshot describing pool usage, capacity and utilization. Values that are not
+ * available on the underlying pool or configuration are normalized to safe defaults
+ * (zeros or false) so the result is stable.
+ *
+ * @returns An object describing the current connection pool statistics and a small summary.
+ */
 export const getConnectionPoolStats = () => {
   const stats = {
     active: Math.max(0, (pool.totalCount ?? 0) - (pool.idleCount ?? 0)),
@@ -34,9 +43,9 @@ export const getConnectionPoolStats = () => {
     totalConnections > 0 ? Math.round((stats.active / totalConnections) * 100) : 0;
 
   return {
-    instance: process.env.FLY_ALLOC_ID || "local",
+    instance: "local",
     pools: { primary: stats },
-    region: process.env.FLY_REGION || "unknown",
+    region: "unknown",
     summary: {
       hasExhaustedPools: stats.active >= totalConnections || (stats.waiting ?? 0) > 0,
       totalActive: stats.active,

@@ -1,9 +1,12 @@
+import { createEnvAccessor } from "@devscast/config";
 import pino from "pino";
 
+const env = createEnvAccessor(["LOG_LEVEL", "NODE_ENV"] as const);
+
 export const logger = pino({
-  level: process.env.LOG_LEVEL || "debug",
+  level: env("LOG_LEVEL", { default: "info" }),
   // Use pretty printing in development, structured JSON in production
-  ...(process.env.NODE_ENV !== "production" && {
+  ...(env("NODE_ENV") !== "production" && {
     transport: {
       options: {
         colorize: true,

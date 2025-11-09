@@ -109,6 +109,7 @@ export const ArticleTokenStatisticsSchema = z.object({
 export const ArticleSchema = z.object({
   body: z.string(),
   categories: z.array(z.string()).default([]),
+  hash: z.string().optional(),
   link: z.url(),
   metadata: ArticleMetadataSchema.optional(),
   source: z.string(),
