@@ -3,14 +3,12 @@
   "workspaces": {
     "": {
       "name": "basango",
-      "dependencies": {
-        "@devscast/config": "^1.0.3",
-      },
       "devDependencies": {
         "@basango/tsconfig": "workspace:*",
         "@biomejs/biome": "^2.3.1",
         "@commitlint/cli": "^20.1.0",
         "@commitlint/config-conventional": "^20.0.0",
+        "@devscast/config": "^1.0.3",
         "@manypkg/cli": "^0.25.1",
         "@types/bun": "^1.3.2",
         "@types/node": "^24.10.0",
@@ -67,11 +65,11 @@
         "react-dom": "catalog:",
       },
       "devDependencies": {
-        "@tailwindcss/postcss": "^4",
+        "@tailwindcss/postcss": "^4.1.11",
         "@types/bun": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
-        "tailwindcss": "^4",
+        "tailwindcss": "^4.1.11",
         "typescript": "catalog:",
       },
     },
@@ -2446,8 +2444,6 @@
 
     "@babel/traverse--for-generate-function-map/@babel/code-frame": ["@babel/code-frame@7.27.1", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.27.1", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg=="],
 
-    "@basango/dashboard/@types/bun": ["@types/bun@1.3.1", "", { "dependencies": { "bun-types": "1.3.1" } }, "sha512-4jNMk2/K9YJtfqwoAa28c8wK+T7nvJFOjxI4h/7sORWcypRNxBpr+TPNaCfVWq70tLCJsqoFwcf0oI0JU/fvMQ=="],
-
     "@basango/ui/zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
     "@commitlint/format/chalk": ["chalk@5.6.2", "", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
@@ -2791,8 +2787,6 @@
     "zod-to-json-schema/zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
     "@babel/helper-compilation-targets/lru-cache/yallist": ["yallist@3.1.1", "", {}, "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="],
-
-    "@basango/dashboard/@types/bun/bun-types": ["bun-types@1.3.1", "", { "dependencies": { "@types/node": "*" }, "peerDependencies": { "@types/react": "^19" } }, "sha512-NMrcy7smratanWJ2mMXdpatalovtxVggkj11bScuWuiOoXTiKIu2eVS1/7qbyI/4yHedtsn175n4Sm4JcdHLXw=="],
 
     "@esbuild-kit/core-utils/esbuild/@esbuild/android-arm": ["@esbuild/android-arm@0.18.20", "", { "os": "android", "cpu": "arm" }, "sha512-fyi7TDI/ijKKNZTUJAQqiG5T7YjJXgnzkURqmGj13C6dCqckZBLdl4h7bkhHt/t0WP+zO9/zwroDvANaOqO5Sw=="],
 

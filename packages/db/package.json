@@ -11,10 +11,11 @@
     "drizzle-kit": "^0.31.6"
   },
   "exports": {
+    ".": "./src/index.ts",
     "./client": "./src/client.ts",
     "./queries": "./src/queries/index.ts",
     "./schema": "./src/schema.ts",
-    "./utils": "./src/utils/*"
+    "./utils": "./src/utils/index.ts"
   },
   "name": "@basango/db",
   "private": true,

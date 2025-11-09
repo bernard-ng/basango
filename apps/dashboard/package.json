@@ -5,11 +5,11 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/bun": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.11",
     "typescript": "catalog:"
   },
   "name": "@basango/dashboard",
