@@ -27,6 +27,7 @@ export const { env, config } = defineConfig({
       "BASANGO_API_PORT",
       "BASANGO_API_ALLOWED_ORIGINS",
       "BASANGO_API_KEY",
+      "BASANGO_CRAWLER_KEY",
     ],
     path: path.join(PROJECT_DIR, ".env"),
   },

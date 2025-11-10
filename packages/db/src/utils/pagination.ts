@@ -6,8 +6,6 @@ import {
   PAGINATION_MAX_LIMIT,
 } from "@/constants";
 
-export type SortDirection = "asc" | "desc";
-
 export interface PageRequest {
   page?: number;
   limit?: number;

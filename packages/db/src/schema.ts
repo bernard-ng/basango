@@ -1,15 +1,14 @@
 import { relations, sql } from "drizzle-orm";
+import { check } from "drizzle-orm/gel-core";
 import {
   boolean,
-  check,
   customType,
-  doublePrecision,
   foreignKey,
   index,
   inet,
   integer,
   jsonb,
-  pgSequence,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -19,242 +18,181 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-const tsvector = customType<{ data: string; driverData: string }>({
+/* -------------------------------------------------------------------------- */
+/*                                   Types                                    */
+/* -------------------------------------------------------------------------- */
+
+export const tsvector = customType<{ data: string; driverData: string }>({
   dataType() {
     return "tsvector";
   },
 });
 
-export const refreshTokensIdSeq = pgSequence("refresh_tokens_id_seq", {
-  cache: "1",
-  cycle: false,
-  increment: "1",
-  maxValue: "9223372036854775807",
-  minValue: "1",
-  startWith: "1",
-});
+export const customJsonType = <T>() =>
+  customType<{ data: T }>({
+    dataType() {
+      return "jsonb";
+    },
+    fromDriver(value) {
+      return value as T;
+    },
+    toDriver(value) {
+      return value; // JSONB → just pass the object
+    },
+  });
 
-// legacy table for doctrine migrations
-export const doctrineMigrationVersions = pgTable("doctrine_migration_versions", {
-  executedAt: timestamp("executed_at", { mode: "string" }).default(sql`NULL`),
-  executionTime: integer("execution_time"),
-  version: varchar({ length: 191 }).primaryKey().notNull(),
-});
+export const biasEnum = pgEnum("bias", ["neutral", "slightly", "partisan", "extreme"]);
+export const reliabilityEnum = pgEnum("reliability", [
+  "trusted",
+  "reliable",
+  "average",
+  "low_trust",
+  "unreliable",
+]);
+export const sentimentEnum = pgEnum("sentiment", ["positive", "neutral", "negative"]);
+export const transparencyEnum = pgEnum("transparency", ["high", "medium", "low"]);
+export const tokenPurposeEnum = pgEnum("token_purpose", [
+  "confirm_account",
+  "password_reset",
+  "unlock_account",
+  "delete_account",
+]);
 
-export const bookmark = pgTable(
-  "bookmark",
+export type EmailAddress = string;
+export type Link = string;
+export type ReadingTime = number;
+
+export type Role = "ROLE_USER" | "ROLE_ADMIN";
+export type Roles = Role[];
+
+export type Bias = (typeof biasEnum.enumValues)[number];
+export type Reliability = (typeof reliabilityEnum.enumValues)[number];
+export type Sentiment = (typeof sentimentEnum.enumValues)[number];
+export type Transparency = (typeof transparencyEnum.enumValues)[number];
+export type TokenPurpose = (typeof tokenPurposeEnum.enumValues)[number];
+
+export type Credibility = {
+  bias: Bias;
+  reliability: Reliability;
+  transparency: Transparency;
+};
+
+export type TokenStatistics = {
+  title: number;
+  body: number;
+  categories: number;
+  excerpt: number;
+  total: number;
+};
+
+export type Device = {
+  operatingSystem?: string;
+  client?: string;
+  device?: string;
+  isBot: boolean;
+};
+
+export type GeoLocation = {
+  country?: string;
+  city?: string;
+  timeZone?: string;
+  longitude?: number;
+  latitude?: number;
+  accuracyRadius?: number;
+};
+
+export type ClientProfile = {
+  userIp?: string;
+  userAgent?: string;
+  hints: unknown[];
+};
+
+export type ArticleMetadata = {
+  title?: string;
+  description?: string;
+  image?: string;
+};
+
+export type DateRange = {
+  start: number; // unix timestamp (seconds)
+  end: number; // unix timestamp (seconds)
+};
+
+// Secrets
+export type GeneratedToken = string;
+export type GeneratedCode = string;
+
+/* -------------------------------------------------------------------------- */
+/*                                   Tables                                   */
+/* -------------------------------------------------------------------------- */
+
+export const user = pgTable(
+  "user",
   {
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    description: varchar({ length: 512 }).default(sql`NULL`),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    email: varchar({ length: 255 }).$type<EmailAddress>().notNull(),
     id: uuid().primaryKey().notNull(),
-    isPublic: boolean("is_public").default(false).notNull(),
+    isConfirmed: boolean("is_confirmed").default(false).notNull(),
+    isLocked: boolean("is_locked").default(false).notNull(),
     name: varchar({ length: 255 }).notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).default(sql`NULL`),
-    userId: uuid("user_id").notNull(),
+    password: varchar({ length: 512 }).notNull(),
+    roles: varchar("roles", { length: 255 })
+      .$type<Roles>()
+      .array()
+      .notNull()
+      .default(["ROLE_USER"]),
+    updatedAt: timestamp("updated_at"),
   },
-  (table) => [
-    index("idx_bookmark_user_created").using(
-      "btree",
-      table.userId.asc().nullsLast().op("timestamp_ops"),
-      table.createdAt.desc().nullsFirst().op("timestamp_ops"),
-    ),
-    index("idx_da62921da76ed395").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "fk_da62921da76ed395",
-    }).onDelete("cascade"),
+  (_table) => [
+    uniqueIndex("unq_user_email").using("btree", sql`lower((email)::text)`),
+    index("idx_user_created_at").using("btree", sql`created_at`),
+    sql`CONSTRAINT "chk_user_roles_json" CHECK (jsonb_typeof(roles) = 'array')`,
   ],
 );
 
-export const loginAttempt = pgTable(
-  "login_attempt",
+export const source = pgTable(
+  "source",
   {
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+    credibility: jsonb("credibility").$type<Credibility>(),
+    description: varchar({ length: 1024 }),
+    displayName: varchar("display_name", { length: 255 }),
     id: uuid().primaryKey().notNull(),
-    userId: uuid("user_id").notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    updatedAt: timestamp("updated_at"),
+    url: varchar({ length: 255 }).notNull(),
   },
-  (table) => [
-    index("idx_8c11c1ba76ed395").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    index("idx_login_attempt_created_at").using(
-      "btree",
-      table.createdAt.desc().nullsFirst().op("timestamp_ops"),
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "fk_8c11c1ba76ed395",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const loginHistory = pgTable(
-  "login_history",
-  {
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    deviceClient: varchar("device_client", { length: 255 }).default(sql`NULL`),
-    deviceDevice: varchar("device_device", { length: 255 }).default(sql`NULL`),
-    deviceIsBot: boolean("device_is_bot").default(false).notNull(),
-    deviceOperatingSystem: varchar("device_operating_system", { length: 255 }).default(sql`NULL`),
-    id: uuid().primaryKey().notNull(),
-    ipAddress: inet("ip_address"),
-    locationAccuracyRadius: integer("location_accuracy_radius"),
-    locationLatitude: doublePrecision("location_latitude"),
-    locationLongitude: doublePrecision("location_longitude"),
-    locationTimeZone: varchar("location_time_zone", { length: 255 }).default(sql`NULL`),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("idx_37976e36a76ed395").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    index("idx_login_history_created_at").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops"),
-      table.createdAt.desc().nullsFirst().op("timestamp_ops"),
-    ),
-    index("idx_login_history_ip_address").using(
-      "btree",
-      table.ipAddress.asc().nullsLast().op("inet_ops"),
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "fk_37976e36a76ed395",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const verificationToken = pgTable(
-  "verification_token",
-  {
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    id: uuid().primaryKey().notNull(),
-    purpose: varchar({ length: 255 }).notNull(),
-    token: varchar({ length: 60 }).default(sql`NULL`),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("idx_c1cc006ba76ed395").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    index("idx_verif_token_created_at").using(
-      "btree",
-      table.createdAt.desc().nullsFirst().op("timestamp_ops"),
-    ),
-    uniqueIndex("unq_verif_user_purpose_token")
-      .using(
-        "btree",
-        table.userId.asc().nullsLast().op("text_ops"),
-        table.purpose.asc().nullsLast().op("text_ops"),
-      )
-      .where(sql`(token IS NOT NULL)`),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "fk_c1cc006ba76ed395",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const followedSource = pgTable(
-  "followed_source",
-  {
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    followerId: uuid("follower_id").notNull(),
-    id: uuid().primaryKey().notNull(),
-    sourceId: uuid("source_id").notNull(),
-  },
-  (table) => [
-    index("idx_7a763a3e953c1c61").using("btree", table.sourceId.asc().nullsLast().op("uuid_ops")),
-    index("idx_7a763a3eac24f853").using("btree", table.followerId.asc().nullsLast().op("uuid_ops")),
-    index("idx_followed_source_follower_created").using(
-      "btree",
-      table.followerId.asc().nullsLast().op("timestamp_ops"),
-      table.createdAt.desc().nullsFirst().op("uuid_ops"),
-    ),
-    foreignKey({
-      columns: [table.followerId],
-      foreignColumns: [user.id],
-      name: "fk_7a763a3eac24f853",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.sourceId],
-      foreignColumns: [source.id],
-      name: "fk_7a763a3e953c1c61",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const comment = pgTable(
-  "comment",
-  {
-    articleId: uuid("article_id").notNull(),
-    content: varchar({ length: 512 }).notNull(),
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    id: uuid().primaryKey().notNull(),
-    isSpam: boolean("is_spam").default(false).notNull(),
-    sentiment: varchar({ length: 30 }).default("neutral").notNull(),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("idx_9474526c7294869c").using("btree", table.articleId.asc().nullsLast().op("uuid_ops")),
-    index("idx_9474526ca76ed395").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    index("idx_comment_article_created").using(
-      "btree",
-      table.articleId.asc().nullsLast().op("timestamp_ops"),
-      table.createdAt.desc().nullsFirst().op("uuid_ops"),
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "fk_9474526ca76ed395",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.articleId],
-      foreignColumns: [article.id],
-      name: "fk_9474526c7294869c",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const refreshTokens = pgTable(
-  "refresh_tokens",
-  {
-    id: integer().primaryKey().notNull(),
-    refreshToken: varchar("refresh_token", { length: 128 }).notNull(),
-    username: varchar({ length: 255 }).notNull(),
-    valid: timestamp({ mode: "string" }).notNull(),
-  },
-  (table) => [
-    uniqueIndex("uniq_9bace7e1c74f2195").using(
-      "btree",
-      table.refreshToken.asc().nullsLast().op("text_ops"),
-    ),
+  (_table) => [
+    uniqueIndex("unq_source_name").using("btree", sql`lower((name)::text)`),
+    uniqueIndex("unq_source_url").using("btree", sql`lower((url)::text)`),
   ],
 );
 
 export const article = pgTable(
   "article",
   {
-    bias: varchar({ length: 30 }).default("neutral").notNull(),
     body: text().notNull(),
     categories: text().array(),
-    crawledAt: timestamp("crawled_at", { mode: "string" }).notNull(),
+    crawledAt: timestamp("crawled_at").defaultNow().notNull(),
+    credibility: jsonb("credibility").$type<Credibility>(),
     excerpt: varchar({ length: 255 }).generatedAlwaysAs(sql`("left"(body, 200) || '...'::text)`),
     hash: varchar({ length: 32 }).notNull(),
     id: uuid().primaryKey().notNull(),
     image: varchar({ length: 1024 }).generatedAlwaysAs(sql`(metadata ->> 'image'::text)`),
     link: varchar({ length: 1024 }).notNull(),
-    metadata: jsonb(),
-    publishedAt: timestamp("published_at", { mode: "string" }).notNull(),
+    metadata: jsonb("metadata").$type<ArticleMetadata>(),
+    publishedAt: timestamp("published_at").notNull(),
     readingTime: integer("reading_time").default(1),
-    reliability: varchar({ length: 30 }).default("reliable").notNull(),
-    sentiment: varchar({ length: 30 }).default("neutral").notNull(),
+    sentiment: sentimentEnum("sentiment").notNull(),
     sourceId: uuid("source_id").notNull(),
     title: varchar({ length: 1024 }).notNull(),
-    tokenStatistics: jsonb("token_statistics"),
-    transparency: varchar({ length: 30 }).default("medium").notNull(),
+    tokenStatistics: jsonb("token_statistics").$type<TokenStatistics>(),
     tsv: tsvector("tsv").generatedAlwaysAs(
-      sql`(setweight(to_tsvector('french'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::"char") || setweight(to_tsvector('french'::regconfig, COALESCE(body, ''::text)), 'B'::"char"))`,
+      sql`(
+        setweight(to_tsvector('french'::regconfig, COALESCE(title, '')::text), 'A'::"char")
+        || setweight(to_tsvector('french'::regconfig, COALESCE(body,  ''::text)), 'B'::"char")
+      )`,
     ),
-    updatedAt: timestamp("updated_at", { mode: "string" }).default(sql`NULL`),
+    updatedAt: timestamp("updated_at"),
   },
   (table) => [
     index("gin_article_categories").using(
@@ -264,69 +202,57 @@ export const article = pgTable(
     index("gin_article_link_trgm").using("gin", table.link.asc().nullsLast().op("gin_trgm_ops")),
     index("gin_article_title_trgm").using("gin", table.title.asc().nullsLast().op("gin_trgm_ops")),
     index("gin_article_tsv").using("gin", table.tsv.asc().nullsLast().op("tsvector_ops")),
-    index("idx_23a0e66953c1c61").using("btree", table.sourceId.asc().nullsLast().op("uuid_ops")),
-    index("idx_article_published_at").using(
+    index("idx_article_source_published_id").using(
       "btree",
-      table.publishedAt.desc().nullsFirst().op("timestamp_ops"),
+      table.sourceId.asc().nullsLast(),
+      table.publishedAt.desc().nullsFirst(),
+      table.id.desc().nullsFirst(),
     ),
-    index("idx_article_published_id").using(
-      "btree",
-      table.publishedAt.desc().nullsFirst().op("timestamp_ops"),
-      table.id.desc().nullsFirst().op("uuid_ops"),
-    ),
-    uniqueIndex("unq_article_hash").using("btree", table.hash.asc().nullsLast().op("text_ops")),
+    uniqueIndex("unq_article_hash").using("btree", table.hash.asc().nullsLast()),
     foreignKey({
       columns: [table.sourceId],
       foreignColumns: [source.id],
-      name: "fk_23a0e66953c1c61",
+      name: "fk_article_source_id",
     }).onDelete("cascade"),
-    check("chk_article_reading_time", sql`reading_time >= 0`),
+    check("chk_article_reading_time", sql`(reading_time >= 0)`),
     check(
       "chk_article_sentiment",
-      sql`(sentiment)::text = ANY ((ARRAY['positive'::character varying, 'neutral'::character varying, 'negative'::character varying])::text[])`,
+      sql`((sentiment)::text = ANY (ARRAY['positive'::text,'neutral'::text,'negative'::text]))`,
     ),
     check(
       "chk_article_metadata_json",
-      sql`(metadata IS NULL) OR (jsonb_typeof(metadata) = ANY (ARRAY['object'::text, 'array'::text]))`,
+      sql`((metadata IS NULL) OR (jsonb_typeof(metadata) IN ('object'::text,'array'::text)))`,
     ),
   ],
 );
 
-export const user = pgTable(
-  "user",
+export const bookmark = pgTable(
+  "bookmark",
   {
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    email: varchar({ length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    description: varchar({ length: 512 }),
     id: uuid().primaryKey().notNull(),
-    isConfirmed: boolean("is_confirmed").default(false).notNull(),
-    isLocked: boolean("is_locked").default(false).notNull(),
+    isPublic: boolean("is_public").default(false).notNull(),
     name: varchar({ length: 255 }).notNull(),
-    password: varchar({ length: 512 }).notNull(),
-    roles: jsonb().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).default(sql`NULL`),
+    updatedAt: timestamp("updated_at"),
+    userId: uuid("user_id").notNull(),
   },
-  (_table) => [
-    uniqueIndex("unq_user_email").using("btree", sql`lower((email)::text)`),
-    check("chk_user_roles_json", sql`jsonb_typeof(roles) = 'array'::text`),
-  ],
-);
-
-export const source = pgTable(
-  "source",
-  {
-    bias: varchar({ length: 30 }).default("neutral").notNull(),
-    description: varchar({ length: 1024 }).default(sql`NULL`),
-    displayName: varchar("display_name", { length: 255 }).default(sql`NULL`),
-    id: uuid().primaryKey().notNull(),
-    name: varchar({ length: 255 }).notNull(),
-    reliability: varchar({ length: 30 }).default("reliable").notNull(),
-    transparency: varchar({ length: 30 }).default("medium").notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).default(sql`NULL`),
-    url: varchar({ length: 255 }).notNull(),
-  },
-  (_table) => [
-    uniqueIndex("unq_source_name").using("btree", sql`lower((name)::text)`),
-    uniqueIndex("unq_source_url").using("btree", sql`lower((url)::text)`),
+  (table) => [
+    index("idx_bookmark_user_created").using(
+      "btree",
+      table.userId.asc().nullsLast(),
+      table.createdAt.desc().nullsFirst(),
+    ),
+    uniqueIndex("unq_bookmark_user_name").using(
+      "btree",
+      table.userId.asc().nullsLast(),
+      sql`lower(${table.name})`,
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "fk_bookmark_user_id",
+    }).onDelete("cascade"),
   ],
 );
 
@@ -337,21 +263,176 @@ export const bookmarkArticle = pgTable(
     bookmarkId: uuid("bookmark_id").notNull(),
   },
   (table) => [
-    index("idx_6fe2655d7294869c").using("btree", table.articleId.asc().nullsLast().op("uuid_ops")),
-    index("idx_6fe2655d92741d25").using("btree", table.bookmarkId.asc().nullsLast().op("uuid_ops")),
+    primaryKey({ columns: [table.bookmarkId, table.articleId], name: "bookmark_article_pkey" }),
+    index("idx_bookmark_article_bookmark_id").using("btree", table.bookmarkId.asc().nullsLast()),
     foreignKey({
       columns: [table.bookmarkId],
       foreignColumns: [bookmark.id],
-      name: "fk_6fe2655d92741d25",
+      name: "fk_bookmark_article_bookmark_id",
     }).onDelete("cascade"),
     foreignKey({
       columns: [table.articleId],
       foreignColumns: [article.id],
-      name: "fk_6fe2655d7294869c",
+      name: "fk_bookmark_article_article_id",
     }).onDelete("cascade"),
-    primaryKey({ columns: [table.bookmarkId, table.articleId], name: "bookmark_article_pkey" }),
   ],
 );
+
+export const loginAttempt = pgTable(
+  "login_attempt",
+  {
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    id: uuid().primaryKey().notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("idx_login_attempt_user_created").using(
+      "btree",
+      table.userId.asc().nullsLast(),
+      table.createdAt.desc().nullsFirst(),
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "fk_login_attempt_user_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const loginHistory = pgTable(
+  "login_history",
+  {
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    device: jsonb("device").$type<Device>(),
+    id: uuid().primaryKey().notNull(),
+    ipAddress: inet("ip_address"),
+    location: jsonb("location").$type<GeoLocation>(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("idx_login_history_user_created").using(
+      "btree",
+      table.userId.asc().nullsLast(),
+      table.createdAt.desc().nullsFirst(),
+    ),
+    index("idx_login_history_ip_address").using("btree", table.ipAddress.asc().nullsLast()),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "fk_login_history_user_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const verificationToken = pgTable(
+  "verification_token",
+  {
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    id: uuid().primaryKey().notNull(),
+    purpose: tokenPurposeEnum("purpose").notNull(),
+    token: varchar({ length: 60 }), // nullable if you support "reservations" before issue
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("idx_verif_token_created_at").using("btree", table.createdAt.desc().nullsFirst()),
+    uniqueIndex("unq_verif_user_purpose_token")
+      .using("btree", table.userId, table.purpose, table.token)
+      .where(sql`${table.token} IS NOT NULL`),
+    uniqueIndex("unq_verif_token_token")
+      .using("btree", table.token)
+      .where(sql`${table.token} IS NOT NULL`),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "fk_verification_token_user_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const followedSource = pgTable(
+  "followed_source",
+  {
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    followerId: uuid("follower_id").notNull(),
+    id: uuid().primaryKey().notNull(),
+    sourceId: uuid("source_id").notNull(),
+  },
+  (table) => [
+    index("idx_followed_source_source_id").using("btree", table.sourceId.asc().nullsLast()),
+    index("idx_followed_source_follower_id").using("btree", table.followerId.asc().nullsLast()),
+    index("idx_followed_source_follower_created").using(
+      "btree",
+      table.followerId.asc().nullsLast(),
+      table.createdAt.desc().nullsFirst(),
+    ),
+    uniqueIndex("unq_followed_source_user_source").using(
+      "btree",
+      table.followerId.asc().nullsLast(),
+      table.sourceId.asc().nullsLast(),
+    ),
+    foreignKey({
+      columns: [table.followerId],
+      foreignColumns: [user.id],
+      name: "fk_followed_source_follower_id",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.sourceId],
+      foreignColumns: [source.id],
+      name: "fk_followed_source_source_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const comment = pgTable(
+  "comment",
+  {
+    articleId: uuid("article_id").notNull(),
+    content: varchar({ length: 512 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    id: uuid().primaryKey().notNull(),
+    isSpam: boolean("is_spam").default(false).notNull(),
+    sentiment: sentimentEnum("sentiment").notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("idx_comment_article_id").using("btree", table.articleId.asc().nullsLast()),
+    index("idx_comment_user_id").using("btree", table.userId.asc().nullsLast()),
+    index("idx_comment_article_created").using(
+      "btree",
+      table.articleId.asc().nullsLast(),
+      table.createdAt.desc().nullsFirst(),
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "fk_comment_user_id",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.articleId],
+      foreignColumns: [article.id],
+      name: "fk_comment_article_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const refreshToken = pgTable(
+  "refresh_token",
+  {
+    id: uuid().primaryKey().notNull(),
+    token: varchar("token", { length: 128 }).notNull(),
+    username: varchar({ length: 255 }).notNull(),
+    valid: timestamp().notNull(),
+  },
+  (table) => [
+    uniqueIndex("uniq_refresh_token_token").using("btree", table.token.asc().nullsLast()),
+    index("idx_refresh_token_valid").using("btree", table.valid.asc().nullsLast()),
+    index("idx_refresh_token_username").using("btree", sql`lower(${table.username})`),
+  ],
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                 Relations                                  */
+/* -------------------------------------------------------------------------- */
 
 export const bookmarkRelations = relations(bookmark, ({ one, many }) => ({
   bookmarkArticles: many(bookmarkArticle),
