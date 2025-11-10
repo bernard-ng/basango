@@ -14,7 +14,7 @@ const env = createEnvAccessor([
   "BASANGO_DATABASE_URL",
 ]);
 
-async function promptConfirm(question: string, def = false) {
+async function askConfirmation(question: string, def = false) {
   const rl = createInterface({ input, output });
   const suffix = def ? "[Y/n]" : "[y/N]";
   const answer = await rl.question(`${question} ${suffix} `);
@@ -28,7 +28,7 @@ async function promptConfirm(question: string, def = false) {
 }
 
 async function main() {
-  const ok = await promptConfirm("Do you want to continue?", false);
+  const ok = await askConfirmation("Do you want to continue?", false);
   if (!ok) {
     console.warn("Process aborted");
     process.exit(1);
