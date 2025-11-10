@@ -59,11 +59,11 @@ export class Engine {
     this.target = new Pool({
       allowExitOnIdle: true,
       connectionString: this.targetOptions.database,
-      max: 8,
+      max: 16,
     });
     this.ignore = { ...DEFAULT_IGNORE, ...(this.targetOptions.ignoreColumns ?? {}) };
-    this.pageSize = this.targetOptions.pageSize ?? 10_000;
-    this.batchSize = Math.max(1, this.targetOptions.batchSize ?? 1000);
+    this.pageSize = this.targetOptions.pageSize ?? 1000;
+    this.batchSize = Math.max(1, this.targetOptions.batchSize ?? 50);
     console.log(
       `Engine initialized with pageSize=${this.pageSize} and batchSize=${this.batchSize}`,
     );
@@ -162,9 +162,10 @@ export class Engine {
         try {
           await target.query(insertSql, params);
         } catch (err: unknown) {
+          // Fallback: coerce all *_at params to now() and retry once
+          // This will never happen in production but anyway let's keep it safe
           const msg = String((err as Error)?.message ?? "");
           if (msg.includes("invalid input syntax for type timestamp")) {
-            // Fallback: coerce all *_at params to now() and retry once
             const fixed = columns!.map((c, i) => (c.endsWith("_at") ? new Date() : params[i]));
             await target.query(insertSql, fixed);
           } else {
@@ -224,7 +225,6 @@ export class Engine {
     const t = this.normalizedName(table);
     const clone: Record<string, unknown> = { ...row };
 
-    // Normalize UUIDs and timestamps and categories
     for (const [key, val] of Object.entries(clone)) {
       if (val == null) continue;
 
@@ -233,7 +233,6 @@ export class Engine {
         continue;
       }
 
-      // Robust timestamp normalization for *_at columns
       if (key.endsWith("_at")) {
         clone[key] = this.normalizeTimestampValue(val);
         continue;
@@ -263,14 +262,6 @@ export class Engine {
         }
       }
 
-      if (t === "article" && key === "token_statistics") {
-        clone[key] = computeTokenStatistics({
-          body: String(clone.body ?? ""),
-          categories: Array.isArray(clone.categories) ? clone.categories : [],
-          title: String(clone.title ?? ""),
-        });
-      }
-
       if (t === "article" && key === "reading_time") {
         clone[key] = Math.max(1, computeReadingTime(String(clone.body ?? "")));
       }
@@ -279,24 +270,9 @@ export class Engine {
         if (Array.isArray(val)) {
           clone[key] = val;
         } else if (typeof val === "string") {
-          const raw = val.trim();
-
-          // If the value is a JSON array string like '["ROLE_USER","ROLE_ADMIN"]', parse it.
-          try {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-              clone[key] = parsed;
-              continue;
-            }
-          } catch {
-            // not JSON, fall back to CSV-like parsing below
-          }
-
-          // Remove surrounding brackets/quotes then split by comma and strip quotes/space
-          const parts = raw
-            .replace(/^\[|\]$/g, "")
+          const parts = val
             .split(",")
-            .map((s) => s.replace(/^["']|["']$/g, "").trim())
+            .map((s) => s.trim())
             .filter(Boolean);
 
           clone[key] = parts.length ? parts : ["ROLE_USER"];
@@ -304,7 +280,6 @@ export class Engine {
       }
     }
 
-    // compute credibility JSON if bias/reliability/transparency present
     if (t === "article" || t === "source") {
       const bias = clone.bias ?? null;
       const reliability = clone.reliability ?? null;
@@ -318,14 +293,10 @@ export class Engine {
       }
     }
 
-    // Ensure article token_statistics exists (computed on the fly)
-    if (
-      t === "article" &&
-      (clone.token_statistics == null || typeof clone.token_statistics !== "object")
-    ) {
+    if (t === "article") {
       clone.token_statistics = computeTokenStatistics({
         body: String(clone.body ?? ""),
-        categories: Array.isArray(clone.categories) ? (clone.categories as string[]) : [],
+        categories: Array.isArray(clone.categories) ? clone.categories : [],
         title: String(clone.title ?? ""),
       });
     }
@@ -352,7 +323,7 @@ export class Engine {
       return JSON.stringify(v);
     }
     if (col === "roles" && v) {
-      return JSON.stringify(v);
+      return v;
     }
     if (col === "metadata" && v && typeof v === "object") {
       return JSON.stringify(v);

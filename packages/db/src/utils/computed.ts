@@ -31,10 +31,12 @@ export const computeTokenStatistics = (data: {
   body: string;
   categories: string[];
 }): TokenStatistics => {
-  const title = computeTokenCount(data.title);
-  const body = computeTokenCount(data.body);
-  const categories = computeTokenCount(data.categories.join(","));
-  const excerpt = computeTokenCount(data.body.substring(0, 200));
+  const [title, body, categories, excerpt] = [
+    computeTokenCount(data.title),
+    computeTokenCount(data.body),
+    computeTokenCount(data.categories.join(",")),
+    computeTokenCount(data.body.substring(0, 200)),
+  ];
 
   return {
     body,

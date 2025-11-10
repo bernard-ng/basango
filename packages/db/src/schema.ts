@@ -101,12 +101,6 @@ export type GeoLocation = {
   accuracyRadius?: number;
 };
 
-export type ClientProfile = {
-  userIp?: string;
-  userAgent?: string;
-  hints: unknown[];
-};
-
 export type ArticleMetadata = {
   title?: string;
   description?: string;
