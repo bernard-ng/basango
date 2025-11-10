@@ -4,7 +4,7 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
 import { config, env } from "@/config";
-import { checkHealth } from "@/utils/health";
+import { routers } from "@/rest/routers";
 
 const app = new OpenAPIHono();
 
@@ -21,26 +21,10 @@ app.use(
   }),
 );
 
-app.get("/health", async (c) => {
-  try {
-    await checkHealth();
-
-    return c.json({ status: "ok" }, 200);
-  } catch (error) {
-    return c.json(
-      {
-        message: error instanceof Error ? error.message : "Unknown error",
-        status: "error",
-      },
-      500,
-    );
-  }
-});
-
 app.doc("/openapi", {
   info: {
     contact: {
-      email: "engineer@basango.io",
+      email: "engineering@basango.io",
       name: "Basango",
       url: "https://basango.io",
     },
@@ -76,6 +60,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "token", {
 });
 
 app.get("/", Scalar({ pageTitle: "Basango API", theme: "saturn", url: "/openapi" }));
+app.route("/", routers);
 
 export default {
   fetch: app.fetch,

@@ -1,10 +1,14 @@
 {
   "dependencies": {
+    "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@date-fns/utc": "^2.1.1",
     "drizzle-orm": "^0.44.7",
+    "mysql2": "^3.15.3",
     "pg": "^8.16.3",
-    "snakecase-keys": "^9.0.2"
+    "snakecase-keys": "^9.0.2",
+    "tiktoken": "^1.0.22",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/pg": "^8.15.6",
@@ -13,6 +17,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
+    "./importer": "./src/importer/index.ts",
     "./queries": "./src/queries/index.ts",
     "./schema": "./src/schema.ts",
     "./utils": "./src/utils/index.ts"
@@ -21,6 +26,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
+    "sync:import": "bun ./src/importer/import.ts",
     "typecheck": "tsc --noEmit"
   }
 }
