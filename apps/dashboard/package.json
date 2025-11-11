@@ -1,15 +1,17 @@
 {
   "dependencies": {
+    "@basango/ui": "workspace:*",
+    "lucide-react": "^0.553.0",
     "next": "catalog:",
+    "next-themes": "^0.4.6",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/bun": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "tailwindcss": "^4.1.11",
     "typescript": "catalog:"
   },
   "name": "@basango/dashboard",

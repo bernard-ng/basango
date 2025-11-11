@@ -56,6 +56,9 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "a11y": {
+        "useSemanticElements": "off"
+      },
       "correctness": {
         "noUnusedImports": "on",
         "useImportExtensions": "off"
@@ -64,6 +67,9 @@
       "style": {
         "noNonNullAssertion": "off",
         "useImportType": "off"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off"
       }
     }
   },
