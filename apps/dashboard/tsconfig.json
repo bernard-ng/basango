@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
       "@basango/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
