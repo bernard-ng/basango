@@ -1,12 +1,10 @@
-import { createEnvAccessor } from "@devscast/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+import { env } from "@/config";
 import * as schema from "@/schema";
 
 const isDevelopment = process.env.NODE_ENV === "development";
-
-const env = createEnvAccessor(["BASANGO_DATABASE_URL"] as const);
 
 const pool = new Pool({
   allowExitOnIdle: true,
