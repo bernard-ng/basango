@@ -5,13 +5,16 @@ import { Database } from "@/client";
 import { NotFoundError } from "@/errors";
 import { Credibility, source } from "@/schema";
 
+export async function getSources(db: Database) {
+  return db.query.source.findMany();
+}
+
 export type CreateSourceParams = {
   name: string;
   url: string;
   displayName?: string;
   description?: string;
-  credibility: Credibility;
-  updatedAt?: Date;
+  credibility?: Credibility;
 };
 
 export async function createSource(db: Database, params: CreateSourceParams) {
@@ -19,6 +22,33 @@ export async function createSource(db: Database, params: CreateSourceParams) {
     .insert(source)
     .values({ id: uuidV7(), ...params })
     .returning();
+
+  return result;
+}
+
+export type UpdateSourceParams = {
+  id: string;
+  name?: string;
+  displayName?: string;
+  description?: string;
+  credibility?: Credibility;
+};
+
+export async function updateSource(db: Database, params: UpdateSourceParams) {
+  const [result] = await db
+    .update(source)
+    .set({
+      credibility: params.credibility,
+      description: params.description,
+      displayName: params.displayName,
+      name: params.name,
+    })
+    .where(eq(source.id, params.id))
+    .returning();
+
+  if (result === undefined) {
+    throw new NotFoundError(`Source not found`);
+  }
 
   return result;
 }
@@ -36,6 +66,12 @@ export async function deleteSource(db: Database, params: DeleteSourceParams) {
 export async function getSourceByName(db: Database, name: string) {
   return db.query.source.findFirst({
     where: eq(source.name, name),
+  });
+}
+
+export async function getById(db: Database, id: string) {
+  return db.query.source.findFirst({
+    where: eq(source.id, id),
   });
 }
 

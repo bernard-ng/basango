@@ -1,3 +1,4 @@
+import { trpcServer } from "@hono/trpc-server";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
@@ -5,6 +6,8 @@ import { secureHeaders } from "hono/secure-headers";
 
 import { config, env } from "@/config";
 import { routers } from "@/rest/routers";
+import { createTRPCContext } from "@/trpc/init";
+import { appRouter } from "@/trpc/routers/_app";
 
 const app = new OpenAPIHono();
 
@@ -18,6 +21,14 @@ app.use(
     exposeHeaders: config.cors.exposeHeaders,
     maxAge: config.cors.maxAge,
     origin: config.cors.origin,
+  }),
+);
+
+app.use(
+  "/trpc/*",
+  trpcServer({
+    createContext: createTRPCContext,
+    router: appRouter,
   }),
 );
 
