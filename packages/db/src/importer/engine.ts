@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2/promise";
 import { Pool, PoolClient } from "pg";
 
-import { computeReadingTime, computeTokenStatistics } from "@/utils/computed";
+import { computeReadingTime } from "@/utils/computed";
 
 type SourceOptions = {
   host: string;
@@ -293,13 +293,14 @@ export class Engine {
       }
     }
 
-    if (t === "article") {
-      clone.token_statistics = computeTokenStatistics({
-        body: String(clone.body ?? ""),
-        categories: Array.isArray(clone.categories) ? clone.categories : [],
-        title: String(clone.title ?? ""),
-      });
-    }
+    // TODO: this is to heavy for the import process need to find a way to compute on creation or later
+    // if (t === "article") {
+    //   clone.token_statistics = computeTokenStatistics({
+    //     body: String(clone.body ?? ""),
+    //     categories: Array.isArray(clone.categories) ? clone.categories : [],
+    //     title: String(clone.title ?? ""),
+    //   });
+    // }
 
     return clone;
   }
