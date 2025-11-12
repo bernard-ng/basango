@@ -1,6 +1,9 @@
+#!/usr/bin/env bun
+
 import { RowDataPacket } from "mysql2/promise";
 import { Pool, PoolClient } from "pg";
 
+import { env } from "@/config";
 import { computeReadingTime } from "@/utils/computed";
 
 type SourceOptions = {
@@ -22,31 +25,7 @@ const DEFAULT_IGNORE: Record<string, string[]> = {
   source: ["bias", "reliability", "transparency"],
 };
 
-/**
- * Engine
- *
- * Coordinates copying rows from a MySQL source into a PostgreSQL target in a
- * controlled, transactional, batched manner.
- *
- * Responsibilities:
- * - Establish and manage a connection pool to the target PostgreSQL database.
- * - Stream rows from a MySQL source (via a temporary pool) using pagination.
- * - Transform row values to match target expectations (UUID normalization,
- *   timestamp fallback, array parsing for categories/roles, computed JSON
- *   credibility, etc.).
- * - Filter out ignored columns based on a configurable ignore map.
- * - Insert rows into the target in configurable batch sizes with transactional
- *   commits every batch to limit long-running transactions.
- * - Provide a safe reset operation that truncates the target table and manages
- *   session replication role toggling for Postgres.
- *
- * @param sourceOptions - connection and authentication options for the MySQL
- *   source (database, host, user, password, etc.).
- * @param targetOptions - configuration for the Postgres target including
- *   connection string (database), optional pageSize, batchSize and per-table
- *   ignoreColumns map.
- */
-export class Engine {
+class Engine {
   private readonly target: Pool;
   private readonly ignore: Record<string, string[]>;
   private readonly pageSize: number;
@@ -293,15 +272,6 @@ export class Engine {
       }
     }
 
-    // TODO: this is to heavy for the import process need to find a way to compute on creation or later
-    // if (t === "article") {
-    //   clone.token_statistics = computeTokenStatistics({
-    //     body: String(clone.body ?? ""),
-    //     categories: Array.isArray(clone.categories) ? clone.categories : [],
-    //     title: String(clone.title ?? ""),
-    //   });
-    // }
-
     return clone;
   }
 
@@ -438,3 +408,35 @@ async function safeRollback(client: PoolClient) {
     await client.query("ROLLBACK");
   } catch {}
 }
+
+async function main() {
+  const engine = new Engine(
+    {
+      database: env("BASANGO_SOURCE_DATABASE_NAME"),
+      host: env("BASANGO_SOURCE_DATABASE_HOST"),
+      password: env("BASANGO_SOURCE_DATABASE_PASS"),
+      user: env("BASANGO_SOURCE_DATABASE_USER"),
+    },
+    {
+      database: env("BASANGO_DATABASE_URL"),
+    },
+  );
+
+  try {
+    const tables = process.argv.slice(2);
+    if (tables.length === 0) tables.push("user", "source", "article");
+    for (const t of tables) {
+      const count = await engine.import(t);
+      console.log(`Imported ${count} records into ${t} table.`);
+    }
+    console.log("Import completed successfully");
+    process.exit(0);
+  } finally {
+    await engine.close();
+  }
+}
+
+main().catch((err) => {
+  console.error(err?.message ?? err);
+  process.exit(1);
+});
