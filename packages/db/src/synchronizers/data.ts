@@ -18,7 +18,6 @@ type TargetOptions = {
   batchSize?: number;
   pageSize?: number;
   ignoreColumns?: Record<string, string[]>;
-  resume?: boolean;
 };
 
 const DEFAULT_IGNORE: Record<string, string[]> = {
@@ -31,7 +30,7 @@ class Engine {
   private readonly ignore: Record<string, string[]>;
   private readonly pageSize: number;
   private readonly batchSize: number;
-  private readonly resume: boolean;
+  private readonly resume: boolean = true;
 
   constructor(
     private readonly sourceOptions: SourceOptions,
@@ -45,7 +44,6 @@ class Engine {
     this.ignore = { ...DEFAULT_IGNORE, ...(this.targetOptions.ignoreColumns ?? {}) };
     this.pageSize = this.targetOptions.pageSize ?? 1000;
     this.batchSize = Math.max(1, this.targetOptions.batchSize ?? 50);
-    this.resume = !!this.targetOptions.resume;
     console.log(
       `Engine initialized with pageSize=${this.pageSize} and batchSize=${this.batchSize} (resume=${this.resume})`,
     );
@@ -484,7 +482,6 @@ async function safeRollback(client: PoolClient) {
 
 async function main() {
   const argv = process.argv.slice(2);
-  const resume = argv.includes("--resume") || argv.includes("-r");
   const tables = argv.filter((a) => !a.startsWith("-"));
 
   const engine = new Engine(
@@ -496,7 +493,6 @@ async function main() {
     },
     {
       database: env("BASANGO_DATABASE_URL"),
-      resume,
     },
   );
 
