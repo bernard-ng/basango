@@ -27,7 +27,8 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "sync:import": "bun ./src/importer/import.ts",
+    "sync:data": "bun ./src/synchronizers/data.ts",
+    "sync:tokens": "bun ./src/synchronizers/tokens.ts",
     "typecheck": "tsc --noEmit"
   }
 }
