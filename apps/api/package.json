@@ -4,6 +4,7 @@
     "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@hono/node-server": "^1.19.6",
+    "@hono/trpc-server": "^0.4.0",
     "@hono/zod-openapi": "^1.1.4",
     "@scalar/hono-api-reference": "^0.9.24",
     "@trpc/server": "^11.7.1",
@@ -15,6 +16,9 @@
     "jose": "^6.1.0",
     "zod": "catalog:",
     "zod-openapi": "^5.4.3"
+  },
+  "exports": {
+    "./trpc/routers/_app": "./src/trpc/routers/_app.ts"
   },
   "name": "@basango/api",
   "private": true,

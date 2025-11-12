@@ -3,7 +3,7 @@ import path from "node:path";
 import { loadConfig } from "@devscast/config";
 import { z } from "zod";
 
-const PROJECT_DIR = path.resolve(__dirname, "../../");
+const PROJECT_DIR = path.resolve(__dirname, "../");
 
 export const { env, config } = loadConfig({
   env: {

@@ -57,7 +57,10 @@
     "enabled": true,
     "rules": {
       "a11y": {
-        "useSemanticElements": "off"
+        "noSvgWithoutTitle": "off",
+        "useFocusableInteractive": "warn",
+        "useSemanticElements": "off",
+        "useValidAnchor": "off"
       },
       "correctness": {
         "noUnusedImports": "on",
@@ -69,7 +72,8 @@
         "useImportType": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noDocumentCookie": "off"
       }
     }
   },
