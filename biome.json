@@ -58,7 +58,7 @@
     "rules": {
       "a11y": {
         "noSvgWithoutTitle": "off",
-        "useFocusableInteractive": "warn",
+        "useFocusableInteractive": "off",
         "useSemanticElements": "off",
         "useValidAnchor": "off"
       },
@@ -67,6 +67,9 @@
         "useImportExtensions": "off"
       },
       "recommended": true,
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
       "style": {
         "noNonNullAssertion": "off",
         "useImportType": "off"

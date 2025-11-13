@@ -11,7 +11,7 @@ export const sourcesRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => getSources(ctx.db)),
 
   getById: protectedProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
-    return getSourceById(ctx.db, { ...input });
+    return getSourceById(ctx.db, input.id);
   }),
 
   update: protectedProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
