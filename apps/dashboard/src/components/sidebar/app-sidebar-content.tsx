@@ -17,7 +17,7 @@ import {
 } from "@basango/ui/components/sidebar";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 
-export function NavMain({
+export function AppSidebarContent({
   items,
 }: {
   items: {

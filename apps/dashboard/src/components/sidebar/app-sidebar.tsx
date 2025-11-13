@@ -7,166 +7,45 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@basango/ui/components/sidebar";
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  MapIcon,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { SquareTerminal } from "lucide-react";
 import * as React from "react";
 
-import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-projects";
-import { NavUser } from "./nav-user";
-import { TeamSwitcher } from "./team-switcher";
+import { AppSidebarContent } from "./app-sidebar-content";
+import { AppSidebarInfo } from "./app-sidebar-info";
+import { AppSidebarUser } from "./app-sidebar-user";
 
 const data = {
-  navMain: [
+  main: [
     {
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Sources",
+          url: "/sources",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "Articles",
+          url: "/articles",
         },
       ],
-      title: "Playground",
-      url: "#",
-    },
-    {
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-      title: "Models",
-      url: "#",
-    },
-    {
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-      title: "Documentation",
-      url: "#",
-    },
-    {
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-      title: "Settings",
+      title: "Dataset",
       url: "#",
     },
   ],
-  projects: [
-    {
-      icon: Frame,
-      name: "Design Engineering",
-      url: "#",
-    },
-    {
-      icon: PieChart,
-      name: "Sales & Marketing",
-      url: "#",
-    },
-    {
-      icon: MapIcon,
-      name: "Travel",
-      url: "#",
-    },
-  ],
-  teams: [
-    {
-      logo: GalleryVerticalEnd,
-      name: "Acme Inc",
-      plan: "Enterprise",
-    },
-    {
-      logo: AudioWaveform,
-      name: "Acme Corp.",
-      plan: "Startup",
-    },
-    {
-      logo: Command,
-      name: "Evil Corp.",
-      plan: "Free",
-    },
-  ],
-  user: {
-    avatar: "/avatars/shadcn.jpg",
-    email: "m@example.com",
-    name: "shadcn",
-  },
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <AppSidebarInfo />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <AppSidebarContent items={data.main} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <AppSidebarUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

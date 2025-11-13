@@ -19,10 +19,10 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
     links: [
       httpBatchLink({
         async headers() {
-          const token = window.localStorage.getItem("auth_token");
+          //const token = window.localStorage.getItem("auth_token");
 
           return {
-            Authorization: `Bearer ${token}`,
+            //Authorization: `Bearer ${token}`,
             // "x-user-country": await getCountryCode(),
             // "x-user-locale": await getLocale(),
             // "x-user-timezone": await getTimezone(),
