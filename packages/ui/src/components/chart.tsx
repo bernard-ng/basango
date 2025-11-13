@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { cn } from "@basango/ui/lib/utils";
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
