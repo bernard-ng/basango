@@ -6,7 +6,6 @@
     "date-fns": "catalog:",
     "ioredis": "^5.8.2",
     "node-html-parser": "^7.0.1",
-    "tiktoken": "^1.0.22",
     "turndown": "^7.2.2",
     "zod": "catalog:"
   },
@@ -19,8 +18,10 @@
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "crawler:async": "bun run src/scripts/queue.ts",
+    "crawler:push": "bun run src/scripts/sync.ts",
     "crawler:sync": "bun run src/scripts/crawl.ts",
     "crawler:worker": "bun run src/scripts/worker.ts",
+    "dev": "bun run src/scripts/worker.ts",
     "test": "vitest --run",
     "typecheck": "tsc --noEmit"
   },

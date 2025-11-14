@@ -5,10 +5,10 @@ import {
   closePersistors,
   createPersistors,
   resolveCrawlerConfig,
-} from "@/process/crawler";
-import { HtmlCrawler } from "@/process/parsers/html";
-import { WordPressCrawler } from "@/process/parsers/wordpress";
-import { resolveSourceConfig } from "@/utils";
+} from "#crawler/process/crawler";
+import { HtmlCrawler } from "#crawler/process/parsers/html";
+import { WordPressCrawler } from "#crawler/process/parsers/wordpress";
+import { resolveSourceConfig } from "#crawler/utils";
 
 export const runSyncCrawl = async (options: CrawlingOptions): Promise<void> => {
   const source = resolveSourceConfig(options.sourceId);

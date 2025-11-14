@@ -1,6 +1,6 @@
 import { type Database, db } from "@basango/db/client";
 
-import type { Session } from "@/utils/auth";
+import type { Session } from "#api/utils/auth";
 
 export const withDatabase = async <TReturn>(opts: {
   ctx: {
@@ -17,7 +17,5 @@ export const withDatabase = async <TReturn>(opts: {
   const { ctx, next } = opts;
 
   ctx.db = db;
-  const result = await next({ ctx });
-
-  return result;
+  return await next({ ctx });
 };

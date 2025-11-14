@@ -2,23 +2,23 @@ import { endOfDay, startOfDay, subDays } from "date-fns";
 import { eq, sql } from "drizzle-orm";
 import { v7 as uuidV7 } from "uuid";
 
-import { Database } from "@/client";
-import { CATEGORY_SHARES_LIMIT, PUBLICATION_GRAPH_DAYS, TIMEZONE } from "@/constants";
-import { NotFoundError } from "@/errors";
-import { Credibility, article, source } from "@/schema";
+import { Database } from "#db/client";
+import { CATEGORY_SHARES_LIMIT, PUBLICATION_GRAPH_DAYS, TIMEZONE } from "#db/constants";
+import { NotFoundError } from "#db/errors";
+import { Credibility, articles, sources } from "#db/schema";
+
+import { countArticlesBySourceId } from "./articles";
 
 export async function getSources(db: Database) {
-  const rows = await db.query.source.findMany();
+  const rows = await db.query.sources.findMany();
 
-  const data = await Promise.all(
-    rows.map(async (it) => ({
-      ...it,
-      categoryShares: await getCategoryShares(db, it.id),
-      publicationGraph: await getPublicationGraph(db, it.id),
+  return await Promise.all(
+    rows.map(async (row) => ({
+      ...row,
+      articles: await countArticlesBySourceId(db, row.id),
+      publicationGraph: await getSourcePublicationGraph(db, row.id),
     })),
   );
-
-  return data;
 }
 
 export type CreateSourceParams = {
@@ -31,7 +31,7 @@ export type CreateSourceParams = {
 
 export async function createSource(db: Database, params: CreateSourceParams) {
   const [result] = await db
-    .insert(source)
+    .insert(sources)
     .values({ id: uuidV7(), ...params })
     .returning();
 
@@ -48,14 +48,14 @@ export type UpdateSourceParams = {
 
 export async function updateSource(db: Database, params: UpdateSourceParams) {
   const [result] = await db
-    .update(source)
+    .update(sources)
     .set({
       credibility: params.credibility,
       description: params.description,
       displayName: params.displayName,
       name: params.name,
     })
-    .where(eq(source.id, params.id))
+    .where(eq(sources.id, params.id))
     .returning();
 
   if (result === undefined) {
@@ -70,39 +70,35 @@ export type DeleteSourceParams = {
 };
 
 export async function deleteSource(db: Database, params: DeleteSourceParams) {
-  const [result] = await db.delete(source).where(eq(source.id, params.id)).returning();
+  const [result] = await db.delete(sources).where(eq(sources.id, params.id)).returning();
 
   return result;
 }
 
 export async function getSourceByName(db: Database, name: string) {
-  return db.query.source.findFirst({
-    where: eq(source.name, name),
+  return await db.query.sources.findFirst({
+    where: eq(sources.name, name),
   });
 }
 
 export async function getSourceById(db: Database, id: string) {
-  const item = db.query.source.findFirst({
-    where: eq(source.id, id),
+  const item = await db.query.sources.findFirst({
+    where: eq(sources.id, id),
   });
 
   if (item === undefined) {
     throw new NotFoundError("Source not found");
   }
 
-  return {
-    ...item,
-    categoryShares: await getCategoryShares(db, id),
-    publicationGraph: await getPublicationGraph(db, id),
-  };
+  return item;
 }
 
 export async function getSourceIdByName(db: Database, name: string): Promise<string> {
-  const result = await db.query.source.findFirst({
+  const result = await db.query.sources.findFirst({
     columns: {
       id: true,
     },
-    where: eq(source.name, name),
+    where: eq(sources.name, name),
   });
 
   if (!result) {
@@ -137,7 +133,7 @@ export type CategoryShares = {
   total: number;
 };
 
-export async function getPublicationGraph(
+export async function getSourcePublicationGraph(
   db: Database,
   id: string,
   days: number = PUBLICATION_GRAPH_DAYS,
@@ -145,7 +141,7 @@ export async function getPublicationGraph(
   const endDate = endOfDay(new Date());
   const startDate = startOfDay(subDays(endDate, days - 1));
 
-  const data = await db.execute<{ date: string; count: number }>(sql`
+  const data = await db.execute<PublicationEntry>(sql`
     WITH bounds AS (
       SELECT
         ${startDate}::timestamptz AS start_ts,
@@ -181,7 +177,7 @@ export async function getPublicationGraph(
   return { items: data.rows, total: data.rows.length };
 }
 
-async function getCategoryShares(db: Database, id: string): Promise<CategoryShares> {
+export async function getSourceCategoryShares(db: Database, id: string): Promise<CategoryShares> {
   const data = await db.execute<CategoryShare>(sql`
     SELECT
       cat AS category,
@@ -189,9 +185,9 @@ async function getCategoryShares(db: Database, id: string): Promise<CategoryShar
       ROUND((COUNT(*)::numeric / SUM(COUNT(*)) OVER ()) * 100, 2) AS percentage
     FROM (
       SELECT NULLIF(BTRIM(c), '') AS cat
-      FROM ${article}
-      CROSS JOIN LATERAL UNNEST(COALESCE(${article.categories}, ARRAY[]::text[])) AS c
-      WHERE ${article.sourceId} = ${id}
+      FROM ${articles}
+      CROSS JOIN LATERAL UNNEST(COALESCE(${articles.categories}, ARRAY[]::text[])) AS c
+      WHERE ${articles.sourceId} = ${id}
     ) t
     WHERE cat IS NOT NULL
     GROUP BY cat

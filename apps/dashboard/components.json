@@ -1,9 +1,9 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
   "aliases": {
-    "components": "@/components",
-    "hooks": "@/hooks",
-    "lib": "@/lib",
+    "components": "#dashboard/components",
+    "hooks": "#dashboard/hooks",
+    "lib": "#dashboard/lib",
     "ui": "@basango/ui/components",
     "utils": "@basango/ui/lib/utils"
   },

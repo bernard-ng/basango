@@ -3,10 +3,10 @@ import { initTRPC } from "@trpc/server";
 import type { Context } from "hono";
 import superjson from "superjson";
 
-import { withAuthentication } from "@/trpc/middlewares/auth";
-import { withDatabase } from "@/trpc/middlewares/db";
-import { Session, verifyAccessToken } from "@/utils/auth";
-import { getGeoContext } from "@/utils/geo";
+import { withAuthentication } from "#api/trpc/middlewares/auth";
+import { withDatabase } from "#api/trpc/middlewares/db";
+import { Session, verifyAccessToken } from "#api/utils/auth";
+import { getGeoContext } from "#api/utils/geo";
 
 type TRPCContext = {
   session: Session | null;

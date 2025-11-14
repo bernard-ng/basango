@@ -1,38 +1,5 @@
 import { z } from "@hono/zod-openapi";
 
-const sentimentSchema = z.enum(["positive", "neutral", "negative"]).openapi({
-  default: "neutral",
-  description: "The sentiment of the article content.",
-});
-
-const readingTimeSchema = z.number().min(1).openapi({
-  description: "The estimated reading time of the article in minutes.",
-  example: 5,
-});
-
-const tokenStatisticsSchema = z.object({
-  body: z.number().min(0).openapi({
-    description: "The number of tokens in the article body.",
-    example: 350,
-  }),
-  categories: z.number().min(0).openapi({
-    description: "The number of tokens in the article categories.",
-    example: 25,
-  }),
-  excerpt: z.number().min(0).openapi({
-    description: "The number of tokens in the article excerpt.",
-    example: 50,
-  }),
-  title: z.number().min(0).openapi({
-    description: "The number of tokens in the article title.",
-    example: 15,
-  }),
-  total: z.number().min(0).openapi({
-    description: "The total number of tokens in the article.",
-    example: 440,
-  }),
-});
-
 const metadataSchema = z.object({
   description: z.string().optional().openapi({
     description: "A brief description or summary of the article.",
@@ -54,10 +21,14 @@ export const createArticleSchema = z
       description: "The main content of the article.",
       example: "This is the body of the article...",
     }),
-    categories: z.array(z.string()).openapi({
-      description: "The categories or tags associated with the article.",
-      example: ["Technology", "AI"],
-    }),
+    categories: z
+      .array(z.string())
+      .openapi({
+        description: "The categories or tags associated with the article.",
+        example: ["Technology", "AI"],
+      })
+      .optional()
+      .default([]),
     hash: z.string().min(1).openapi({
       description: "The unique hash of the article link.",
       example: "d41d8cd98f00b204e9800998ecf8427e",
@@ -71,17 +42,14 @@ export const createArticleSchema = z
       description: "The publication date of the article.",
       example: "2023-01-01T00:00:00Z",
     }),
-    readingTime: readingTimeSchema.optional(),
-    sentiment: sentimentSchema.optional().optional().default("neutral"),
     sourceId: z.string().openapi({
       description: "The unique identifier of the source from which the article was crawled.",
-      example: "source-123",
+      example: "radiookapi.net",
     }),
     title: z.string().min(1).openapi({
       description: "The title of the article.",
       example: "The Rise of AI",
     }),
-    tokenStatistics: tokenStatisticsSchema.optional(),
   })
   .openapi("CreateArticle");
 

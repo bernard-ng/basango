@@ -1,4 +1,4 @@
-import { DEFAULT_USER_AGENT, OPEN_GRAPH_USER_AGENT } from "@/constants";
+import { DEFAULT_USER_AGENT, OPEN_GRAPH_USER_AGENT } from "#crawler/constants";
 
 /**
  * User agent provider with optional rotation.

@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from "hono";
 
-import type { Scope } from "@/utils/scopes";
+import type { Scope } from "#api/utils/scopes";
 
 export const withRequiredScope = (...requiredScopes: Scope[]): MiddlewareHandler => {
   return async (c, next) => {

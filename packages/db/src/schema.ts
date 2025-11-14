@@ -120,7 +120,7 @@ export type GeneratedCode = string;
 /*                                   Tables                                   */
 /* -------------------------------------------------------------------------- */
 
-export const user = pgTable(
+export const users = pgTable(
   "user",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -144,7 +144,7 @@ export const user = pgTable(
   ],
 );
 
-export const source = pgTable(
+export const sources = pgTable(
   "source",
   {
     credibility: jsonb("credibility").$type<Credibility>(),
@@ -161,7 +161,7 @@ export const source = pgTable(
   ],
 );
 
-export const article = pgTable(
+export const articles = pgTable(
   "article",
   {
     body: text().notNull(),
@@ -205,7 +205,7 @@ export const article = pgTable(
     uniqueIndex("unq_article_hash").using("btree", table.hash.asc().nullsLast()),
     foreignKey({
       columns: [table.sourceId],
-      foreignColumns: [source.id],
+      foreignColumns: [sources.id],
       name: "fk_article_source_id",
     }).onDelete("cascade"),
     check("chk_article_reading_time", sql`(reading_time >= 0)`),
@@ -220,7 +220,7 @@ export const article = pgTable(
   ],
 );
 
-export const bookmark = pgTable(
+export const bookmarks = pgTable(
   "bookmark",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -244,13 +244,13 @@ export const bookmark = pgTable(
     ),
     foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
       name: "fk_bookmark_user_id",
     }).onDelete("cascade"),
   ],
 );
 
-export const bookmarkArticle = pgTable(
+export const bookmarkArticles = pgTable(
   "bookmark_article",
   {
     articleId: uuid("article_id").notNull(),
@@ -261,18 +261,18 @@ export const bookmarkArticle = pgTable(
     index("idx_bookmark_article_bookmark_id").using("btree", table.bookmarkId.asc().nullsLast()),
     foreignKey({
       columns: [table.bookmarkId],
-      foreignColumns: [bookmark.id],
+      foreignColumns: [bookmarks.id],
       name: "fk_bookmark_article_bookmark_id",
     }).onDelete("cascade"),
     foreignKey({
       columns: [table.articleId],
-      foreignColumns: [article.id],
+      foreignColumns: [articles.id],
       name: "fk_bookmark_article_article_id",
     }).onDelete("cascade"),
   ],
 );
 
-export const loginAttempt = pgTable(
+export const loginAttempts = pgTable(
   "login_attempt",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -287,7 +287,7 @@ export const loginAttempt = pgTable(
     ),
     foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
       name: "fk_login_attempt_user_id",
     }).onDelete("cascade"),
   ],
@@ -312,13 +312,13 @@ export const loginHistory = pgTable(
     index("idx_login_history_ip_address").using("btree", table.ipAddress.asc().nullsLast()),
     foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
       name: "fk_login_history_user_id",
     }).onDelete("cascade"),
   ],
 );
 
-export const verificationToken = pgTable(
+export const verificationTokens = pgTable(
   "verification_token",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -337,13 +337,13 @@ export const verificationToken = pgTable(
       .where(sql`${table.token} IS NOT NULL`),
     foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
       name: "fk_verification_token_user_id",
     }).onDelete("cascade"),
   ],
 );
 
-export const followedSource = pgTable(
+export const followedSources = pgTable(
   "followed_source",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -366,18 +366,18 @@ export const followedSource = pgTable(
     ),
     foreignKey({
       columns: [table.followerId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
       name: "fk_followed_source_follower_id",
     }).onDelete("cascade"),
     foreignKey({
       columns: [table.sourceId],
-      foreignColumns: [source.id],
+      foreignColumns: [sources.id],
       name: "fk_followed_source_source_id",
     }).onDelete("cascade"),
   ],
 );
 
-export const comment = pgTable(
+export const comments = pgTable(
   "comment",
   {
     articleId: uuid("article_id").notNull(),
@@ -398,18 +398,18 @@ export const comment = pgTable(
     ),
     foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
       name: "fk_comment_user_id",
     }).onDelete("cascade"),
     foreignKey({
       columns: [table.articleId],
-      foreignColumns: [article.id],
+      foreignColumns: [articles.id],
       name: "fk_comment_article_id",
     }).onDelete("cascade"),
   ],
 );
 
-export const refreshToken = pgTable(
+export const refreshTokens = pgTable(
   "refresh_token",
   {
     id: uuid().primaryKey().notNull(),
@@ -428,87 +428,87 @@ export const refreshToken = pgTable(
 /*                                 Relations                                  */
 /* -------------------------------------------------------------------------- */
 
-export const bookmarkRelations = relations(bookmark, ({ one, many }) => ({
-  bookmarkArticles: many(bookmarkArticle),
-  user: one(user, {
-    fields: [bookmark.userId],
-    references: [user.id],
+export const bookmarkRelations = relations(bookmarks, ({ one, many }) => ({
+  bookmarkArticles: many(bookmarkArticles),
+  user: one(users, {
+    fields: [bookmarks.userId],
+    references: [users.id],
   }),
 }));
 
-export const userRelations = relations(user, ({ many }) => ({
-  bookmarks: many(bookmark),
-  comments: many(comment),
-  followedSources: many(followedSource),
-  loginAttempts: many(loginAttempt),
+export const userRelations = relations(users, ({ many }) => ({
+  bookmarks: many(bookmarks),
+  comments: many(comments),
+  followedSources: many(followedSources),
+  loginAttempts: many(loginAttempts),
   loginHistories: many(loginHistory),
-  verificationTokens: many(verificationToken),
+  verificationTokens: many(verificationTokens),
 }));
 
-export const loginAttemptRelations = relations(loginAttempt, ({ one }) => ({
-  user: one(user, {
-    fields: [loginAttempt.userId],
-    references: [user.id],
+export const loginAttemptRelations = relations(loginAttempts, ({ one }) => ({
+  user: one(users, {
+    fields: [loginAttempts.userId],
+    references: [users.id],
   }),
 }));
 
 export const loginHistoryRelations = relations(loginHistory, ({ one }) => ({
-  user: one(user, {
+  user: one(users, {
     fields: [loginHistory.userId],
-    references: [user.id],
+    references: [users.id],
   }),
 }));
 
-export const verificationTokenRelations = relations(verificationToken, ({ one }) => ({
-  user: one(user, {
-    fields: [verificationToken.userId],
-    references: [user.id],
+export const verificationTokenRelations = relations(verificationTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [verificationTokens.userId],
+    references: [users.id],
   }),
 }));
 
-export const followedSourceRelations = relations(followedSource, ({ one }) => ({
-  source: one(source, {
-    fields: [followedSource.sourceId],
-    references: [source.id],
+export const followedSourceRelations = relations(followedSources, ({ one }) => ({
+  source: one(sources, {
+    fields: [followedSources.sourceId],
+    references: [sources.id],
   }),
-  user: one(user, {
-    fields: [followedSource.followerId],
-    references: [user.id],
-  }),
-}));
-
-export const sourceRelations = relations(source, ({ many }) => ({
-  articles: many(article),
-  followedSources: many(followedSource),
-}));
-
-export const commentRelations = relations(comment, ({ one }) => ({
-  article: one(article, {
-    fields: [comment.articleId],
-    references: [article.id],
-  }),
-  user: one(user, {
-    fields: [comment.userId],
-    references: [user.id],
+  user: one(users, {
+    fields: [followedSources.followerId],
+    references: [users.id],
   }),
 }));
 
-export const articleRelations = relations(article, ({ one, many }) => ({
-  bookmarkArticles: many(bookmarkArticle),
-  comments: many(comment),
-  source: one(source, {
-    fields: [article.sourceId],
-    references: [source.id],
+export const sourceRelations = relations(sources, ({ many }) => ({
+  articles: many(articles),
+  followedSources: many(followedSources),
+}));
+
+export const commentRelations = relations(comments, ({ one }) => ({
+  article: one(articles, {
+    fields: [comments.articleId],
+    references: [articles.id],
+  }),
+  user: one(users, {
+    fields: [comments.userId],
+    references: [users.id],
   }),
 }));
 
-export const bookmarkArticleRelations = relations(bookmarkArticle, ({ one }) => ({
-  article: one(article, {
-    fields: [bookmarkArticle.articleId],
-    references: [article.id],
+export const articleRelations = relations(articles, ({ one, many }) => ({
+  bookmarkArticles: many(bookmarkArticles),
+  comments: many(comments),
+  source: one(sources, {
+    fields: [articles.sourceId],
+    references: [sources.id],
   }),
-  bookmark: one(bookmark, {
-    fields: [bookmarkArticle.bookmarkId],
-    references: [bookmark.id],
+}));
+
+export const bookmarkArticleRelations = relations(bookmarkArticles, ({ one }) => ({
+  article: one(articles, {
+    fields: [bookmarkArticles.articleId],
+    references: [articles.id],
+  }),
+  bookmark: one(bookmarks, {
+    fields: [bookmarkArticles.bookmarkId],
+    references: [bookmarks.id],
   }),
 }));

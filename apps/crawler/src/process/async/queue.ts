@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { JobsOptions, Queue, QueueOptions } from "bullmq";
 import IORedis from "ioredis";
 
-import { FetchAsyncConfig, config } from "@/config";
+import { FetchAsyncConfig, config } from "#crawler/config";
 import {
   DetailsTaskPayload,
   DetailsTaskPayloadSchema,
@@ -11,8 +11,8 @@ import {
   ListingTaskPayloadSchema,
   ProcessingTaskPayload,
   ProcessingTaskPayloadSchema,
-} from "@/process/async/schemas";
-import { parseRedisUrl } from "@/utils";
+} from "#crawler/process/async/schemas";
+import { parseRedisUrl } from "#crawler/utils";
 
 export interface QueueBackend<T = unknown> {
   add: (name: string, data: T, opts?: JobsOptions) => Promise<{ id: string }>;

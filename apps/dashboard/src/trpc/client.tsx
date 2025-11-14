@@ -2,8 +2,8 @@
 
 import type { AppRouter } from "@basango/api/trpc/routers/_app";
 import type { QueryClient } from "@tanstack/react-query";
-import { QueryClientProvider, isServer } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import superjson from "superjson";
@@ -15,7 +15,7 @@ export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
 let browserQueryClient: QueryClient;
 
 function getQueryClient() {
-  if (isServer) {
+  if (typeof window === "undefined") {
     // Server: always make a new query client
     return makeQueryClient();
   }
@@ -34,24 +34,24 @@ export function TRPCReactProvider(
     children: React.ReactNode;
   }>,
 ) {
+  // NOTE: Avoid useState when initializing the query client if you don't
+  //       have a suspense boundary between this and the code that may
+  //       suspend because React will throw away the client on the initial
+  //       render if it suspends and there is no boundary
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
       links: [
         httpBatchLink({
-          async headers() {
-            const token = window.localStorage.getItem("auth_token");
+          headers: async () => {
+            //const token = window.localStorage.getItem("auth_token");
+
             return {
-              Authorization: `Bearer ${token}`,
+              //Authorization: `Bearer ${token}`,
             };
           },
           transformer: superjson,
           url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
-        }),
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
         }),
       ],
     }),

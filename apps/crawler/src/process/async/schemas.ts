@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ArticleSchema, DateRangeSchema, PageRangeSchema } from "@/schema";
+import { ArticleSchema, DateRangeSchema, PageRangeSchema } from "#crawler/schema";
 
 export const ListingTaskPayloadSchema = z.object({
   category: z.string().optional(),

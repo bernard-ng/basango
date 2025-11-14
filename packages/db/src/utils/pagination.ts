@@ -4,7 +4,7 @@ import {
   PAGINATION_DEFAULT_LIMIT,
   PAGINATION_DEFAULT_PAGE,
   PAGINATION_MAX_LIMIT,
-} from "@/constants";
+} from "#db/constants";
 
 export interface PageRequest {
   page?: number;
@@ -83,7 +83,7 @@ export function decodeCursor(cursor?: string | null): CursorPayload | null {
     const decoded = Buffer.from(cursor, "base64").toString("utf8");
     const payload = JSON.parse(decoded) as CursorPayload;
 
-    if (!payload || typeof payload.id !== "string" || payload.id.length === 0) {
+    if (!payload || payload.id.length === 0) {
       return null;
     }
 

@@ -1,10 +1,10 @@
 import { HTMLElement, parse as parseHtml } from "node-html-parser";
 
-import { FetchCrawlerConfig, config } from "@/config";
-import { SyncHttpClient } from "@/http/http-client";
-import { OpenGraph } from "@/http/open-graph";
-import type { Persistor } from "@/process/persistence";
-import { AnySourceConfig, Article } from "@/schema";
+import { FetchCrawlerConfig, config } from "#crawler/config";
+import { SyncHttpClient } from "#crawler/http/http-client";
+import { OpenGraph } from "#crawler/http/open-graph";
+import type { Persistor } from "#crawler/process/persistence";
+import { AnySourceConfig, Article } from "#crawler/schema";
 
 export interface CrawlerOptions {
   persistors?: Persistor[];

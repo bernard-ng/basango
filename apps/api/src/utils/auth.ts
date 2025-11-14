@@ -1,6 +1,6 @@
 import { type JWTPayload, jwtVerify } from "jose";
 
-import { env } from "@/config";
+import { env } from "#api/config";
 
 export type Session = {
   user: {

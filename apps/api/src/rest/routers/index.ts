@@ -1,8 +1,8 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 
-import { articlesRouter } from "@/rest/routers/articles";
+import { articlesRouter } from "#api/rest/routers/articles";
 
-const routers = new OpenAPIHono();
+const routers: OpenAPIHono = new OpenAPIHono();
 
 routers.route("/articles", articlesRouter);
 

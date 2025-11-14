@@ -1,6 +1,6 @@
 import { TiktokenEncoding, get_encoding } from "tiktoken";
 
-import { TokenStatistics } from "@/schema";
+import { TokenStatistics } from "#db/schema";
 
 /**
  * Count the number of tokens in the given text using the specified encoding.

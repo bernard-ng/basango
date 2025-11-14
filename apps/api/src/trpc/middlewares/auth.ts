@@ -2,7 +2,7 @@ import type { Database } from "@basango/db/client";
 
 // import { TRPCError } from "@trpc/server";
 
-import type { Session } from "@/utils/auth";
+import type { Session } from "#api/utils/auth";
 
 export const withAuthentication = async <TReturn>(opts: {
   ctx: {

@@ -1,8 +1,0 @@
-{
-  "apple.ccacheEnabled": "false",
-  "apple.extraPods": "[]",
-  "apple.privacyManifestAggregationEnabled": "true",
-  "EX_DEV_CLIENT_NETWORK_INSPECTOR": "true",
-  "expo.jsEngine": "hermes",
-  "newArchEnabled": "true"
-}

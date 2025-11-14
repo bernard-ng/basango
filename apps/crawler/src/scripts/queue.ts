@@ -1,7 +1,7 @@
 import { logger } from "@basango/logger";
 
-import { scheduleAsyncCrawl } from "@/process/async/tasks";
-import { CRAWLING_USAGE, parseCrawlingCliArgs } from "@/scripts/utils";
+import { scheduleAsyncCrawl } from "#crawler/process/async/tasks";
+import { CRAWLING_USAGE, parseCrawlingCliArgs } from "#crawler/scripts/utils";
 
 const main = async (): Promise<void> => {
   const options = parseCrawlingCliArgs();

@@ -2,8 +2,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@basango/ui/*": ["../../packages/ui/src/*"]
+      "@basango/api/*": ["../api/src/*"],
+      "@basango/ui/*": ["../../packages/ui/src/*"],
+      "#dashboard/*": ["./src/*"]
     },
     "plugins": [
       {
@@ -13,12 +14,10 @@
   },
   "exclude": ["node_modules"],
   "extends": "@basango/tsconfig/nextjs.json",
-  "include": [
-    "next-env.d.ts",
-    "next.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../packages/ui/src/hooks/use-mobile.ts"
+  "include": ["next-env.d.ts", "next.config.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "references": [
+    {
+      "path": "../api"
+    }
   ]
 }

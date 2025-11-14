@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "#crawler/*": ["./src/*"]
     }
   },
   "extends": "@basango/tsconfig/base.json",

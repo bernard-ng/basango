@@ -16,6 +16,10 @@
       ],
       "passThroughEnv": []
     },
+    "clean": {
+      "cache": false,
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "inputs": ["$TURBO_DEFAULT$", ".env"],

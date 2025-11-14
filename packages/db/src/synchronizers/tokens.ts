@@ -2,8 +2,8 @@
 
 import { Pool } from "pg";
 
-import { env } from "@/config";
-import { computeTokenStatistics } from "@/utils/computed";
+import { env } from "#db/config";
+import { computeTokenStatistics } from "#db/utils/computed";
 
 type ArticleRow = {
   id: string;

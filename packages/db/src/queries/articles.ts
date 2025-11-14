@@ -1,12 +1,11 @@
 import { md5 } from "@basango/encryption";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { v7 as uuidV7 } from "uuid";
 
-import { Database } from "@/client";
-import { ArticleMetadata, Sentiment, TokenStatistics, article } from "@/schema";
-import { computeReadingTime, computeTokenStatistics } from "@/utils/computed";
-
-import { getSourceIdByName } from "./sources";
+import { Database } from "#db/client";
+import { getSourceIdByName } from "#db/queries/sources";
+import { ArticleMetadata, Sentiment, TokenStatistics, articles } from "#db/schema";
+import { computeReadingTime, computeTokenStatistics } from "#db/utils/computed";
 
 export type CreateArticleParams = {
   title: string;
@@ -44,11 +43,11 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
   }
 
   const [result] = await db
-    .insert(article)
+    .insert(articles)
     .values({ id: uuidV7(), ...data })
     .returning({
-      id: article.id,
-      sourceId: article.sourceId,
+      id: articles.id,
+      sourceId: articles.sourceId,
     });
 
   if (result === undefined) {
@@ -59,7 +58,17 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
 }
 
 export async function getArticleByHash(db: Database, hash: string) {
-  return db.query.article.findFirst({
-    where: eq(article.hash, hash),
+  return await db.query.articles.findFirst({
+    where: eq(articles.hash, hash),
   });
+}
+
+export async function countArticlesBySourceId(db: Database, sourceId: string) {
+  const result = await db
+    .select({ count: count(articles.id) })
+    .from(articles)
+    .where(eq(articles.sourceId, sourceId))
+    .then((res) => res[0]);
+
+  return result?.count ?? 0;
 }

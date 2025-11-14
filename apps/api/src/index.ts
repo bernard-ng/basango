@@ -2,15 +2,28 @@ import { trpcServer } from "@hono/trpc-server";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
-import { config, env } from "@/config";
-import { routers } from "@/rest/routers";
-import { createTRPCContext } from "@/trpc/init";
-import { appRouter } from "@/trpc/routers/_app";
+import { config, env } from "#api/config";
+import { routers } from "#api/rest/routers";
+import { createTRPCContext } from "#api/trpc/init";
+import { appRouter } from "#api/trpc/routers/_app";
 
 const app = new OpenAPIHono();
 
+app.use(async (c, next) => {
+  const data = await c.req.json();
+
+  console.log("Incoming Request:", {
+    data: data,
+    headers: c.req.header,
+    method: c.req.method,
+    url: c.req.url,
+  });
+
+  return next();
+});
 app.use(secureHeaders());
 
 app.use(

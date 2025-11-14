@@ -1,6 +1,6 @@
 import { parseArgs } from "node:util";
 
-import { CrawlingOptions } from "@/process/crawler";
+import { CrawlingOptions } from "#crawler/process/crawler";
 
 interface WorkerCliOptions {
   queue?: string[];
