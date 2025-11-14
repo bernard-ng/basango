@@ -1,9 +1,8 @@
 import { format, getUnixTime, isMatch, parse } from "date-fns";
 import type { RedisOptions } from "ioredis";
-import { TiktokenEncoding, get_encoding } from "tiktoken";
 
-import { config } from "@/config";
-import { DEFAULT_DATE_FORMAT } from "@/constants";
+import { config } from "#crawler/config";
+import { DEFAULT_DATE_FORMAT } from "#crawler/constants";
 import {
   AnySourceConfig,
   CreateDateRangeOptions,
@@ -15,7 +14,7 @@ import {
   PageRangeSchema,
   PageRangeSpecSchema,
   WordPressSourceConfig,
-} from "@/schema";
+} from "#crawler/schema";
 
 /**
  * Resolve a source configuration by its ID.
@@ -64,22 +63,6 @@ const parseDate = (value: string, format: string): Date => {
     throw new Error(`Invalid date '${value}' for format '${format}'`);
   }
   return parsed;
-};
-
-/**
- * Count the number of tokens in the given text using the specified encoding.
- * @param text - The input text
- * @param encoding - The token encoding (default: "cl100k_base")
- */
-export const countTokens = (text: string, encoding: TiktokenEncoding = "cl100k_base"): number => {
-  try {
-    const encoder = get_encoding(encoding);
-    const tokens = encoder.encode(text);
-    encoder.free();
-    return tokens.length;
-  } catch {
-    return text.length;
-  }
 };
 
 /**

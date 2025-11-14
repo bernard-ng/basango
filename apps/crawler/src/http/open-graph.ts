@@ -1,10 +1,10 @@
 import { parse } from "node-html-parser";
 
-import { config } from "@/config";
-import { OPEN_GRAPH_USER_AGENT } from "@/constants";
-import { SyncHttpClient } from "@/http/http-client";
-import { UserAgents } from "@/http/user-agent";
-import { ArticleMetadata } from "@/schema";
+import { config } from "#crawler/config";
+import { OPEN_GRAPH_USER_AGENT } from "#crawler/constants";
+import { SyncHttpClient } from "#crawler/http/http-client";
+import { UserAgents } from "#crawler/http/user-agent";
+import { ArticleMetadata } from "#crawler/schema";
 
 /**
  * Picks the first non-empty value from the provided array.

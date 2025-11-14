@@ -1,8 +1,8 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-import { env } from "@/config";
-import * as schema from "@/schema";
+import { env } from "#db/config";
+import * as schema from "#db/schema";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 

@@ -1,9 +1,9 @@
 import logger from "@basango/logger";
 
-import { FetchCrawlerConfig, config } from "@/config";
-import { JsonlPersistor, Persistor } from "@/process/persistence";
-import { AnySourceConfig } from "@/schema";
-import { createDateRange, createPageRange } from "@/utils";
+import { FetchCrawlerConfig, config } from "#crawler/config";
+import { JsonlPersistor, Persistor } from "#crawler/process/persistence";
+import { AnySourceConfig } from "#crawler/schema";
+import { createDateRange, createPageRange } from "#crawler/utils";
 
 export interface CrawlingOptions {
   sourceId: string;

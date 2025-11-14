@@ -1,12 +1,12 @@
 import { setTimeout as delay } from "node:timers/promises";
 
-import { FetchClientConfig } from "@/config";
+import { FetchClientConfig } from "#crawler/config";
 import {
   DEFAULT_RETRY_AFTER_HEADER,
   DEFAULT_USER_AGENT,
   TRANSIENT_HTTP_STATUSES,
-} from "@/constants";
-import { UserAgents } from "@/http/user-agent";
+} from "#crawler/constants";
+import { UserAgents } from "#crawler/http/user-agent";
 
 export type HttpHeaders = Record<string, string>;
 export type HttpParams = Record<string, string | number | boolean | null | undefined>;

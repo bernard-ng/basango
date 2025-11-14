@@ -1,5 +1,0 @@
-framework:
-    cache:
-        pools:
-            cache.dbal:
-                adapter: cache.adapter.filesystem

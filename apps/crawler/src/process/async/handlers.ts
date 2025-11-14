@@ -1,19 +1,24 @@
 import { logger } from "@basango/logger";
 
-import { config, env } from "@/config";
-import { UnsupportedSourceKindError } from "@/errors";
-import { SyncHttpClient } from "@/http/http-client";
-import { QueueManager, createQueueManager } from "@/process/async/queue";
+import { config, env } from "#crawler/config";
+import { UnsupportedSourceKindError } from "#crawler/errors";
+import { SyncHttpClient } from "#crawler/http/http-client";
+import { QueueManager, createQueueManager } from "#crawler/process/async/queue";
 import {
   DetailsTaskPayload,
   ListingTaskPayload,
   ProcessingTaskPayload,
-} from "@/process/async/schemas";
-import { createPersistors, resolveCrawlerConfig } from "@/process/crawler";
-import { HtmlCrawler } from "@/process/parsers/html";
-import { WordPressCrawler } from "@/process/parsers/wordpress";
-import { Article, HtmlSourceConfig, SourceKindSchema, WordPressSourceConfig } from "@/schema";
-import { createDateRange, formatDateRange, formatPageRange, resolveSourceConfig } from "@/utils";
+} from "#crawler/process/async/schemas";
+import { createPersistors, resolveCrawlerConfig } from "#crawler/process/crawler";
+import { HtmlCrawler } from "#crawler/process/parsers/html";
+import { WordPressCrawler } from "#crawler/process/parsers/wordpress";
+import { Article, HtmlSourceConfig, WordPressSourceConfig } from "#crawler/schema";
+import {
+  createDateRange,
+  formatDateRange,
+  formatPageRange,
+  resolveSourceConfig,
+} from "#crawler/utils";
 
 export const collectHtmlListing = async (
   payload: ListingTaskPayload,
@@ -107,7 +112,7 @@ export const collectArticle = async (
   });
   const persistors = createPersistors(source);
 
-  if (source.sourceKind === SourceKindSchema.enum.html) {
+  if (source.sourceKind === "html") {
     const crawler = new HtmlCrawler(settings, { persistors });
     const html = await crawler.crawl(payload.url);
 
@@ -118,7 +123,7 @@ export const collectArticle = async (
     } as ProcessingTaskPayload);
   }
 
-  if (source.sourceKind === SourceKindSchema.enum.wordpress) {
+  if (source.sourceKind === "wordpress") {
     const crawler = new WordPressCrawler(settings, { persistors });
 
     const article = await crawler.fetchOne(payload.data ?? {}, settings.dateRange);
@@ -134,11 +139,24 @@ export const collectArticle = async (
 export const forwardForProcessing = async (payload: ProcessingTaskPayload): Promise<Article> => {
   logger.info({ article: payload.article.title }, "Ready for downstream processing");
 
-  const client = new SyncHttpClient(config.fetch.client);
-  const endpoint = env("BASANGO_CRAWLER_BACKEND_API_ENDPOINT");
+  try {
+    logger.info({ article: payload.article.title }, "Forwarding article to API");
 
-  await client.post(endpoint, { json: payload.article });
-  logger.info({ article: payload.article.title }, "Forwarded article to API");
+    const client = new SyncHttpClient(config.fetch.client);
+    const response = await client.post(env("BASANGO_CRAWLER_BACKEND_API_ENDPOINT"), {
+      headers: {
+        Authorization: `${env("BASANGO_CRAWLER_TOKEN")}`,
+      },
+      json: payload.article,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      logger.info({ ...data }, "Article successfully forwarded to API");
+    }
+  } catch (error) {
+    logger.error({ error }, "Failed to forward article to API");
+  }
 
   return payload.article;
 };

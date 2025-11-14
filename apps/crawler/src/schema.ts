@@ -112,8 +112,8 @@ export const ArticleSchema = z.object({
   hash: z.string().optional(),
   link: z.url(),
   metadata: ArticleMetadataSchema.optional(),
-  source: z.string(),
-  timestamp: z.number().int(),
+  publishedAt: z.date(),
+  sourceId: z.string(),
   title: z.string(),
   tokenStatistics: ArticleTokenStatisticsSchema.optional(),
 });

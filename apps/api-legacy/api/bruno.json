@@ -1,6 +1,0 @@
-{
-  "ignore": ["node_modules", ".git"],
-  "name": "basango",
-  "type": "collection",
-  "version": "1"
-}

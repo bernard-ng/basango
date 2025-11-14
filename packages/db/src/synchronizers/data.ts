@@ -3,8 +3,8 @@
 import { RowDataPacket } from "mysql2/promise";
 import { Pool, PoolClient } from "pg";
 
-import { env } from "@/config";
-import { computeReadingTime } from "@/utils/computed";
+import { env } from "#db/config";
+import { computeReadingTime } from "#db/utils/computed";
 
 type SourceOptions = {
   host: string;

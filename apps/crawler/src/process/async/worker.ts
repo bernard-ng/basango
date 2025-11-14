@@ -1,8 +1,8 @@
 import { QueueEvents, Worker } from "bullmq";
 import IORedis from "ioredis";
 
-import { QueueFactory, QueueManager } from "@/process/async/queue";
-import { collectArticle, collectListing, forwardForProcessing } from "@/process/async/tasks";
+import { QueueFactory, QueueManager } from "#crawler/process/async/queue";
+import { collectArticle, collectListing, forwardForProcessing } from "#crawler/process/async/tasks";
 
 export interface WorkerOptions {
   queueNames?: string[];

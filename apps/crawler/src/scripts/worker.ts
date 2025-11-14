@@ -1,8 +1,8 @@
 import { logger } from "@basango/logger";
 
-import { createQueueManager } from "@/process/async/queue";
-import { startWorker } from "@/process/async/worker";
-import { parseWorkerCliArgs } from "@/scripts/utils";
+import { createQueueManager } from "#crawler/process/async/queue";
+import { startWorker } from "#crawler/process/async/worker";
+import { parseWorkerCliArgs } from "#crawler/scripts/utils";
 
 const main = async (): Promise<void> => {
   const options = parseWorkerCliArgs();

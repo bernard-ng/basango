@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true
     },
-    "name": "mobile",
+    "name": "basango",
     "newArchEnabled": true,
     "orientation": "portrait",
     "plugins": [
@@ -36,8 +36,8 @@
         }
       ]
     ],
-    "scheme": "mobile",
-    "slug": "mobile",
+    "scheme": "basango",
+    "slug": "basango",
     "userInterfaceStyle": "automatic",
     "version": "1.0.0",
     "web": {

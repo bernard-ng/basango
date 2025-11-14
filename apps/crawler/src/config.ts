@@ -9,7 +9,7 @@ import {
   PageRangeSchema,
   UpdateDirectionSchema,
   WordPressSourceConfigSchema,
-} from "@/schema";
+} from "#crawler/schema";
 
 export const PROJECT_DIR = path.resolve(__dirname, "../");
 

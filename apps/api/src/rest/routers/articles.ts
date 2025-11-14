@@ -1,10 +1,11 @@
 import { createArticle } from "@basango/db/queries";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 
-import { withCrawlerAuth } from "@/rest/middlewares/crawler";
-import type { Context } from "@/rest/types";
-import { createArticleResponseSchema, createArticleSchema } from "@/schemas/articles";
-import { validateResponse } from "@/utils/response";
+import { withCrawlerAuth } from "#api/rest/middlewares/crawler";
+import { withDatabase } from "#api/rest/middlewares/db";
+import type { Context } from "#api/rest/types";
+import { createArticleResponseSchema, createArticleSchema } from "#api/schemas/articles";
+import { validateResponse } from "#api/utils/response";
 
 const app = new OpenAPIHono<Context>();
 
@@ -12,7 +13,7 @@ app.openapi(
   createRoute({
     description: "Store a new crawled article in the database.",
     method: "post",
-    middleware: [withCrawlerAuth],
+    middleware: [withCrawlerAuth, withDatabase],
     operationId: "CreateArticle",
     path: "/",
     request: {
@@ -40,8 +41,8 @@ app.openapi(
   }),
   async (c) => {
     const db = c.get("db");
-    const body = c.req.valid("json");
-    const result = await createArticle(db, { ...body });
+    const input = c.req.valid("json");
+    const result = await createArticle(db, input);
 
     return c.json(
       validateResponse(result, createArticleResponseSchema) as { id: string; sourceId: string },

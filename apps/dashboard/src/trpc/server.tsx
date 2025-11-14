@@ -1,7 +1,7 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: needed for tRPC type inference */
 import "server-only";
 
 import type { AppRouter } from "@basango/api/trpc/routers/_app";
-//import { getCountryCode, getLocale, getTimezone } from "@basango/location";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { type TRPCQueryOptions, createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
@@ -43,38 +43,14 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 
 export function HydrateClient(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-
   return <HydrationBoundary state={dehydrate(queryClient)}>{props.children}</HydrationBoundary>;
 }
 
-export function prefetch<T extends ReturnType<TRPCQueryOptions<AppRouter>>>(queryOptions: T) {
+export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(queryOptions: T) {
   const queryClient = getQueryClient();
-
   if (queryOptions.queryKey[1]?.type === "infinite") {
-    void queryClient.prefetchInfiniteQuery(
-      queryOptions as unknown as Parameters<typeof queryClient.prefetchInfiniteQuery>[0],
-    );
+    void queryClient.prefetchInfiniteQuery(queryOptions as any);
   } else {
-    void queryClient.prefetchQuery(
-      queryOptions as unknown as Parameters<typeof queryClient.prefetchQuery>[0],
-    );
-  }
-}
-
-export function batchPrefetch<T extends ReturnType<TRPCQueryOptions<AppRouter>>>(
-  queryOptionsArray: T[],
-) {
-  const queryClient = getQueryClient();
-
-  for (const queryOptions of queryOptionsArray) {
-    if (queryOptions.queryKey[1]?.type === "infinite") {
-      void queryClient.prefetchInfiniteQuery(
-        queryOptions as unknown as Parameters<typeof queryClient.prefetchInfiniteQuery>[0],
-      );
-    } else {
-      void queryClient.prefetchQuery(
-        queryOptions as unknown as Parameters<typeof queryClient.prefetchQuery>[0],
-      );
-    }
+    void queryClient.prefetchQuery(queryOptions);
   }
 }

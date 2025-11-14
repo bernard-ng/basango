@@ -3,8 +3,8 @@
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 
-import { I18nProviderClient } from "@/locales/client";
-import { TRPCReactProvider } from "@/trpc/client";
+import { I18nProviderClient } from "#dashboard/locales/client";
+import { TRPCReactProvider } from "#dashboard/trpc/client";
 
 type ProviderProps = {
   locale: string;

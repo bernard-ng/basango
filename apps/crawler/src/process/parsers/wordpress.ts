@@ -1,16 +1,16 @@
 import { logger } from "@basango/logger";
 import TurndownService from "turndown";
 
-import { FetchCrawlerConfig } from "@/config";
+import { FetchCrawlerConfig } from "#crawler/config";
 import {
   ArticleOutOfDateRangeError,
   InvalidArticleError,
   UnsupportedSourceKindError,
-} from "@/errors";
-import { BaseCrawler } from "@/process/parsers/base";
-import { Persistor, persist } from "@/process/persistence";
-import { Article, DateRange, PageRange, WordPressSourceConfig } from "@/schema";
-import { isTimestampInRange } from "@/utils";
+} from "#crawler/errors";
+import { BaseCrawler } from "#crawler/process/parsers/base";
+import { Persistor, persist } from "#crawler/process/persistence";
+import { Article, DateRange, PageRange, WordPressSourceConfig } from "#crawler/schema";
+import { isTimestampInRange } from "#crawler/utils";
 
 const md = new TurndownService({
   bulletListMarker: "-",
@@ -148,8 +148,8 @@ export class WordPressCrawler extends BaseCrawler {
         body,
         categories,
         link,
-        source: this.source.sourceId,
-        timestamp,
+        publishedAt: new Date(timestamp * 1000),
+        sourceId: this.source.sourceId,
         title,
       },
       link,

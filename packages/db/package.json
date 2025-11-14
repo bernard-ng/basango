@@ -17,9 +17,8 @@
     "drizzle-kit": "^0.31.6"
   },
   "exports": {
-    ".": "./src/index.ts",
     "./client": "./src/client.ts",
-    "./importer": "./src/importer/index.ts",
+    "./errors": "./src/errors.ts",
     "./queries": "./src/queries/index.ts",
     "./schema": "./src/schema.ts",
     "./utils": "./src/utils/index.ts"
