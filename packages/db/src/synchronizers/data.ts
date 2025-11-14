@@ -42,8 +42,8 @@ class Engine {
       max: 16,
     });
     this.ignore = { ...DEFAULT_IGNORE, ...(this.targetOptions.ignoreColumns ?? {}) };
-    this.pageSize = this.targetOptions.pageSize ?? 1000;
-    this.batchSize = Math.max(1, this.targetOptions.batchSize ?? 50);
+    this.pageSize = this.targetOptions.pageSize ?? 5000;
+    this.batchSize = Math.max(1, this.targetOptions.batchSize ?? 500);
     console.log(
       `Engine initialized with pageSize=${this.pageSize} and batchSize=${this.batchSize} (resume=${this.resume})`,
     );
