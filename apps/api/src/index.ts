@@ -12,18 +12,7 @@ import { appRouter } from "#api/trpc/routers/_app";
 
 const app = new OpenAPIHono();
 
-app.use(async (c, next) => {
-  const data = await c.req.json();
-
-  console.log("Incoming Request:", {
-    data: data,
-    headers: c.req.header,
-    method: c.req.method,
-    url: c.req.url,
-  });
-
-  return next();
-});
+app.use(logger());
 app.use(secureHeaders());
 
 app.use(

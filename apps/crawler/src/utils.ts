@@ -145,3 +145,17 @@ export const createAbsoluteUrl = (base: string, href: string): string => {
     return href;
   }
 };
+
+/**
+ * extract the domain name from a URL.
+ * @param url - The URL string
+ * @returns The domain name or null if invalid URL
+ */
+export const extractDomainName = (url: string): string | null => {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname;
+  } catch {
+    return null;
+  }
+};

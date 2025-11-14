@@ -5,16 +5,13 @@
         "paginationTemplate": "actualite",
         "requiresDetails": true,
         "requiresRateLimit": false,
-        "sourceDate": {
-          "pattern": "/(\\d{2})/(\\d{2})/(\\d{4}) - (\\d{2}:\\d{2})/",
-          "replacement": "$3-$2-$1 $4"
-        },
+        "sourceDate": {},
         "sourceId": "radiookapi.net",
         "sourceKind": "html",
         "sourceSelectors": {
           "articleBody": ".field-name-body",
           "articleCategories": ".views-field-field-cat-gorie a",
-          "articleDate": ".views-field-created",
+          "articleDate": "head > meta[property=\"article:published_time\"]",
           "articleLink": ".views-field-title a",
           "articles": ".view-content > .views-row.content-row",
           "articleTitle": "h1.page-header",
@@ -26,17 +23,14 @@
       {
         "categories": ["politique", "economie", "culture", "sport", "societe"],
         "paginationTemplate": "index.php/category/{category}",
-        "requiresDetails": false,
+        "requiresDetails": true,
         "requiresRateLimit": false,
-        "sourceDate": {
-          "pattern": "/\\w{3} (\\d{2})/(\\d{2})/(\\d{4}) - (\\d{2}:\\d{2})/",
-          "replacement": "$3-$2-$1 $4"
-        },
+        "sourceDate": {},
         "sourceId": "7sur7.cd",
         "sourceKind": "html",
         "sourceSelectors": {
-          "articleBody": ".field.field--name-body",
-          "articleDate": ".views-field-created",
+          "articleBody": "div[property=\"schema:text\"].field.field--name-body",
+          "articleDate": "head > meta[property=\"article:published_time\"]",
           "articleLink": ".views-field-title a",
           "articles": ".view-content > .row.views-row",
           "articleTitle": ".views-field-title a",
@@ -50,7 +44,7 @@
         "requiresDetails": true,
         "requiresRateLimit": false,
         "sourceDate": {
-          "format": "%d.%m.%Y %H:%M"
+          "format": "dd.MM.yyyy"
         },
         "sourceId": "mediacongo.net",
         "sourceKind": "html",
@@ -70,16 +64,13 @@
         "paginationTemplate": "actualite",
         "requiresDetails": true,
         "requiresRateLimit": false,
-        "sourceDate": {
-          "pattern": "/(\\d{1}) (\\d{1,2}) (\\d{2}) (\\d{4}) - (\\d{2}:\\d{2})/",
-          "replacement": "$4-$3-$2 $5"
-        },
+        "sourceDate": {},
         "sourceId": "actualite.cd",
         "sourceKind": "html",
         "sourceSelectors": {
-          "articleBody": ".views-field.views-field-body",
+          "articleBody": ".views-field.views-field-body .field-content",
           "articleCategories": "#actu-cat",
-          "articleDate": "#p-date",
+          "articleDate": "head > meta[property=\"article:published_time\"]",
           "articleLink": "#actu-titre a",
           "articles": "#views-bootstrap-taxonomy-term-page-2 > div > div",
           "articleTitle": "h1.page-title"

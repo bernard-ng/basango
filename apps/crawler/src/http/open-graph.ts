@@ -5,6 +5,7 @@ import { OPEN_GRAPH_USER_AGENT } from "#crawler/constants";
 import { SyncHttpClient } from "#crawler/http/http-client";
 import { UserAgents } from "#crawler/http/user-agent";
 import { ArticleMetadata } from "#crawler/schema";
+import { createAbsoluteUrl } from "#crawler/utils";
 
 /**
  * Picks the first non-empty value from the provided array.
@@ -71,7 +72,7 @@ export class OpenGraph {
    * @param html - HTML content as a string
    * @param url - Optional URL of the page
    */
-  static consumeHtml(html: string, url?: string): ArticleMetadata | undefined {
+  static consumeHtml(html: string, url: string): ArticleMetadata | undefined {
     if (!html) {
       return undefined;
     }
@@ -95,9 +96,9 @@ export class OpenGraph {
 
     return {
       description,
-      image,
+      image: createAbsoluteUrl(url, image ?? "") || undefined,
       title,
-      url: canonical,
+      url: createAbsoluteUrl(url, canonical ?? "") || undefined,
     };
   }
 }

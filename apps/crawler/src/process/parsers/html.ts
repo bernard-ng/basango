@@ -1,5 +1,5 @@
 import { logger } from "@basango/logger";
-import { getUnixTime, isMatch as isDateMatch, parse as parseDateFns } from "date-fns";
+import { fromUnixTime, getUnixTime, isMatch as isDateMatch, parse } from "date-fns";
 import { HTMLElement } from "node-html-parser";
 import TurndownService from "turndown";
 
@@ -20,19 +20,6 @@ const md = new TurndownService({
   headingStyle: "atx",
   hr: "---",
 });
-
-/**
- * Create a safe RegExp from the given pattern.
- * @param pattern
- */
-const safeRegExp = (pattern?: string | null): RegExp | null => {
-  if (!pattern) return null;
-  try {
-    return new RegExp(pattern, "g");
-  } catch {
-    return null;
-  }
-};
 
 /**
  * Crawler for generic HTML pages.
@@ -123,10 +110,10 @@ export class HtmlCrawler extends BaseCrawler {
     const root = this.parseHtml(html);
     const selectors = this.source.sourceSelectors;
 
-    const title = this.extractText(root, selectors.articleTitle) ?? "Untitled";
+    const title = this.extractText(root, selectors.articleTitle);
     const link = this.currentNode ?? this.extractLink(root);
-    if (!link) {
-      throw new InvalidArticleError("Missing article link");
+    if (!link || !title) {
+      throw new InvalidArticleError("Missing article link or title");
     }
 
     const body = this.extractBody(root, selectors.articleBody);
@@ -148,7 +135,7 @@ export class HtmlCrawler extends BaseCrawler {
         body,
         categories,
         link,
-        publishedAt: new Date(timestamp * 1000),
+        publishedAt: fromUnixTime(timestamp),
         sourceId: this.source.sourceId,
         title,
       },
@@ -271,6 +258,19 @@ export class HtmlCrawler extends BaseCrawler {
       const pick = (alt ?? title ?? "").trim();
       if (pick.length > 0) return pick;
     }
+
+    // If it's a time tag, prefer datetime attribute
+    if (tag === "time") {
+      const datetime = target.getAttribute("datetime");
+      if (datetime) return datetime.trim();
+    }
+
+    // If it's a meta tag, prefer content attribute
+    if (tag === "meta") {
+      const content = target.getAttribute("content");
+      if (content) return content.trim();
+    }
+
     return this.textContent(target);
   }
 
@@ -296,7 +296,9 @@ export class HtmlCrawler extends BaseCrawler {
    * @param selector - The CSS selector
    */
   private extractCategories(root: HTMLElement, selector?: string | null): string[] {
+    if (!selector && this.settings.category) return [this.settings.category.toLowerCase()];
     if (!selector) return [];
+
     const values: string[] = [];
     for (const node of this.extractAll(root, selector)) {
       const text = this.textContent(node);
@@ -314,24 +316,22 @@ export class HtmlCrawler extends BaseCrawler {
    */
   private computeTimestamp(raw?: string | null): number {
     if (!raw) return Math.floor(Date.now() / 1000);
-    let value = raw.trim();
-    const pattern = safeRegExp(this.source.sourceDate?.pattern);
-    const replacement = this.source.sourceDate?.replacement ?? "";
-    if (pattern) {
-      try {
-        value = value.replace(pattern, replacement);
-      } catch {
-        // ignore pattern failures
-      }
+    const value = raw.trim();
+
+    const format = this.source.sourceDate.format;
+    if (format === "dd.MM.yyyy") {
+      const [day, month, year] = raw.split(".").map(Number);
+      const timestamp = getUnixTime(new Date(year!, month! - 1, day));
+      return Number.isFinite(timestamp) ? timestamp : Math.floor(Date.now() / 1000);
     }
-    const format = this.source.sourceDate?.format ?? "yyyy-LL-dd HH:mm";
+
     if (!isDateMatch(value, format)) {
-      // fallback: try native Date.parse as last resort
       const parsed = Date.parse(value);
       return Number.isNaN(parsed) ? Math.floor(Date.now() / 1000) : Math.floor(parsed / 1000);
     }
-    const date = parseDateFns(value, format, new Date());
-    const ts = getUnixTime(date);
-    return Number.isFinite(ts) ? ts : Math.floor(Date.now() / 1000);
+
+    const date = parse(value, format, new Date());
+    const timestamp = getUnixTime(date);
+    return Number.isFinite(timestamp) ? timestamp : Math.floor(Date.now() / 1000);
   }
 }
