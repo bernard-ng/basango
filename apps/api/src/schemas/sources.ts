@@ -55,6 +55,43 @@ export const getSourceSchema = z.object({
   id: idSchema,
 });
 
+export const getSourcePublicationGraphSchema = z.object({
+  days: z
+    .number()
+    .optional()
+    .openapi({
+      default: 60,
+      description: "",
+      example: 60,
+    })
+    .openapi({
+      description: "The number of days to include in the publication graph.",
+    }),
+  id: idSchema,
+  range: z
+    .object({
+      from: z.date().openapi({
+        description: "The start date of the range.",
+      }),
+      to: z.date().openapi({
+        description: "The end date of the range.",
+      }),
+    })
+    .optional()
+    .openapi({
+      description: "The date range for the publication graph.",
+    }),
+});
+
+export const getSourceCategorySharesSchema = z.object({
+  id: idSchema,
+  limit: z.number().int().min(1).max(100).optional().openapi({
+    default: 10,
+    description: "The maximum number of categories to return.",
+    example: 10,
+  }),
+});
+
 export const updateSourceSchema = z.object({
   credibility: credibilitySchema.optional(),
   description: createSourceSchema.shape.description,

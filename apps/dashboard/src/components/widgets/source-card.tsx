@@ -16,7 +16,7 @@ import {
 } from "@basango/ui/components/chart";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-import { formatNumber } from "#dashboard/utils/utils";
+import { formatDate, formatNumber } from "#dashboard/utils/utils";
 
 const chartConfig = {
   count: {
@@ -61,13 +61,7 @@ export function SourceCard({ source }: { source: SourceDetails }) {
               axisLine={false}
               dataKey="date"
               minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "short",
-                });
-              }}
+              tickFormatter={(value) => formatDate(new Date(value).toISOString())}
               tickLine={false}
               tickMargin={8}
             />

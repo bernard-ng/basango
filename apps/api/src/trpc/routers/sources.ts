@@ -7,7 +7,13 @@ import {
   updateSource,
 } from "@basango/db/queries";
 
-import { createSourceSchema, getSourceSchema, updateSourceSchema } from "#api/schemas/sources";
+import {
+  createSourceSchema,
+  getSourceCategorySharesSchema,
+  getSourcePublicationGraphSchema,
+  getSourceSchema,
+  updateSourceSchema,
+} from "#api/schemas/sources";
 import { createTRPCRouter, protectedProcedure } from "#api/trpc/init";
 
 export const sourcesRouter = createTRPCRouter({
@@ -21,13 +27,17 @@ export const sourcesRouter = createTRPCRouter({
     return getSourceById(ctx.db, input.id);
   }),
 
-  getCategoryShares: protectedProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
-    return getSourceCategoryShares(ctx.db, input.id);
-  }),
+  getCategoryShares: protectedProcedure
+    .input(getSourceCategorySharesSchema)
+    .query(async ({ ctx, input }) => {
+      return getSourceCategoryShares(ctx.db, input);
+    }),
 
-  getPublicationGraph: protectedProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
-    return getSourcePublicationGraph(ctx.db, input.id);
-  }),
+  getPublicationGraph: protectedProcedure
+    .input(getSourcePublicationGraphSchema)
+    .query(async ({ ctx, input }) => {
+      return getSourcePublicationGraph(ctx.db, input);
+    }),
 
   update: protectedProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
     return updateSource(ctx.db, input);

@@ -1,8 +1,9 @@
 import { RouterOutputs } from "@basango/api/trpc/routers/_app";
 import { Metadata } from "next";
+import Link from "next/link";
 
 import { PageLayout } from "#dashboard/components/shell/page-layout";
-import { SourceCard } from "#dashboard/components/source-card";
+import { SourceCard } from "#dashboard/components/widgets/source-card";
 import { HydrateClient, getQueryClient, prefetch, trpc } from "#dashboard/trpc/server";
 
 export const metadata: Metadata = {
@@ -22,7 +23,9 @@ export default async function Page() {
       <PageLayout leading="Manage your news sources" title="Sources">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {sources.map((source: SourceDetails) => (
-            <SourceCard key={source.id} source={source} />
+            <Link href={`/sources/${source.id}`} key={source.id}>
+              <SourceCard source={source} />
+            </Link>
           ))}
         </div>
       </PageLayout>
