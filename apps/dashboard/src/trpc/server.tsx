@@ -54,3 +54,15 @@ export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(queryOptio
     void queryClient.prefetchQuery(queryOptions);
   }
 }
+
+export function batchPrefetch<T extends ReturnType<TRPCQueryOptions<any>>>(queryOptionsArray: T[]) {
+  const queryClient = getQueryClient();
+
+  for (const queryOptions of queryOptionsArray) {
+    if (queryOptions.queryKey[1]?.type === "infinite") {
+      void queryClient.prefetchInfiniteQuery(queryOptions as any);
+    } else {
+      void queryClient.prefetchQuery(queryOptions);
+    }
+  }
+}

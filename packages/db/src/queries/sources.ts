@@ -16,7 +16,7 @@ export async function getSources(db: Database) {
     rows.map(async (row) => ({
       ...row,
       articles: await countArticlesBySourceId(db, row.id),
-      publicationGraph: await getSourcePublicationGraph(db, row.id),
+      publicationGraph: await getSourcePublicationGraph(db, { id: row.id }),
     })),
   );
 }
@@ -133,13 +133,21 @@ export type CategoryShares = {
   total: number;
 };
 
+export type GetSourcePublicationGraphParams = {
+  id: string;
+  days?: number;
+  range?: {
+    from: Date;
+    to: Date;
+  };
+};
+
 export async function getSourcePublicationGraph(
   db: Database,
-  id: string,
-  days: number = PUBLICATION_GRAPH_DAYS,
+  params: GetSourcePublicationGraphParams,
 ): Promise<PublicationGraph> {
   const endDate = endOfDay(new Date());
-  const startDate = startOfDay(subDays(endDate, days - 1));
+  const startDate = startOfDay(subDays(endDate, params.days ?? PUBLICATION_GRAPH_DAYS - 1));
 
   const data = await db.execute<PublicationEntry>(sql`
     WITH bounds AS (
@@ -161,7 +169,7 @@ export async function getSourcePublicationGraph(
         a.published_at::date AS d,
         COUNT(*)::int        AS c
       FROM article a, bounds b
-      WHERE a.source_id = ${id}::uuid
+      WHERE a.source_id = ${params.id}::uuid
         AND a.published_at >= timezone(${TIMEZONE}, b.start_ts)
         AND a.published_at <= timezone(${TIMEZONE}, b.end_ts)
       GROUP BY 1
@@ -177,7 +185,15 @@ export async function getSourcePublicationGraph(
   return { items: data.rows, total: data.rows.length };
 }
 
-export async function getSourceCategoryShares(db: Database, id: string): Promise<CategoryShares> {
+export type GetSourceCategorySharesParams = {
+  id: string;
+  limit?: number;
+};
+
+export async function getSourceCategoryShares(
+  db: Database,
+  params: GetSourceCategorySharesParams,
+): Promise<CategoryShares> {
   const data = await db.execute<CategoryShare>(sql`
     SELECT
       cat AS category,
@@ -187,12 +203,12 @@ export async function getSourceCategoryShares(db: Database, id: string): Promise
       SELECT NULLIF(BTRIM(c), '') AS cat
       FROM ${articles}
       CROSS JOIN LATERAL UNNEST(COALESCE(${articles.categories}, ARRAY[]::text[])) AS c
-      WHERE ${articles.sourceId} = ${id}
+      WHERE ${articles.sourceId} = ${params.id}
     ) t
     WHERE cat IS NOT NULL
     GROUP BY cat
     ORDER BY count DESC
-    LIMIT ${CATEGORY_SHARES_LIMIT}
+    LIMIT ${params.limit ?? CATEGORY_SHARES_LIMIT}
   `);
 
   return { items: data.rows, total: data.rowCount ?? 0 };
