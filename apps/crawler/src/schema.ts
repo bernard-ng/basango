@@ -58,8 +58,6 @@ export const DateRangeSpecSchema = z
 
 export const SourceDateSchema = z.object({
   format: z.string().default("yyyy-LL-dd HH:mm"),
-  pattern: z.string().nullable().optional(),
-  replacement: z.string().nullable().optional(),
 });
 
 const BaseSourceSchema = z.object({

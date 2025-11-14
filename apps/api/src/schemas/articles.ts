@@ -38,10 +38,16 @@ export const createArticleSchema = z
       example: "https://example.com/article",
     }),
     metadata: metadataSchema.optional(),
-    publishedAt: z.date().openapi({
-      description: "The publication date of the article.",
-      example: "2023-01-01T00:00:00Z",
-    }),
+    publishedAt: z
+      .string()
+      .refine((value) => !Number.isNaN(Date.parse(value)), {
+        message: "Invalid date format",
+      })
+      .transform((value) => new Date(value))
+      .openapi({
+        description: "The publication date of the article in ISO 8601 format.",
+        example: "2023-01-01T00:00:00Z",
+      }),
     sourceId: z.string().openapi({
       description: "The unique identifier of the source from which the article was crawled.",
       example: "radiookapi.net",

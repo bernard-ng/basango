@@ -1,4 +1,5 @@
 import { logger } from "@basango/logger";
+import { fromUnixTime } from "date-fns";
 import TurndownService from "turndown";
 
 import { FetchCrawlerConfig } from "#crawler/config";
@@ -148,7 +149,7 @@ export class WordPressCrawler extends BaseCrawler {
         body,
         categories,
         link,
-        publishedAt: new Date(timestamp * 1000),
+        publishedAt: fromUnixTime(timestamp),
         sourceId: this.source.sourceId,
         title,
       },

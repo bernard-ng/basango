@@ -6,7 +6,7 @@ import { parseArgs } from "node:util";
 import { logger } from "@basango/logger";
 
 import { config, env } from "#crawler/config";
-import { SyncHttpClient } from "#crawler/http/http-client";
+import { HttpError, SyncHttpClient } from "#crawler/http/http-client";
 import type { Article } from "#crawler/schema";
 
 const USAGE = `
@@ -43,7 +43,13 @@ const forwardArticle = async (article: Article): Promise<void> => {
 
     logger.error({ link: article.link, status: response.status }, "Forwarding failed");
   } catch (error) {
-    logger.error({ error, link: article.link }, "Failed to forward article");
+    if (error instanceof HttpError) {
+      const data = await error.response.json();
+      logger.error({ ...data, link: article.link }, "Error forwarding article");
+      return;
+    }
+
+    logger.error({ error, link: article.link }, "Error forwarding article");
   }
 };
 
