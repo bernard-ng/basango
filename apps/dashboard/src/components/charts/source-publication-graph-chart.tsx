@@ -95,7 +95,7 @@ export function SourcePublicationgGraphChart({ sourceId }: Props) {
               axisLine={false}
               dataKey="date"
               minTickGap={32}
-              tickFormatter={(value) => formatDate(new Date(value).toISOString())}
+              tickFormatter={(value) => formatDate(value)}
               tickLine={false}
               tickMargin={8}
             />
