@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@basango/api": "workspace:*",
+    "@basango/domain": "workspace:*",
     "@basango/ui": "workspace:*",
     "@date-fns/tz": "^1.4.1",
     "@hookform/resolvers": "^5.2.2",
@@ -18,10 +19,12 @@
     "next-themes": "^0.4.6",
     "nuqs": "^2.7.3",
     "react": "catalog:",
+    "react-day-picker": "^9.11.1",
     "react-dom": "catalog:",
     "react-hook-form": "^7.66.0",
     "recharts": "^3.4.1",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.7",
     "superjson": "^2.2.5",
     "zod": "^4.1.12",
     "zustand": "^5.0.8"
@@ -34,12 +37,15 @@
     "@types/react-dom": "catalog:",
     "typescript": "catalog:"
   },
+  "imports": {
+    "#dashboard/*": "./src/*"
+  },
   "name": "@basango/dashboard",
   "private": true,
   "scripts": {
     "build": "next build",
+    "clean": "rm -rf .next node_modules",
     "dev": "next dev",
-    "lint": "eslint",
     "start": "next start"
   }
 }

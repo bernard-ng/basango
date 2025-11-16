@@ -42,8 +42,8 @@ export function formatDate(date: string, dateFormat?: string | null, checkYear =
   return format(new Date(date), dateFormat ?? "P");
 }
 
-export function formatNumber(value: number): string {
-  return Intl.NumberFormat("en-US").format(value);
+export function formatNumber(value: number | undefined): string {
+  return Intl.NumberFormat("en-US").format(value ?? 0);
 }
 
 export function getInitials(value: string) {

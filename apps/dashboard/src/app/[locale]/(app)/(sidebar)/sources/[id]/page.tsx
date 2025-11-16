@@ -1,9 +1,12 @@
+import { Source } from "@basango/domain/models/sources";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@basango/ui/components/tabs";
 import { Metadata } from "next";
 
-import { SourceCategorySharesChart } from "#dashboard/components/charts/source-category-shares-chart";
-import { SourcePublicationgGraphChart } from "#dashboard/components/charts/source-publication-graph-chart";
+import { ArticlesFeed } from "#dashboard/components/articles-feed";
+import { CategorySharesChart } from "#dashboard/components/charts/sources/category-shares-chart";
+import { PublicationGraphChart } from "#dashboard/components/charts/sources/publication-graph-chart";
 import { PageLayout } from "#dashboard/components/shell/page-layout";
+import { SourceDetailsTab } from "#dashboard/components/source-details-tab";
 import { HydrateClient, batchPrefetch, getQueryClient, trpc } from "#dashboard/trpc/server";
 
 export const metadata: Metadata = {
@@ -16,11 +19,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   batchPrefetch([
     trpc.sources.getById.queryOptions({ id }),
-    trpc.sources.getCategoryShares.queryOptions({ id }),
+    trpc.sources.getCategoryShares.queryOptions({ id, limit: 10 }),
     trpc.sources.getPublicationGraph.queryOptions({ id }),
+    trpc.articles.list.infiniteQueryOptions({ limit: 12, sourceId: id }),
   ]);
 
-  const source = await queryClient.fetchQuery(trpc.sources.getById.queryOptions({ id }));
+  const source: Source = await queryClient.fetchQuery(trpc.sources.getById.queryOptions({ id }));
 
   return (
     <HydrateClient>
@@ -29,20 +33,17 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="articles">Articles</TabsTrigger>
+            <TabsTrigger value="details">Details</TabsTrigger>
           </TabsList>
           <TabsContent className="space-y-4" value="overview">
-            <SourceCategorySharesChart sourceId={source.id} />
-            <SourcePublicationgGraphChart sourceId={source.id} />
+            <CategorySharesChart sourceId={source.id} />
+            <PublicationGraphChart sourceId={source.id} />
           </TabsContent>
           <TabsContent value="articles">
-            <div className="flex flex-1 flex-col gap-4">
-              <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div className="bg-muted/50 aspect-video rounded-xl" />
-                <div className="bg-muted/50 aspect-video rounded-xl" />
-                <div className="bg-muted/50 aspect-video rounded-xl" />
-              </div>
-              <div className="bg-muted/50 min-h-screen flex-1 rounded-xl md:min-h-min" />
-            </div>
+            <ArticlesFeed sourceId={source.id} />
+          </TabsContent>
+          <TabsContent value="details">
+            <SourceDetailsTab source={source} />
           </TabsContent>
         </Tabs>
       </PageLayout>

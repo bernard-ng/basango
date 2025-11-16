@@ -1,3 +1,5 @@
+import type { PageRange, TimestampRange, WordPressSourceConfig } from "@basango/domain/crawler";
+import { Article } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 import { fromUnixTime } from "date-fns";
 import TurndownService from "turndown";
@@ -10,7 +12,6 @@ import {
 } from "#crawler/errors";
 import { BaseCrawler } from "#crawler/process/parsers/base";
 import { Persistor, persist } from "#crawler/process/persistence";
-import { Article, DateRange, PageRange, WordPressSourceConfig } from "#crawler/schema";
 import { isTimestampInRange } from "#crawler/utils";
 
 const md = new TurndownService({
@@ -107,7 +108,7 @@ export class WordPressCrawler extends BaseCrawler {
    * @param input - Decoded JSON object or raw JSON string
    * @param dateRange - Optional date range for filtering
    */
-  async fetchOne(input: unknown, dateRange?: DateRange | null): Promise<Article> {
+  async fetchOne(input: unknown, dateRange?: TimestampRange | null): Promise<Article> {
     // input can be the decoded JSON object or a raw JSON string
     let data: WordPressPost | null = null;
     try {

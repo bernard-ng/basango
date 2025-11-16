@@ -1,11 +1,12 @@
 import { setTimeout as delay } from "node:timers/promises";
 
-import { FetchClientConfig } from "#crawler/config";
 import {
   DEFAULT_RETRY_AFTER_HEADER,
+  DEFAULT_TRANSIENT_HTTP_STATUSES,
   DEFAULT_USER_AGENT,
-  TRANSIENT_HTTP_STATUSES,
-} from "#crawler/constants";
+} from "@basango/domain/constants";
+
+import { FetchClientConfig } from "#crawler/config";
 import { UserAgents } from "#crawler/http/user-agent";
 
 export type HttpHeaders = Record<string, string>;
@@ -187,7 +188,7 @@ export class SyncHttpClient extends BaseHttpClient {
         const response = await this.fetchImpl(target, init);
 
         if (
-          TRANSIENT_HTTP_STATUSES.includes(response.status as number) &&
+          DEFAULT_TRANSIENT_HTTP_STATUSES.includes(response.status as number) &&
           attempt < this.config.maxRetries
         ) {
           await this.maybeDelay(attempt, response, retryAfterHeader);

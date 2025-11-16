@@ -1,6 +1,5 @@
+import { Delta, TokenStatistics } from "@basango/domain/models";
 import { TiktokenEncoding, get_encoding } from "tiktoken";
-
-import { TokenStatistics } from "#db/schema";
 
 /**
  * Count the number of tokens in the given text using the specified encoding.
@@ -56,4 +55,18 @@ export const computeTokenStatistics = (data: {
 export const computeReadingTime = (text: string, wordsPerMinute = 200): number => {
   const words = text.trim().split(/\s+/).length;
   return Math.ceil(words / wordsPerMinute);
+};
+
+export const computeDelta = (current: number, previous: number): Delta => {
+  const delta = current - previous;
+  const percentage = previous === 0 ? (current === 0 ? 0 : 100) : (delta / previous) * 100;
+  const sign = delta >= 0 ? "+" : "-";
+  const variant = previous === 0 ? "positive" : delta >= 0 ? "increase" : "decrease";
+
+  return {
+    delta,
+    percentage,
+    sign,
+    variant,
+  };
 };

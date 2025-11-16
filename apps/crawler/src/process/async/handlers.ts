@@ -1,8 +1,8 @@
+import type { HtmlSourceConfig, WordPressSourceConfig } from "@basango/domain/crawler";
+import { Article } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 
-import { config, env } from "#crawler/config";
 import { UnsupportedSourceKindError } from "#crawler/errors";
-import { SyncHttpClient } from "#crawler/http/http-client";
 import { QueueManager, createQueueManager } from "#crawler/process/async/queue";
 import {
   DetailsTaskPayload,
@@ -12,11 +12,11 @@ import {
 import { createPersistors, resolveCrawlerConfig } from "#crawler/process/crawler";
 import { HtmlCrawler } from "#crawler/process/parsers/html";
 import { WordPressCrawler } from "#crawler/process/parsers/wordpress";
-import { Article, HtmlSourceConfig, WordPressSourceConfig } from "#crawler/schema";
+import { forward } from "#crawler/process/persistence";
 import {
-  createDateRange,
-  formatDateRange,
+  createTimestampRange,
   formatPageRange,
+  formatTimestampRange,
   resolveSourceConfig,
 } from "#crawler/utils";
 
@@ -45,7 +45,7 @@ export const collectHtmlListing = async (
 
         await manager.enqueueArticle({
           category: payload.category,
-          dateRange: createDateRange(payload.dateRange),
+          dateRange: createTimestampRange(payload.dateRange),
           sourceId: payload.sourceId,
           url,
         } as DetailsTaskPayload);
@@ -85,7 +85,7 @@ export const collectWordPressListing = async (
         await manager.enqueueArticle({
           category: payload.category,
           data,
-          dateRange: createDateRange(payload.dateRange),
+          dateRange: createTimestampRange(payload.dateRange),
           sourceId: payload.sourceId,
           url,
         } as DetailsTaskPayload);
@@ -106,7 +106,7 @@ export const collectArticle = async (
   const source = resolveSourceConfig(payload.sourceId);
   const settings = resolveCrawlerConfig(source, {
     category: payload.category,
-    dateRange: payload.dateRange ? formatDateRange(payload.dateRange) : undefined,
+    dateRange: payload.dateRange ? formatTimestampRange(payload.dateRange) : undefined,
     pageRange: payload.pageRange ? formatPageRange(payload.pageRange) : undefined,
     sourceId: payload.sourceId,
   });
@@ -141,19 +141,7 @@ export const forwardForProcessing = async (payload: ProcessingTaskPayload): Prom
 
   try {
     logger.info({ article: payload.article.title }, "Forwarding article to API");
-
-    const client = new SyncHttpClient(config.fetch.client);
-    const response = await client.post(env("BASANGO_CRAWLER_BACKEND_API_ENDPOINT"), {
-      headers: {
-        Authorization: `${env("BASANGO_CRAWLER_TOKEN")}`,
-      },
-      json: payload.article,
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      logger.info({ ...data }, "Article successfully forwarded to API");
-    }
+    await forward(payload.article);
   } catch (error) {
     logger.error({ error }, "Failed to forward article to API");
   }

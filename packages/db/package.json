@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@basango/domain": "workspace:*",
     "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@date-fns/utc": "^2.1.1",
@@ -22,6 +23,9 @@
     "./queries": "./src/queries/index.ts",
     "./schema": "./src/schema.ts",
     "./utils": "./src/utils/index.ts"
+  },
+  "imports": {
+    "#db/*": "./src/*"
   },
   "name": "@basango/db",
   "private": true,

@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "@hono/zod-openapi": "^1.1.4",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@basango/tsconfig": "workspace:*"
+  },
+  "exports": {
+    "./constants": "./src/constants.ts",
+    "./crawler": "./src/crawler/index.ts",
+    "./models": "./src/models/index.ts"
+  },
+  "imports": {
+    "#domain/*": "./src/*"
+  },
+  "name": "@basango/domain",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module"
+}

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@basango/domain": "workspace:*",
     "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "bullmq": "^4.18.3",
@@ -13,13 +14,16 @@
     "@types/turndown": "^5.0.6",
     "vitest": "^4.0.7"
   },
+  "imports": {
+    "#crawler/*": "./src/*"
+  },
   "name": "@basango/crawler",
   "private": true,
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "crawler:async": "bun run src/scripts/queue.ts",
-    "crawler:push": "bun run src/scripts/sync.ts",
-    "crawler:sync": "bun run src/scripts/crawl.ts",
+    "crawler:async": "bun run src/scripts/async.ts",
+    "crawler:push": "bun run src/scripts/push.ts",
+    "crawler:sync": "bun run src/scripts/sync.ts",
     "crawler:worker": "bun run src/scripts/worker.ts",
     "dev": "bun run src/scripts/worker.ts",
     "test": "vitest --run",

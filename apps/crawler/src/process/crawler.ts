@@ -1,9 +1,9 @@
+import type { AnySourceConfig } from "@basango/domain/crawler";
 import logger from "@basango/logger";
 
 import { FetchCrawlerConfig, config } from "#crawler/config";
 import { JsonlPersistor, Persistor } from "#crawler/process/persistence";
-import { AnySourceConfig } from "#crawler/schema";
-import { createDateRange, createPageRange } from "#crawler/utils";
+import { createPageRange, createTimestampRange } from "#crawler/utils";
 
 export interface CrawlingOptions {
   sourceId: string;
@@ -19,7 +19,7 @@ export const resolveCrawlerConfig = (
   return {
     ...config.fetch.crawler,
     category: options.category,
-    dateRange: createDateRange(options.dateRange),
+    dateRange: createTimestampRange(options.dateRange),
     pageRange: createPageRange(options.pageRange),
     source,
   };

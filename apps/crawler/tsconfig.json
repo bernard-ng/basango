@@ -1,11 +1,4 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "#crawler/*": ["./src/*"]
-    }
-  },
   "extends": "@basango/tsconfig/base.json",
-  "include": ["src"],
-  "references": []
+  "include": ["src"]
 }

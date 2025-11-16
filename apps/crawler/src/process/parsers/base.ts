@@ -1,10 +1,11 @@
+import type { AnySourceConfig } from "@basango/domain/crawler";
+import { Article } from "@basango/domain/models";
 import { HTMLElement, parse as parseHtml } from "node-html-parser";
 
 import { FetchCrawlerConfig, config } from "#crawler/config";
 import { SyncHttpClient } from "#crawler/http/http-client";
 import { OpenGraph } from "#crawler/http/open-graph";
 import type { Persistor } from "#crawler/process/persistence";
-import { AnySourceConfig, Article } from "#crawler/schema";
 
 export interface CrawlerOptions {
   persistors?: Persistor[];
@@ -97,7 +98,10 @@ export abstract class BaseCrawler {
    * @param record - The article record
    * @param url - The URL to fetch Open Graph data from
    */
-  protected async enrichWithOpenGraph(record: Article, url?: string): Promise<Article> {
+  protected async enrichWithOpenGraph(
+    record: Partial<Article>,
+    url?: string,
+  ): Promise<Partial<Article>> {
     try {
       const metadata = url ? await this.openGraph.consumeUrl(url) : undefined;
       return { ...record, metadata };

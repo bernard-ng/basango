@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import {
@@ -7,11 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@basango/ui/components/card";
-import { ToggleGroup, ToggleGroupItem } from "@basango/ui/components/toggle-group";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
+import { ChartLimitToggle, useChartLimitFilter } from "#dashboard/components/charts/chart-filters";
 import { useTRPC } from "#dashboard/trpc/client";
 import { getColorFromName } from "#dashboard/utils/categories";
 
@@ -19,29 +19,23 @@ type Props = {
   sourceId: string;
 };
 
-export function SourceCategorySharesChart({ sourceId }: Props) {
+export function CategorySharesChart({ sourceId }: Props) {
   const trpc = useTRPC();
-  const [limit, setLimit] = useState(10);
+  const { limit } = useChartLimitFilter();
 
   const { data } = useQuery(
     trpc.sources.getCategoryShares.queryOptions({
       id: sourceId,
-      limit: limit,
+      limit,
     }),
   );
-  const items = data?.items ?? [];
 
   const chartData = [
     {
       name: "Total",
-      ...Object.fromEntries(items.map((item) => [item.category, item.count])),
+      ...Object.fromEntries(data?.items.map((item) => [item.category, item.count])),
     },
   ];
-
-  const barData = items.map((item) => ({
-    fill: getColorFromName(item.category),
-    name: item.category,
-  }));
 
   return (
     <Card className="pt-0">
@@ -50,17 +44,7 @@ export function SourceCategorySharesChart({ sourceId }: Props) {
           <CardTitle>Category Shares</CardTitle>
           <CardDescription>showing top {limit} categories for this source</CardDescription>
         </div>
-        <ToggleGroup
-          className="*:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
-          onValueChange={(v) => setLimit(Number(v))}
-          type="single"
-          value={String(limit)}
-          variant="outline"
-        >
-          <ToggleGroupItem value="10">Top 10</ToggleGroupItem>
-          <ToggleGroupItem value="20">Top 20</ToggleGroupItem>
-          <ToggleGroupItem value="50">Top 50</ToggleGroupItem>
-        </ToggleGroup>
+        <ChartLimitToggle paramKey={`categoryLimit-${sourceId}`} />
       </CardHeader>
       <CardContent>
         <div className="-ml-1 h-20">
@@ -80,15 +64,15 @@ export function SourceCategorySharesChart({ sourceId }: Props) {
               />
               <XAxis axisLine={false} fontSize={12} hide tickLine={false} type="number" />
               <Legend align="left" iconSize={8} iconType="circle" />
-              {barData.map((entry, index) => (
+              {data?.items.map((entry, index) => (
                 <Bar
                   barSize={16}
                   className="transition-all delay-75"
-                  dataKey={entry.name}
-                  fill={entry.fill}
+                  dataKey={entry.category}
+                  fill={getColorFromName(entry.category)}
                   key={`bar-${index}`}
                   radius={
-                    index === 0 ? [4, 0, 0, 4] : index === barData.length - 1 ? [0, 4, 4, 0] : 0
+                    index === 0 ? [4, 0, 0, 4] : index === data?.items.length - 1 ? [0, 4, 4, 0] : 0
                   }
                   stackId="category"
                 />

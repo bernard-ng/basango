@@ -1,4 +1,4 @@
-import { DEFAULT_USER_AGENT, OPEN_GRAPH_USER_AGENT } from "#crawler/constants";
+import { DEFAULT_OPEN_GRAPH_USER_AGENT, DEFAULT_USER_AGENT } from "@basango/domain/constants";
 
 /**
  * User agent provider with optional rotation.
@@ -30,7 +30,7 @@ export class UserAgents {
   }
 
   og(): string {
-    return OPEN_GRAPH_USER_AGENT;
+    return DEFAULT_OPEN_GRAPH_USER_AGENT;
   }
 
   get(): string {

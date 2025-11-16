@@ -66,5 +66,5 @@ Gotchas
 
 Contact Points
 - Architecture overview: `docs/architecture.md`.
-- Architecture map: `docs/architectures/README.md`.
+- Forms handling patterns: `docs/forms-handling.md`.
 

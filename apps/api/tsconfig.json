@@ -1,14 +1,4 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "composite": true,
-    "incremental": true,
-    "paths": {
-      "@basango/db": ["../../packages/db/src/*"],
-      "#api/*": ["./src/*"],
-      "#db/*": ["../../packages/db/src/*"]
-    }
-  },
   "extends": "@basango/tsconfig/base.json",
   "include": ["src"]
 }

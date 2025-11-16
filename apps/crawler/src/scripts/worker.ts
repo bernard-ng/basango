@@ -1,3 +1,5 @@
+#! /usr/bin/env bun
+
 import { logger } from "@basango/logger";
 
 import { createQueueManager } from "#crawler/process/async/queue";

@@ -1,13 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import type { Article } from "@basango/domain/models";
 import { md5 } from "@basango/encryption";
 import logger from "@basango/logger";
 
-import { Article } from "#crawler/schema";
+import { config, env } from "#crawler/config";
+import { HttpError, SyncHttpClient } from "#crawler/http/http-client";
 
 export interface Persistor {
-  persist(record: Article): Promise<void> | void;
+  persist(record: Partial<Article>): Promise<void> | void;
   close: () => Promise<void> | void;
 }
 
@@ -35,17 +37,20 @@ const sanitize = (text: string): string => {
   return s.trim();
 };
 
-export const persist = async (payload: Article, persistors: Persistor[]): Promise<Article> => {
+export const persist = async (
+  payload: Partial<Article>,
+  persistors: Persistor[],
+): Promise<Article> => {
   const data = {
     ...payload,
-    body: sanitize(payload.body),
-    categories: payload.categories.map(sanitize),
-    title: sanitize(payload.title),
+    body: sanitize(payload.body!),
+    categories: payload.categories!.map(sanitize),
+    title: sanitize(payload.title!),
   };
 
   const article = {
     ...data,
-    hash: md5(data.link),
+    hash: md5(data.link!),
   } as Article;
 
   for (const persistor of persistors) {
@@ -58,6 +63,37 @@ export const persist = async (payload: Article, persistors: Persistor[]): Promis
 
   logger.info({ url: article.link }, "article successfully persisted");
   return article;
+};
+
+export const forward = async (payload: Partial<Article>): Promise<void> => {
+  const client = new SyncHttpClient(config.fetch.client);
+  const endpoint = env("BASANGO_CRAWLER_BACKEND_API_ENDPOINT");
+  const token = env("BASANGO_CRAWLER_TOKEN");
+
+  try {
+    const response = await client.post(endpoint, {
+      headers: {
+        Authorization: `${token}`,
+      },
+      json: payload,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      logger.info({ ...data }, "Article forwarded");
+      return;
+    }
+
+    logger.error({ status: response.status, url: payload.link }, "Forwarding failed");
+  } catch (error) {
+    if (error instanceof HttpError) {
+      const data = await error.response.json();
+      logger.error({ ...data, url: payload.link }, "Error forwarding article");
+      return;
+    }
+
+    logger.error({ error, url: payload.link }, "Error forwarding article");
+  }
 };
 
 export class JsonlPersistor implements Persistor {
@@ -78,15 +114,15 @@ export class JsonlPersistor implements Persistor {
     }
   }
 
-  persist(record: Article): Promise<void> {
+  persist(payload: Partial<Article>): Promise<void> {
     if (this.closed) {
       return Promise.reject(new Error("Persistor has been closed"));
     }
 
-    const payload = `${JSON.stringify(record)}\n`;
+    const record = `${JSON.stringify(payload)}\n`;
 
     this.pending = this.pending.then(async () => {
-      fs.appendFileSync(this.filePath, payload, { encoding: this.encoding });
+      fs.appendFileSync(this.filePath, record, { encoding: this.encoding });
     });
 
     return this.pending;

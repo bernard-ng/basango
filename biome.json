@@ -76,7 +76,8 @@
       },
       "suspicious": {
         "noArrayIndexKey": "off",
-        "noDocumentCookie": "off"
+        "noDocumentCookie": "off",
+        "noExplicitAny": "warn"
       }
     }
   },

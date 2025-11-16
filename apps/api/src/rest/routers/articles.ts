@@ -1,10 +1,10 @@
 import { createArticle } from "@basango/db/queries";
+import { createArticleResponseSchema, createArticleSchema } from "@basango/domain/models";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 
+import type { Context } from "#api/rest/init";
 import { withCrawlerAuth } from "#api/rest/middlewares/crawler";
 import { withDatabase } from "#api/rest/middlewares/db";
-import type { Context } from "#api/rest/types";
-import { createArticleResponseSchema, createArticleSchema } from "#api/schemas/articles";
 import { validateResponse } from "#api/utils/response";
 
 const app = new OpenAPIHono<Context>();
@@ -44,10 +44,7 @@ app.openapi(
     const input = c.req.valid("json");
     const result = await createArticle(db, input);
 
-    return c.json(
-      validateResponse(result, createArticleResponseSchema) as { id: string; sourceId: string },
-      201,
-    );
+    return c.json(validateResponse(result, createArticleResponseSchema), 201);
   },
 );
 

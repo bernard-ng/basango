@@ -1,10 +1,10 @@
+import { DEFAULT_OPEN_GRAPH_USER_AGENT } from "@basango/domain/constants";
+import { ArticleMetadata } from "@basango/domain/models";
 import { parse } from "node-html-parser";
 
 import { config } from "#crawler/config";
-import { OPEN_GRAPH_USER_AGENT } from "#crawler/constants";
 import { SyncHttpClient } from "#crawler/http/http-client";
 import { UserAgents } from "#crawler/http/user-agent";
-import { ArticleMetadata } from "#crawler/schema";
 import { createAbsoluteUrl } from "#crawler/utils";
 
 /**
@@ -45,7 +45,7 @@ export class OpenGraph {
 
   constructor() {
     const settings = config.fetch.client;
-    const provider = new UserAgents(true, OPEN_GRAPH_USER_AGENT);
+    const provider = new UserAgents(true, DEFAULT_OPEN_GRAPH_USER_AGENT);
 
     this.client = new SyncHttpClient(settings, {
       defaultHeaders: { "User-Agent": provider.og() },

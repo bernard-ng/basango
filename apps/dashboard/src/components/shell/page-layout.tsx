@@ -11,7 +11,7 @@ export const PageLayout = (props: React.PropsWithChildren<PageProps>) => {
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="container mx-auto">
+      <div className="container mx-auto space-y-4">
         {title && (
           <div className="mb-8 flex items-center justify-between space-y-4">
             <div>
