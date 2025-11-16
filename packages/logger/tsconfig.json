@@ -1,5 +1,5 @@
 {
   "exclude": ["node_modules"],
   "extends": "@basango/tsconfig/base.json",
-  "include": ["src/**/*"]
+  "include": ["src"]
 }

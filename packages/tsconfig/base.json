@@ -11,13 +11,6 @@
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
     "noUncheckedIndexedAccess": true,
-    "paths": {
-      "#api/*": ["../../apps/api/src/*"],
-      "#crawler/*": ["../../apps/crawler/src/*"],
-      "#dashboard/*": ["../../apps/dashboard/src/*"],
-      "#db/*": ["../db/src/*"],
-      "#domain/*": ["../domain/src/*"]
-    },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,

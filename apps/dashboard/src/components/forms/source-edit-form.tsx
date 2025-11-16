@@ -1,7 +1,7 @@
 "use client";
 
 import type { RouterOutputs } from "@basango/api/trpc/routers/_app";
-import { updateSourceSchema } from "@basango/domain/models/sources";
+import { updateSourceSchema } from "@basango/domain/models";
 import {
   Field,
   FieldDescription,

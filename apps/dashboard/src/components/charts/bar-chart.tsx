@@ -5,11 +5,11 @@ import { Bar, BarChart as BaseBarChart, CartesianGrid, XAxis } from "recharts";
 
 import { formatDate } from "#dashboard/utils/utils";
 
-type BarChartProps = {
-  data: unknown;
+type BarChartProps<T> = {
+  data: T[];
 };
 
-export function BarChart({ data }: BarChartProps) {
+export function BarChart<T>({ data }: BarChartProps<T>) {
   return (
     <BaseBarChart accessibilityLayer data={data}>
       <CartesianGrid vertical={false} />

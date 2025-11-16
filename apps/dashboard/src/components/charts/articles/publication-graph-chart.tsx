@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import {
@@ -33,7 +32,7 @@ export function PublicationGraphChart() {
   const period = useChartPeriodFilter();
 
   const { data } = useQuery(
-    trpc.articles.getPublicationGraph.queryOptions({
+    trpc.articles.getPublications.queryOptions({
       range: period.range,
     }),
   );
@@ -45,19 +44,19 @@ export function PublicationGraphChart() {
           <CardTitle>{formatNumber(data?.meta?.current)} articles</CardTitle>
           <CardDescription>
             <div className="flex items-center justify-start gap-1 text-xs">
-              <Status value={data?.delta} />
+              <Status value={data?.meta?.delta} />
               <span className="text-muted-foreground">vs previous</span>
             </div>
           </CardDescription>
         </div>
         <div className="flex items-center gap-3">
-          <ChartPeriodPicker defaultDays={period.defaultDays} paramKey="articlesPeriod" />
+          <ChartPeriodPicker defaultDays={period.defaultDays} />
         </div>
       </CardHeader>
 
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer className="aspect-auto h-[250px] w-full" config={chartConfig}>
-          <AreaChart data={data?.items} />
+          <AreaChart data={data?.items ?? []} />
         </ChartContainer>
       </CardContent>
 
@@ -68,7 +67,7 @@ export function PublicationGraphChart() {
             <span className="font-semibold text-foreground">
               {formatNumber(data?.meta?.current)} vs {formatNumber(data?.meta?.previous)} articles
             </span>
-            <Status icons={false} percentage={true} value={data?.deltaPercentage} />
+            <Status icons={false} percentage={true} value={data?.meta?.delta} />
             <span className="text-muted-foreground">period</span>
             {data?.meta?.previous === 0 && data?.meta?.current === 0 && (
               <span className="text-muted-foreground">(no articles yet)</span>

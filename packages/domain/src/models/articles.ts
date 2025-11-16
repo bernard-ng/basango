@@ -2,6 +2,8 @@ import { z } from "@hono/zod-openapi";
 
 import { idSchema, sentimentSchema } from "#domain/models/shared";
 
+import { sourceSchema } from "./sources";
+
 // schemas
 export const articleMetadataSchema = z.object({
   author: z.string().optional().openapi({
@@ -70,11 +72,19 @@ export const articleSchema = z.object({
     description: "The date and time when the article was created in the system.",
     example: "2023-01-01T12:00:00Z",
   }),
+  excerpt: z.string().optional().openapi({
+    description: "A brief excerpt or summary of the article.",
+    example: "This article discusses the latest advancements in AI technology.",
+  }),
   hash: z.string().min(1).openapi({
     description: "The unique hash of the article link.",
     example: "d41d8cd98f00b204e9800998ecf8427e",
   }),
   id: idSchema,
+  image: z.url().optional().openapi({
+    description: "The URL of the main image associated with the article.",
+    example: "https://example.com/image.jpg",
+  }),
   link: z.string().url().openapi({
     description: "The URL of the article.",
     example: "https://example.com/article",
@@ -84,6 +94,11 @@ export const articleSchema = z.object({
     description: "The publication date of the article as a Date object.",
     example: "2023-01-01T00:00:00Z",
   }),
+  readingTime: z.number().int().min(1).openapi({
+    description: "Estimated reading time of the article in minutes.",
+    example: 5,
+  }),
+  source: sourceSchema.optional(),
   sourceId: z.union([z.uuid(), z.string().min(1)]).openapi({
     description: "The unique identifier of the source from which the article was crawled.",
     example: "b3e1c8f4-5d6a-4c9e-8f1e-2d3c4b5a6f7g",

@@ -1,6 +1,6 @@
 "use client";
 
-import { createSourceSchema } from "@basango/domain/models/sources";
+import { createSourceSchema } from "@basango/domain/models";
 import {
   Field,
   FieldDescription,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import {
@@ -11,6 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
+import { RouterOutputs } from "#api/trpc/routers/_app";
 import { ChartLimitToggle, useChartLimitFilter } from "#dashboard/components/charts/chart-filters";
 import { useTRPC } from "#dashboard/trpc/client";
 import { getColorFromName } from "#dashboard/utils/categories";
@@ -18,6 +18,8 @@ import { getColorFromName } from "#dashboard/utils/categories";
 type Props = {
   sourceId: string;
 };
+
+type CategoryShare = RouterOutputs["sources"]["getCategoryShares"]["items"][number];
 
 export function CategorySharesChart({ sourceId }: Props) {
   const trpc = useTRPC();
@@ -29,11 +31,12 @@ export function CategorySharesChart({ sourceId }: Props) {
       limit,
     }),
   );
+  const items: CategoryShare[] = data?.items || [];
 
   const chartData = [
     {
       name: "Total",
-      ...Object.fromEntries(data?.items.map((item) => [item.category, item.count])),
+      ...Object.fromEntries(items.map((item) => [item.category, item.count])),
     },
   ];
 
@@ -44,7 +47,7 @@ export function CategorySharesChart({ sourceId }: Props) {
           <CardTitle>Category Shares</CardTitle>
           <CardDescription>showing top {limit} categories for this source</CardDescription>
         </div>
-        <ChartLimitToggle paramKey={`categoryLimit-${sourceId}`} />
+        <ChartLimitToggle />
       </CardHeader>
       <CardContent>
         <div className="-ml-1 h-20">

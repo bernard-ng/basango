@@ -23,18 +23,8 @@ type ArticleCardProps = {
   article: Article;
 };
 
-function getDescription(article: Article) {
-  return (
-    article.metadata?.description ??
-    article.excerpt ??
-    "No description was provided for this article."
-  );
-}
-
 export function ArticleCard({ article }: ArticleCardProps) {
   const [copied, setCopied] = React.useState(false);
-  const description = getDescription(article);
-  const imageUrl = article.image ?? undefined;
 
   const copyLink = React.useCallback(async () => {
     try {
@@ -50,12 +40,12 @@ export function ArticleCard({ article }: ArticleCardProps) {
     <Card className="flex h-full flex-col overflow-hidden border border-border/80 p-0">
       <CardHeader className="relative h-40 overflow-hidden p-0">
         <div className="relative h-full w-full bg-muted">
-          {imageUrl ? (
+          {article.image ? (
             <img
               alt={article.title}
               className="h-full w-full object-cover transition duration-200 hover:scale-105"
               loading="lazy"
-              src={imageUrl}
+              src={article.image}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
@@ -63,7 +53,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </div>
           )}
           <div className="absolute left-3 top-3">
-            <Badge variant="secondary">{article.sourceName}</Badge>
+            <Badge variant="secondary">{article.source?.name}</Badge>
           </div>
           <div className="absolute right-3 top-3">
             <DropdownMenu>
@@ -103,14 +93,18 @@ export function ArticleCard({ article }: ArticleCardProps) {
             {article.title}
           </Link>
         </CardTitle>
-        <p className="text-sm text-muted-foreground line-clamp-3">{description}</p>
+        <p className="text-sm text-muted-foreground line-clamp-3">
+          {article.metadata?.description ??
+            article.excerpt ??
+            "No description was provided for this article."}
+        </p>
       </CardContent>
       <CardFooter className="flex items-center justify-between gap-2 px-4 py-3 text-xs text-muted-foreground">
         <div className="flex flex-col">
           <span className="font-medium text-foreground">
             {formatDate(article.publishedAt.toISOString(), "PP", false)}
           </span>
-          <span>{formatRelativeTime(new Date(article.publishedAt))}</span>
+          <span>{formatRelativeTime(article.publishedAt)}</span>
         </div>
         <span>{article.readingTime} min</span>
       </CardFooter>

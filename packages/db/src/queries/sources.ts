@@ -24,7 +24,7 @@ export async function getSources(db: Database) {
     rows.map(async (row) => ({
       ...row,
       articles: await countArticlesBySourceId(db, row.id),
-      publicationGraph: await getSourcePublicationGraph(db, { id: row.id }),
+      publications: await getSourcePublicationGraph(db, { id: row.id }),
     })),
   );
 }

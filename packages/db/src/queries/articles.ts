@@ -1,5 +1,6 @@
 import { DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import {
+  Article,
   Distribution,
   Distributions,
   ID,
@@ -143,7 +144,7 @@ export async function getArticles(db: Database, params: GetArticlesParams) {
     .orderBy(desc(articles.publishedAt), desc(articles.id))
     .limit(pagination.limit + 1);
 
-  return buildPaginatedResult(rows, pagination, {
+  return buildPaginatedResult<Article>(rows, pagination, {
     date: "publishedAt",
     id: "id",
   });
@@ -154,7 +155,7 @@ export async function getArticlesPublicationGraph(
   params: GetPublicationsParams,
 ): Promise<Publications> {
   const [startDate, endDate] = buildDateRange(params.range);
-  const [previousRangeStart, previousRangeEnd] = buildPreviousRange([startDate, endDate]);
+  const [previousStart, previousEnd] = buildPreviousRange([startDate, endDate]);
 
   const data = await db.execute<Publication>(sql`
     WITH bounds AS (
@@ -193,8 +194,8 @@ export async function getArticlesPublicationGraph(
       sql`
       SELECT COALESCE(COUNT(*)::int, 0) AS count
       FROM article a
-      WHERE a.published_at >= timezone(${DEFAULT_TIMEZONE}, ${previousRangeStart})
-        AND a.published_at <= timezone(${DEFAULT_TIMEZONE}, ${previousRangeEnd})
+      WHERE a.published_at >= timezone(${DEFAULT_TIMEZONE}, ${previousStart})
+        AND a.published_at <= timezone(${DEFAULT_TIMEZONE}, ${previousEnd})
     `,
     )
     .then((res) => res.rows);
