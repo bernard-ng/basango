@@ -1,6 +1,8 @@
+#! /usr/bin/env bun
+
 import { logger } from "@basango/logger";
 
-import { runSyncCrawl } from "#crawler/process/sync/tasks";
+import { scheduleAsyncCrawl } from "#crawler/process/async/tasks";
 import { CRAWLING_USAGE, parseCrawlingCliArgs } from "#crawler/scripts/utils";
 
 const main = async (): Promise<void> => {
@@ -13,9 +15,11 @@ const main = async (): Promise<void> => {
   }
 
   try {
-    await runSyncCrawl({ ...options });
+    const id = await scheduleAsyncCrawl({ ...options });
+
+    logger.info({ id, options }, "Scheduled asynchronous crawl job");
   } catch (error) {
-    logger.error({ error }, "Synchronous crawl failed");
+    logger.error({ error }, "Failed to schedule crawl job");
     process.exitCode = 1;
   }
 };

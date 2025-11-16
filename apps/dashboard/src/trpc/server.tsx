@@ -4,7 +4,11 @@ import "server-only";
 import type { AppRouter } from "@basango/api/trpc/routers/_app";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
-import { type TRPCQueryOptions, createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import {
+  type TRPCInfiniteQueryOptions,
+  type TRPCQueryOptions,
+  createTRPCOptionsProxy,
+} from "@trpc/tanstack-react-query";
 import { cache } from "react";
 import superjson from "superjson";
 
@@ -46,7 +50,11 @@ export function HydrateClient(props: { children: React.ReactNode }) {
   return <HydrationBoundary state={dehydrate(queryClient)}>{props.children}</HydrationBoundary>;
 }
 
-export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(queryOptions: T) {
+type AnyQueryOptions =
+  | ReturnType<TRPCQueryOptions<any>>
+  | ReturnType<TRPCInfiniteQueryOptions<any>>;
+
+export function prefetch<T extends AnyQueryOptions>(queryOptions: T) {
   const queryClient = getQueryClient();
   if (queryOptions.queryKey[1]?.type === "infinite") {
     void queryClient.prefetchInfiniteQuery(queryOptions as any);
@@ -55,7 +63,7 @@ export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(queryOptio
   }
 }
 
-export function batchPrefetch<T extends ReturnType<TRPCQueryOptions<any>>>(queryOptionsArray: T[]) {
+export function batchPrefetch<T extends AnyQueryOptions>(queryOptionsArray: T[]) {
   const queryClient = getQueryClient();
 
   for (const queryOptions of queryOptionsArray) {

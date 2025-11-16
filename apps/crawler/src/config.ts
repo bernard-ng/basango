@@ -1,15 +1,14 @@
 import path from "node:path";
 
-import { loadConfig as defineConfig } from "@devscast/config";
-import { z } from "zod";
-
 import {
-  DateRangeSchema,
   HtmlSourceConfigSchema,
   PageRangeSchema,
+  TimestampRangeSchema,
   UpdateDirectionSchema,
   WordPressSourceConfigSchema,
-} from "#crawler/schema";
+} from "@basango/domain/crawler";
+import { loadConfig as defineConfig } from "@devscast/config";
+import { z } from "zod";
 
 export const PROJECT_DIR = path.resolve(__dirname, "../");
 
@@ -43,7 +42,7 @@ export const PipelineConfigSchema = z.object({
     }),
     crawler: z.object({
       category: z.string().optional(),
-      dateRange: DateRangeSchema.optional(),
+      dateRange: TimestampRangeSchema.optional(),
       direction: UpdateDirectionSchema.default("forward"),
       isUpdate: z.boolean().default(false),
       maxWorkers: z.number().int().positive().default(5),

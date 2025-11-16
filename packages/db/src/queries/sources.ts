@@ -1,11 +1,19 @@
-import { endOfDay, startOfDay, subDays } from "date-fns";
+import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
+import { ID, Publication, Publications } from "@basango/domain/models";
 import { eq, sql } from "drizzle-orm";
 import { v7 as uuidV7 } from "uuid";
 
 import { Database } from "#db/client";
-import { CATEGORY_SHARES_LIMIT, PUBLICATION_GRAPH_DAYS, TIMEZONE } from "#db/constants";
 import { NotFoundError } from "#db/errors";
-import { Credibility, articles, sources } from "#db/schema";
+import { articles, sources } from "#db/schema";
+import {
+  CategoryShare,
+  CategoryShares,
+  GetCategorySharesParams,
+  GetPublicationsParams,
+} from "#db/types/shared";
+import { CreateSourceParams, UpdateSourceParams } from "#db/types/sources";
+import { buildDateRange } from "#db/utils";
 
 import { countArticlesBySourceId } from "./articles";
 
@@ -21,14 +29,6 @@ export async function getSources(db: Database) {
   );
 }
 
-export type CreateSourceParams = {
-  name: string;
-  url: string;
-  displayName?: string;
-  description?: string;
-  credibility?: Credibility;
-};
-
 export async function createSource(db: Database, params: CreateSourceParams) {
   const [result] = await db
     .insert(sources)
@@ -37,14 +37,6 @@ export async function createSource(db: Database, params: CreateSourceParams) {
 
   return result;
 }
-
-export type UpdateSourceParams = {
-  id: string;
-  name?: string;
-  displayName?: string;
-  description?: string;
-  credibility?: Credibility;
-};
 
 export async function updateSource(db: Database, params: UpdateSourceParams) {
   const [result] = await db
@@ -65,12 +57,8 @@ export async function updateSource(db: Database, params: UpdateSourceParams) {
   return result;
 }
 
-export type DeleteSourceParams = {
-  id: string;
-};
-
-export async function deleteSource(db: Database, params: DeleteSourceParams) {
-  const [result] = await db.delete(sources).where(eq(sources.id, params.id)).returning();
+export async function deleteSource(db: Database, id: ID) {
+  const [result] = await db.delete(sources).where(eq(sources.id, id)).returning();
 
   return result;
 }
@@ -81,7 +69,7 @@ export async function getSourceByName(db: Database, name: string) {
   });
 }
 
-export async function getSourceById(db: Database, id: string) {
+export async function getSourceById(db: Database, id: ID) {
   const item = await db.query.sources.findFirst({
     where: eq(sources.id, id),
   });
@@ -108,48 +96,13 @@ export async function getSourceIdByName(db: Database, name: string): Promise<str
   return result.id;
 }
 
-export type GetSourceByIdParams = {
-  id: string;
-};
-
-export type PublicationEntry = {
-  date: string;
-  count: number;
-};
-
-export type PublicationGraph = {
-  items: PublicationEntry[];
-  total: number;
-};
-
-export type CategoryShare = {
-  category: string;
-  count: number;
-  percentage: number;
-};
-
-export type CategoryShares = {
-  items: CategoryShare[];
-  total: number;
-};
-
-export type GetSourcePublicationGraphParams = {
-  id: string;
-  days?: number;
-  range?: {
-    from: Date;
-    to: Date;
-  };
-};
-
 export async function getSourcePublicationGraph(
   db: Database,
-  params: GetSourcePublicationGraphParams,
-): Promise<PublicationGraph> {
-  const endDate = endOfDay(new Date());
-  const startDate = startOfDay(subDays(endDate, params.days ?? PUBLICATION_GRAPH_DAYS - 1));
+  params: GetPublicationsParams,
+): Promise<Publications> {
+  const [startDate, endDate] = buildDateRange(params.range);
 
-  const data = await db.execute<PublicationEntry>(sql`
+  const data = await db.execute<Publication>(sql`
     WITH bounds AS (
       SELECT
         ${startDate}::timestamptz AS start_ts,
@@ -159,8 +112,8 @@ export async function getSourcePublicationGraph(
       SELECT (gs)::date AS d
       FROM bounds b,
       LATERAL generate_series(
-        date_trunc('day', timezone(${TIMEZONE}, b.start_ts)),
-        date_trunc('day', timezone(${TIMEZONE}, b.end_ts)),
+        date_trunc('day', timezone(${DEFAULT_TIMEZONE}, b.start_ts)),
+        date_trunc('day', timezone(${DEFAULT_TIMEZONE}, b.end_ts)),
         INTERVAL '1 day'
       ) AS gs
     ),
@@ -170,8 +123,8 @@ export async function getSourcePublicationGraph(
         COUNT(*)::int        AS c
       FROM article a, bounds b
       WHERE a.source_id = ${params.id}::uuid
-        AND a.published_at >= timezone(${TIMEZONE}, b.start_ts)
-        AND a.published_at <= timezone(${TIMEZONE}, b.end_ts)
+        AND a.published_at >= timezone(${DEFAULT_TIMEZONE}, b.start_ts)
+        AND a.published_at <= timezone(${DEFAULT_TIMEZONE}, b.end_ts)
       GROUP BY 1
     )
     SELECT
@@ -182,17 +135,12 @@ export async function getSourcePublicationGraph(
     ORDER BY s.d ASC
   `);
 
-  return { items: data.rows, total: data.rows.length };
+  return { items: data.rows };
 }
-
-export type GetSourceCategorySharesParams = {
-  id: string;
-  limit?: number;
-};
 
 export async function getSourceCategoryShares(
   db: Database,
-  params: GetSourceCategorySharesParams,
+  params: GetCategorySharesParams,
 ): Promise<CategoryShares> {
   const data = await db.execute<CategoryShare>(sql`
     SELECT
@@ -208,7 +156,7 @@ export async function getSourceCategoryShares(
     WHERE cat IS NOT NULL
     GROUP BY cat
     ORDER BY count DESC
-    LIMIT ${params.limit ?? CATEGORY_SHARES_LIMIT}
+    LIMIT ${params.limit ?? DEFAULT_CATEGORY_SHARES_LIMIT}
   `);
 
   return { items: data.rows, total: data.rowCount ?? 0 };

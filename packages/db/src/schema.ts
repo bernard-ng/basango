@@ -1,3 +1,12 @@
+import { BIAS, RELIABILITY, SENTIMENT, TRANSPARENCY } from "@basango/domain/constants";
+import {
+  ArticleMetadata,
+  Credibility,
+  Device,
+  GeoLocation,
+  Roles,
+  TokenStatistics,
+} from "@basango/domain/models";
 import { relations, sql } from "drizzle-orm";
 import { check } from "drizzle-orm/gel-core";
 import {
@@ -22,99 +31,23 @@ import {
 /*                                   Types                                    */
 /* -------------------------------------------------------------------------- */
 
-export const tsvector = customType<{ data: string; driverData: string }>({
+const tsvector = customType<{ data: string; driverData: string }>({
   dataType() {
     return "tsvector";
   },
 });
 
-export const customJsonType = <T>() =>
-  customType<{ data: T }>({
-    dataType() {
-      return "jsonb";
-    },
-    fromDriver(value) {
-      return value as T;
-    },
-    toDriver(value) {
-      return value; // JSONB → just pass the object
-    },
-  });
+pgEnum("bias", BIAS);
+pgEnum("reliability", RELIABILITY);
+pgEnum("transparency", TRANSPARENCY);
 
-export const biasEnum = pgEnum("bias", ["neutral", "slightly", "partisan", "extreme"]);
-export const reliabilityEnum = pgEnum("reliability", [
-  "trusted",
-  "reliable",
-  "average",
-  "low_trust",
-  "unreliable",
-]);
-export const sentimentEnum = pgEnum("sentiment", ["positive", "neutral", "negative"]);
-export const transparencyEnum = pgEnum("transparency", ["high", "medium", "low"]);
-export const tokenPurposeEnum = pgEnum("token_purpose", [
+const sentimentEnum = pgEnum("sentiment", SENTIMENT);
+const tokenPurposeEnum = pgEnum("token_purpose", [
   "confirm_account",
   "password_reset",
   "unlock_account",
   "delete_account",
 ]);
-
-export type EmailAddress = string;
-export type Link = string;
-export type ReadingTime = number;
-
-export type Role = "ROLE_USER" | "ROLE_ADMIN";
-export type Roles = Role[];
-
-export type Bias = (typeof biasEnum.enumValues)[number];
-export type Reliability = (typeof reliabilityEnum.enumValues)[number];
-export type Sentiment = (typeof sentimentEnum.enumValues)[number];
-export type Transparency = (typeof transparencyEnum.enumValues)[number];
-export type TokenPurpose = (typeof tokenPurposeEnum.enumValues)[number];
-
-export type Credibility = {
-  bias: Bias;
-  reliability: Reliability;
-  transparency: Transparency;
-};
-
-export type TokenStatistics = {
-  title: number;
-  body: number;
-  categories: number;
-  excerpt: number;
-  total: number;
-};
-
-export type Device = {
-  operatingSystem?: string;
-  client?: string;
-  device?: string;
-  isBot: boolean;
-};
-
-export type GeoLocation = {
-  country?: string;
-  city?: string;
-  timeZone?: string;
-  longitude?: number;
-  latitude?: number;
-  accuracyRadius?: number;
-};
-
-export type ArticleMetadata = {
-  title?: string;
-  description?: string;
-  image?: string;
-};
-
-export type DateRange = {
-  start: number; // unix timestamp (seconds)
-  end: number; // unix timestamp (seconds)
-};
-
-// Secrets
-export type GeneratedToken = string;
-export type GeneratedCode = string;
 
 /* -------------------------------------------------------------------------- */
 /*                                   Tables                                   */
@@ -124,7 +57,7 @@ export const users = pgTable(
   "user",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    email: varchar({ length: 255 }).$type<EmailAddress>().notNull(),
+    email: varchar({ length: 255 }).notNull(),
     id: uuid().primaryKey().notNull(),
     isConfirmed: boolean("is_confirmed").default(false).notNull(),
     isLocked: boolean("is_locked").default(false).notNull(),

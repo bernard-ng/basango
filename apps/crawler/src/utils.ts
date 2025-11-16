@@ -1,20 +1,19 @@
-import { format, getUnixTime, isMatch, parse } from "date-fns";
-import type { RedisOptions } from "ioredis";
-
-import { config } from "#crawler/config";
-import { DEFAULT_DATE_FORMAT } from "#crawler/constants";
+import { DEFAULT_DATE_FORMAT } from "@basango/domain/constants";
 import {
   AnySourceConfig,
-  CreateDateRangeOptions,
-  DateRange,
-  DateRangeSchema,
-  DateRangeSpecSchema,
+  DateSpecSchema,
   HtmlSourceConfig,
   PageRange,
   PageRangeSchema,
-  PageRangeSpecSchema,
+  PageSpecSchema,
+  TimestampRange,
+  TimestampRangeSchema,
   WordPressSourceConfig,
-} from "#crawler/schema";
+} from "@basango/domain/crawler";
+import { format, fromUnixTime, getUnixTime, isMatch, parse } from "date-fns";
+import type { RedisOptions } from "ioredis";
+
+import { config } from "#crawler/config";
 
 /**
  * Resolve a source configuration by its ID.
@@ -71,7 +70,7 @@ const parseDate = (value: string, format: string): Date => {
  */
 export const createPageRange = (spec: string | undefined): PageRange | undefined => {
   if (!spec) return undefined;
-  const parsed = PageRangeSpecSchema.parse(spec);
+  const parsed = PageSpecSchema.parse(spec);
   return PageRangeSchema.parse(parsed);
 };
 
@@ -80,10 +79,13 @@ export const createPageRange = (spec: string | undefined): PageRange | undefined
  * @param spec - The date range specification (e.g., "2023-01-01:2023-12-31")
  * @param options - Options for date range creation
  */
-export const createDateRange = (
+export const createTimestampRange = (
   spec: string | undefined,
-  options: CreateDateRangeOptions = {},
-): DateRange | undefined => {
+  options: {
+    format?: string;
+    separator?: string;
+  } = {},
+): TimestampRange | undefined => {
   if (!spec) return undefined;
   const { format = DEFAULT_DATE_FORMAT, separator = ":" } = options;
   if (!separator) {
@@ -91,7 +93,7 @@ export const createDateRange = (
   }
 
   const normalized = spec.replace(separator, ":");
-  const parsedSpec = DateRangeSpecSchema.parse(normalized);
+  const parsedSpec = DateSpecSchema.parse(normalized);
 
   const startDate = parseDate(parsedSpec.startRaw, format);
   const endDate = parseDate(parsedSpec.endRaw, format);
@@ -101,7 +103,7 @@ export const createDateRange = (
     start: getUnixTime(startDate),
   };
 
-  return DateRangeSchema.parse(range);
+  return TimestampRangeSchema.parse(range);
 };
 
 /**
@@ -109,9 +111,9 @@ export const createDateRange = (
  * @param range - The date range
  * @param fmt - The date format (default: DEFAULT_DATE_FORMAT)
  */
-export const formatDateRange = (range: DateRange, fmt = DEFAULT_DATE_FORMAT): string => {
-  const start = format(new Date(range.start * 1000), fmt);
-  const end = format(new Date(range.end * 1000), fmt);
+export const formatTimestampRange = (range: TimestampRange, fmt = DEFAULT_DATE_FORMAT): string => {
+  const start = format(fromUnixTime(range.start), fmt);
+  const end = format(fromUnixTime(range.end), fmt);
   return `${start}:${end}`;
 };
 
@@ -128,7 +130,7 @@ export const formatPageRange = (range: PageRange): string => {
  * @param range - The date range
  * @param timestamp - The timestamp to check
  */
-export const isTimestampInRange = (range: DateRange, timestamp: number): boolean => {
+export const isTimestampInRange = (range: TimestampRange, timestamp: number): boolean => {
   return range.start <= timestamp && timestamp <= range.end;
 };
 
@@ -143,19 +145,5 @@ export const createAbsoluteUrl = (base: string, href: string): string => {
     return new URL(href, base.endsWith("/") ? base : `${base}/`).toString();
   } catch {
     return href;
-  }
-};
-
-/**
- * extract the domain name from a URL.
- * @param url - The URL string
- * @returns The domain name or null if invalid URL
- */
-export const extractDomainName = (url: string): string | null => {
-  try {
-    const parsed = new URL(url);
-    return parsed.hostname;
-  } catch {
-    return null;
   }
 };

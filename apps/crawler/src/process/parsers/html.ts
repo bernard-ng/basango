@@ -1,3 +1,5 @@
+import type { HtmlSourceConfig, TimestampRange } from "@basango/domain/crawler";
+import { Article } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 import { fromUnixTime, getUnixTime, isMatch as isDateMatch, parse } from "date-fns";
 import { HTMLElement } from "node-html-parser";
@@ -12,7 +14,6 @@ import {
 } from "#crawler/errors";
 import { BaseCrawler } from "#crawler/process/parsers/base";
 import { Persistor, persist } from "#crawler/process/persistence";
-import { Article, DateRange, HtmlSourceConfig } from "#crawler/schema";
 import { createAbsoluteUrl, isTimestampInRange } from "#crawler/utils";
 
 const md = new TurndownService({
@@ -106,7 +107,7 @@ export class HtmlCrawler extends BaseCrawler {
    * @param html - The HTML content of the article
    * @param dateRange - Optional date range for filtering
    */
-  async fetchOne(html: string, dateRange?: DateRange | null): Promise<Article> {
+  async fetchOne(html: string, dateRange?: TimestampRange | null): Promise<Partial<Article>> {
     const root = this.parseHtml(html);
     const selectors = this.source.sourceSelectors;
 

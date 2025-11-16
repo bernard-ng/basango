@@ -16,7 +16,7 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  transpilePackages: ["@basango/ui", "@basango/api"],
+  transpilePackages: ["@basango/ui", "@basango/api", "@basango/domain"],
 };
 
 export default nextConfig;

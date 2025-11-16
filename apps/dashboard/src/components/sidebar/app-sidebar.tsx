@@ -7,7 +7,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@basango/ui/components/sidebar";
-import { SquareTerminal } from "lucide-react";
+import { LayoutDashboard, SquareTerminal } from "lucide-react";
 import * as React from "react";
 
 import { AppSidebarContent } from "./app-sidebar-content";
@@ -16,6 +16,18 @@ import { AppSidebarUser } from "./app-sidebar-user";
 
 const data = {
   main: [
+    {
+      icon: LayoutDashboard,
+      isActive: true,
+      items: [
+        {
+          title: "Dashboard",
+          url: "/dashboard",
+        },
+      ],
+      title: "Overview",
+      url: "#",
+    },
     {
       icon: SquareTerminal,
       isActive: true,

@@ -166,8 +166,8 @@ basango/apps/crawler/
 │   │   ├── crawler.ts         # Main crawler interface
 │   │   └── persistence.ts     # Data persistence layer
 │   ├── scripts/               # CLI entry points
-│   │   ├── crawl.ts           # Sync crawling script
-│   │   ├── queue.ts           # Async job scheduling
+│   │   ├── sync.ts           # Sync crawling script
+│   │   ├── async.ts           # Async job scheduling
 │   │   ├── worker.ts          # Worker process
 │   │   └── utils.ts           # CLI utilities
 │   └── __tests__/             # Test files

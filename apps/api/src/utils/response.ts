@@ -1,20 +1,19 @@
 import { logger } from "@basango/logger";
 import { z } from "zod";
 
-export function validateResponse(data: unknown, schema: z.ZodSchema) {
+type ValidationSuccess<T> = z.infer<T>;
+
+export function validateResponse<T extends z.ZodTypeAny>(
+  data: unknown,
+  schema: T,
+): ValidationSuccess<T> {
   const result = schema.safeParse(data);
 
   if (!result.success) {
     const cause = z.treeifyError(result.error);
+    logger.error({ cause }, "Response validation failed");
 
-    logger.error(cause);
-
-    return {
-      data: null,
-      details: cause,
-      error: "Response validation failed",
-      success: false,
-    };
+    throw new Error("Response validation failed");
   }
 
   return result.data;

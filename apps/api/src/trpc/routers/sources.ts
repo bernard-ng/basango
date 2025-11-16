@@ -6,14 +6,14 @@ import {
   getSources,
   updateSource,
 } from "@basango/db/queries";
-
 import {
   createSourceSchema,
-  getSourceCategorySharesSchema,
-  getSourcePublicationGraphSchema,
+  getCategorySharesSchema,
+  getPublicationsSchema,
   getSourceSchema,
   updateSourceSchema,
-} from "#api/schemas/sources";
+} from "@basango/domain/models";
+
 import { createTRPCRouter, protectedProcedure } from "#api/trpc/init";
 
 export const sourcesRouter = createTRPCRouter({
@@ -21,23 +21,23 @@ export const sourcesRouter = createTRPCRouter({
     return createSource(ctx.db, input);
   }),
 
-  get: protectedProcedure.query(async ({ ctx }) => getSources(ctx.db)),
-
   getById: protectedProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
     return getSourceById(ctx.db, input.id);
   }),
 
   getCategoryShares: protectedProcedure
-    .input(getSourceCategorySharesSchema)
+    .input(getCategorySharesSchema)
     .query(async ({ ctx, input }) => {
       return getSourceCategoryShares(ctx.db, input);
     }),
 
   getPublicationGraph: protectedProcedure
-    .input(getSourcePublicationGraphSchema)
+    .input(getPublicationsSchema)
     .query(async ({ ctx, input }) => {
       return getSourcePublicationGraph(ctx.db, input);
     }),
+
+  list: protectedProcedure.query(async ({ ctx }) => getSources(ctx.db)),
 
   update: protectedProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
     return updateSource(ctx.db, input);

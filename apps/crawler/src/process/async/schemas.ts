@@ -1,6 +1,6 @@
+import { PageRangeSchema, TimestampRangeSchema } from "@basango/domain/crawler";
+import { articleSchema } from "@basango/domain/models";
 import { z } from "zod";
-
-import { ArticleSchema, DateRangeSchema, PageRangeSchema } from "#crawler/schema";
 
 export const ListingTaskPayloadSchema = z.object({
   category: z.string().optional(),
@@ -12,7 +12,7 @@ export const ListingTaskPayloadSchema = z.object({
 export const DetailsTaskPayloadSchema = z.object({
   category: z.string().optional(),
   data: z.any().optional(),
-  dateRange: DateRangeSchema.optional(),
+  dateRange: TimestampRangeSchema.optional(),
   page: z.number().int().nonnegative().optional(),
   pageRange: PageRangeSchema.optional(),
   sourceId: z.string(),
@@ -20,7 +20,7 @@ export const DetailsTaskPayloadSchema = z.object({
 });
 
 export const ProcessingTaskPayloadSchema = z.object({
-  article: ArticleSchema,
+  article: articleSchema,
   sourceId: z.string(),
 });
 
