@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import {
@@ -37,7 +36,7 @@ export function PublicationGraphChart({ sourceId }: Props) {
   const period = useChartPeriodFilter();
 
   const { data } = useQuery(
-    trpc.sources.getPublicationGraph.queryOptions({
+    trpc.sources.getPublications.queryOptions({
       id: sourceId,
       range: period.range,
     }),
@@ -50,11 +49,11 @@ export function PublicationGraphChart({ sourceId }: Props) {
           <CardTitle>Publication Graph</CardTitle>
           <CardDescription>Showing total crawled articles for the selected period</CardDescription>
         </div>
-        <ChartPeriodPicker defaultDays={period.defaultDays} paramKey={`sourcePeriod-${sourceId}`} />
+        <ChartPeriodPicker defaultDays={period.defaultDays} />
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer className="aspect-auto h-[250px] w-full" config={chartConfig}>
-          <AreaChart data={data?.items} />
+          <AreaChart data={data?.items ?? []} />
         </ChartContainer>
       </CardContent>
     </Card>

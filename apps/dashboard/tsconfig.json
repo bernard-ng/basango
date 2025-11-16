@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
+    "paths": {
+      "#api/*": ["../api/src/*"],
+      "#dashboard/*": ["./src/*"],
+      "#db/*": ["../../packages/db/src/*"],
+      "#domain/*": ["../../packages/domain/src/*"]
+    },
     "plugins": [
       {
         "name": "next"

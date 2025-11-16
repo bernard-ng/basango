@@ -5,11 +5,11 @@ import { Area, AreaChart as BaseAreachart, CartesianGrid, XAxis, YAxis } from "r
 
 import { formatDate, formatNumber } from "#dashboard/utils/utils";
 
-type AreaChartProps = {
-  data: unknown;
+type AreaChartProps<T> = {
+  data: T[];
 };
 
-export function AreaChart({ data }: AreaChartProps) {
+export function AreaChart<T>({ data }: AreaChartProps<T>) {
   return (
     <BaseAreachart accessibilityLayer data={data}>
       <CartesianGrid strokeDasharray="3 3" vertical={false} />

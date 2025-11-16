@@ -1,4 +1,11 @@
 {
+  "compilerOptions": {
+    "paths": {
+      "#api/*": ["./src/*"],
+      "#db/*": ["../../packages/db/src/*"],
+      "#domain/*": ["../../packages/domain/src/*"]
+    }
+  },
   "extends": "@basango/tsconfig/base.json",
   "include": ["src"]
 }

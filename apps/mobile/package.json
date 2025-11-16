@@ -35,9 +35,11 @@
   "private": true,
   "scripts": {
     "android": "expo start --android",
+    "clean": "rm -rf .expo node_modules",
     "ios": "expo start --ios",
     "lint": "expo lint",
     "start": "expo start",
+    "typecheck": "tsc --noEmit",
     "web": "expo start --web"
   },
   "version": "1.0.0"

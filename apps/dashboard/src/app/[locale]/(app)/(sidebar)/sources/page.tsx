@@ -1,9 +1,9 @@
-import { Source } from "@basango/domain/models/sources";
 import { Button } from "@basango/ui/components/button";
 import { PlusIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
+import { RouterOutputs } from "#api/trpc/routers/_app";
 import { SourceCreateModal } from "#dashboard/components/modals/source-create-modal";
 import { PageLayout } from "#dashboard/components/shell/page-layout";
 import { SourceCard } from "#dashboard/components/source-card";
@@ -13,11 +13,13 @@ export const metadata: Metadata = {
   title: "Sources | Basango Dashboard",
 };
 
+type Source = RouterOutputs["sources"]["list"][number];
+
 export default async function Page() {
   const queryClient = getQueryClient();
 
-  prefetch(trpc.sources.get.queryOptions());
-  const sources: Source[] = await queryClient.fetchQuery(trpc.sources.get.queryOptions());
+  prefetch(trpc.sources.list.queryOptions());
+  const sources = await queryClient.fetchQuery(trpc.sources.list.queryOptions());
 
   return (
     <HydrateClient>

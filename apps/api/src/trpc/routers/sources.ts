@@ -31,11 +31,9 @@ export const sourcesRouter = createTRPCRouter({
       return getSourceCategoryShares(ctx.db, input);
     }),
 
-  getPublicationGraph: protectedProcedure
-    .input(getPublicationsSchema)
-    .query(async ({ ctx, input }) => {
-      return getSourcePublicationGraph(ctx.db, input);
-    }),
+  getPublications: protectedProcedure.input(getPublicationsSchema).query(async ({ ctx, input }) => {
+    return getSourcePublicationGraph(ctx.db, input);
+  }),
 
   list: protectedProcedure.query(async ({ ctx }) => getSources(ctx.db)),
 

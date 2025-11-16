@@ -1,6 +1,5 @@
 "use client";
 
-import { Source } from "@basango/domain/models/sources";
 import {
   Card,
   CardContent,
@@ -17,6 +16,7 @@ import {
 } from "@basango/ui/components/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
+import { RouterOutputs } from "#api/trpc/routers/_app";
 import { formatDate, formatNumber } from "#dashboard/utils/utils";
 
 const chartConfig = {
@@ -29,7 +29,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function SourceCard({ source }: { source: Source }) {
+type Props = {
+  source: RouterOutputs["sources"]["list"][number];
+};
+
+export function SourceCard({ source }: Props) {
   return (
     <Card>
       <CardHeader>

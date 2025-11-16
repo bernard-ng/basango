@@ -25,8 +25,6 @@ const DEFAULT_PERIOD_OPTIONS = [
   { label: "Last 12 months", value: 365 },
 ] as const;
 
-type DateInput = number | Date | null | undefined;
-
 const createRangeFromDays = (days: number): DateRange => {
   const end = new Date();
 
@@ -75,7 +73,7 @@ export function useChartPeriodFilter(options: ChartPeriodFilterOptions = {}) {
     return undefined;
   }, [from, to]);
 
-  const range = useMemo(() => {
+  const calendarRange: DateRange | undefined = useMemo(() => {
     if (from && to) {
       return { from, to };
     }
@@ -83,7 +81,10 @@ export function useChartPeriodFilter(options: ChartPeriodFilterOptions = {}) {
     return defaultRange;
   }, [defaultRange, from, to]);
 
+  const range = useMemo(() => formatDomainDateRange(calendarRange), [calendarRange]);
+
   return {
+    calendarRange,
     defaultDays,
     keys: { fromKey, toKey },
     range,
@@ -118,19 +119,22 @@ export function ChartPeriodPicker({
   paramKey = "chartPeriod",
   disabled,
 }: ChartPeriodPickerProps & { disabled?: boolean }) {
-  const { range, selectedRange, keys, setState } = useChartPeriodFilter({ defaultDays, paramKey });
+  const { calendarRange, selectedRange, keys, setState } = useChartPeriodFilter({
+    defaultDays,
+    paramKey,
+  });
   const [open, setOpen] = useState(false);
 
   const selectValue = useMemo(() => {
-    if (!range?.from || !range?.to) {
+    if (!calendarRange?.from || !calendarRange?.to) {
       return "custom";
     }
 
-    const diff = differenceInCalendarDays(range.to, range.from) + 1;
+    const diff = differenceInCalendarDays(calendarRange.to, calendarRange.from) + 1;
     const match = options.find((option) => option.value === diff);
 
     return match ? String(match.value) : "custom";
-  }, [options, range]);
+  }, [calendarRange, options]);
 
   const handlePresetChange = (value: string) => {
     if (value === "custom") {
@@ -160,7 +164,7 @@ export function ChartPeriodPicker({
   };
 
   const displayLabel =
-    formatDateRange(range) ??
+    formatDateRange(calendarRange) ??
     options.find((option) => String(option.value) === selectValue)?.label ??
     "Select range";
 
@@ -196,7 +200,7 @@ export function ChartPeriodPicker({
           mode="range"
           numberOfMonths={2}
           onSelect={handleCalendarSelect}
-          selected={(selectedRange ?? range) as DateRange | undefined}
+          selected={(selectedRange ?? calendarRange) as DateRange | undefined}
         />
 
         <div className="flex justify-end gap-2">
@@ -252,8 +256,14 @@ export function ChartLimitToggle({
   );
 }
 
-function formatDateRange(range?: { from?: DateInput; to?: DateInput }) {
+function formatDateRange(range?: DateRange) {
   if (!range?.from || !range?.to) return null;
 
   return `${format(range.from, "MMM d, yyyy")} - ${format(range.to, "MMM d, yyyy")}`;
+}
+
+function formatDomainDateRange(range?: DateRange) {
+  if (!range?.from || !range?.to) return undefined;
+
+  return { end: range.to, start: range.from };
 }
