@@ -21,35 +21,7 @@ import { z } from "zod";
 import { useZodForm } from "#dashboard/hooks/use-zod-form";
 import { useTRPC } from "#dashboard/trpc/client";
 
-const baseSchema = updateSourceSchema.pick({
-  description: true,
-  displayName: true,
-  id: true,
-  name: true,
-});
-
-const sourceEditSchema = z.object({
-  description: z
-    .string()
-    .optional()
-    .transform((value) => {
-      const trimmed = value?.trim();
-      return trimmed ? trimmed : undefined;
-    })
-    .pipe(baseSchema.shape.description),
-  displayName: z
-    .string()
-    .optional()
-    .transform((value) => {
-      const trimmed = value?.trim();
-      return trimmed ? trimmed : undefined;
-    })
-    .pipe(baseSchema.shape.displayName),
-  id: baseSchema.shape.id,
-  name: z.string().trim().pipe(baseSchema.shape.name),
-});
-
-type SourceEditValues = z.infer<typeof sourceEditSchema>;
+type SourceEditValues = z.infer<typeof updateSourceSchema>;
 
 type Props = {
   source: RouterOutputs["sources"]["getById"];
@@ -59,12 +31,13 @@ export function SourceEditForm({ source }: Props) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const form = useZodForm(sourceEditSchema, {
+  const form = useZodForm(updateSourceSchema, {
     defaultValues: {
       description: source.description ?? "",
       displayName: source.displayName ?? "",
       id: source.id,
       name: source.name,
+      url: source.url ?? "",
     },
     mode: "onChange",
   });

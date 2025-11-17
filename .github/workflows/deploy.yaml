@@ -1,27 +1,16 @@
-name: api-legacy deploy
-defaults:
-  run:
-    working-directory: projects/api-legacy
-
+name: Deploy
 on:
   push:
     branches:
       - main
-    paths:
-      - "../../basango/apps/api-legacy/**"
-      - ".github/workflows/backend_*.yaml"
+
 jobs:
-  audit:
-    uses: ./.github/workflows/backend_audit.yaml
   quality:
-    uses: ./.github/workflows/backend_quality.yaml
-  tests:
-    uses: ./.github/workflows/backend_tests.yaml
-    needs: [audit, quality]
+    uses: ./.github/workflows/quality.yaml
 
   deploy:
     name: deploy
-    needs: [tests]
+    needs: [quality]
     runs-on: ubuntu-latest
     steps:
       -   name: execute ssh command
@@ -32,15 +21,13 @@ jobs:
             key: ${{ secrets.SSH_KEY }}
             port: ${{ secrets.SSH_PORT }}
             script: |
-              cd /var/www/html/news.devscast.tech
+              cd /var/www/html/basango.io
               git pull origin main --rebase
-              cd projects/backend
-              make deploy
+              bun install --frozen-lockfile
               curl -X POST "https://api.telegram.org/bot${{ secrets.DEVY_TOKEN }}/sendMessage" \
                   -H "Content-Type: application/json" \
                   -d '{
                     "chat_id": "${{ secrets.DEVY_CHAT_ID }}",
-                    "text": "news.devscast.tech : `'"$(git rev-parse --short HEAD)"'` has been deployed! 🎉",
+                    "text": "basango.io : `'"$(git rev-parse --short HEAD)"'` has been deployed! 🎉",
                     "parse_mode": "Markdown"
                   }'
-

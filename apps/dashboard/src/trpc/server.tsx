@@ -56,21 +56,22 @@ type AnyQueryOptions =
 
 export function prefetch<T extends AnyQueryOptions>(queryOptions: T) {
   const queryClient = getQueryClient();
-  if (queryOptions.queryKey[1]?.type === "infinite") {
+  const meta = queryOptions.queryKey[1];
+  if (!Array.isArray(meta) && meta?.type === "infinite") {
     void queryClient.prefetchInfiniteQuery(queryOptions as any);
   } else {
-    void queryClient.prefetchQuery(queryOptions);
+    void queryClient.prefetchQuery(queryOptions as any);
   }
 }
-
 export function batchPrefetch<T extends AnyQueryOptions>(queryOptionsArray: T[]) {
   const queryClient = getQueryClient();
 
   for (const queryOptions of queryOptionsArray) {
-    if (queryOptions.queryKey[1]?.type === "infinite") {
+    const meta = queryOptions.queryKey[1];
+    if (!Array.isArray(meta) && meta?.type === "infinite") {
       void queryClient.prefetchInfiniteQuery(queryOptions as any);
     } else {
-      void queryClient.prefetchQuery(queryOptions);
+      void queryClient.prefetchQuery(queryOptions as any);
     }
   }
 }

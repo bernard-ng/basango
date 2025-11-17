@@ -4,14 +4,15 @@
     "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@date-fns/utc": "^2.1.1",
-    "date-fns": "^4.1.0",
+    "@devscast/config": "catalog:",
+    "date-fns": "catalog:",
     "drizzle-orm": "^0.44.7",
     "mysql2": "^3.15.3",
     "pg": "^8.16.3",
     "snakecase-keys": "^9.0.2",
     "tiktoken": "^1.0.22",
     "uuid": "^13.0.0",
-    "zod": "^4.1.12"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/pg": "^8.15.6",

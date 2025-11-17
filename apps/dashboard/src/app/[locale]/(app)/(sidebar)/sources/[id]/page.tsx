@@ -1,4 +1,3 @@
-import { Source } from "@basango/domain/models/sources";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@basango/ui/components/tabs";
 import { Metadata } from "next";
 
@@ -20,11 +19,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   batchPrefetch([
     trpc.sources.getById.queryOptions({ id }),
     trpc.sources.getCategoryShares.queryOptions({ id, limit: 10 }),
-    trpc.sources.getPublicationGraph.queryOptions({ id }),
+    trpc.sources.getPublications.queryOptions({ id }),
     trpc.articles.list.infiniteQueryOptions({ limit: 12, sourceId: id }),
   ]);
 
-  const source: Source = await queryClient.fetchQuery(trpc.sources.getById.queryOptions({ id }));
+  const source = await queryClient.fetchQuery(trpc.sources.getById.queryOptions({ id }));
 
   return (
     <HydrateClient>

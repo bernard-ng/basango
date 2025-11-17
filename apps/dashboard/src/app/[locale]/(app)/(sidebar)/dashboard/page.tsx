@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   batchPrefetch([
-    trpc.articles.getPublicationGraph.queryOptions({}),
+    trpc.articles.getPublications.queryOptions({}),
     trpc.articles.getSourceDistribution.queryOptions({ limit: 8 }),
   ]);
 
