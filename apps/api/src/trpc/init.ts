@@ -1,11 +1,11 @@
 import { Database, db } from "@basango/db/client";
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import type { Context } from "hono";
 import superjson from "superjson";
 
 import { withAuthentication } from "#api/trpc/middlewares/auth";
 import { withDatabase } from "#api/trpc/middlewares/db";
-import { Session, verifyAccessToken } from "#api/utils/auth";
+import { Session, getSession } from "#api/utils/auth";
 import { getGeoContext } from "#api/utils/geo";
 
 type TRPCContext = {
@@ -16,7 +16,7 @@ type TRPCContext = {
 
 export const createTRPCContext = async (_: unknown, c: Context): Promise<TRPCContext> => {
   const accessToken = c.req.header("Authorization")?.split(" ")[1];
-  const session = await verifyAccessToken(accessToken);
+  const session = await getSession(db, accessToken);
   const geo = getGeoContext(c.req);
 
   return {
@@ -51,13 +51,13 @@ export const publicProcedure = t.procedure.use(withDatabaseMiddleware);
 
 export const protectedProcedure = t.procedure
   .use(withDatabaseMiddleware)
-  .use(withAutenticationMiddleware) // NOTE: This is needed to ensure that the teamId is set in the context
+  .use(withAutenticationMiddleware)
   .use(async (opts) => {
     const { session } = opts.ctx;
 
-    // if (!session) {
-    //   throw new TRPCError({ code: "UNAUTHORIZED" });
-    // }
+    if (!session) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
     return opts.next({
       ctx: {

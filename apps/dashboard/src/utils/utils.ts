@@ -15,7 +15,7 @@ export function formatSize(bytes: number): string {
   }).format(+Math.round(bytes / 1024 ** unitIndex));
 }
 
-export function secondsToHoursAndMinutes(seconds: number) {
+export function formatHoursMinutes(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
 

@@ -8,6 +8,8 @@ import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import superjson from "superjson";
 
+import { getClientAccessToken } from "#dashboard/utils/auth/client";
+
 import { makeQueryClient } from "./query-client";
 
 export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
@@ -44,11 +46,12 @@ export function TRPCReactProvider(
       links: [
         httpBatchLink({
           headers: async () => {
-            //const token = window.localStorage.getItem("auth_token");
-
-            return {
-              //Authorization: `Bearer ${token}`,
-            };
+            const token = getClientAccessToken();
+            return token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {};
           },
           transformer: superjson,
           url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,

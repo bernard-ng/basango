@@ -23,3 +23,14 @@ export const DEFAULT_SOURCE_IMAGE = "https://devscast.org/images/sources/";
 export const DEFAULT_PUBLICATION_GRAPH_DAYS = 30;
 export const DEFAULT_CATEGORY_SHARES_LIMIT = 10;
 export const DEFAULT_TIMEZONE = "Africa/Lubumbashi";
+
+export const DEFAULT_ACCESS_TOKEN_COOKIE = "basango.access_token";
+export const DEFAULT_REFRESH_TOKEN_COOKIE = "basango.refresh_token";
+export const DEFAULT_ENCRYPTION_ALGORITHM = "aes-256-gcm";
+export const DEFAULT_IV_LENGTH = 16;
+export const DEFAULT_AUTH_TAG_LENGTH = 16;
+export const DEFAULT_BCRYPT_SALT_ROUNDS = 12;
+export const DEFAULT_TOKEN_AUDIENCE = "basango_dashboard";
+export const DEFAULT_TOKEN_ISSUER = "basango_api";
+export const DEFAULT_ACCESS_TOKEN_TTL = "15m";
+export const DEFAULT_REFRESH_TOKEN_TTL = "7d";

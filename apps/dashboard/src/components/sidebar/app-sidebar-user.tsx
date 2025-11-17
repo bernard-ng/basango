@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback } from "@basango/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -16,10 +15,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@basango/ui/components/sidebar";
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import { useUser } from "#dashboard/hooks/use-user";
+import { clearSessionTokens } from "#dashboard/utils/auth/client";
+import { getInitials } from "#dashboard/utils/utils";
 
 export function AppSidebarUser() {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+  const { user, setUser } = useUser();
+
+  const handleLogout = () => {
+    clearSessionTokens();
+    setUser(null);
+    router.push(`/login`);
+    router.refresh();
+  };
 
   return (
     <SidebarMenu>
@@ -31,11 +44,13 @@ export function AppSidebarUser() {
               size="lg"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg">BN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {getInitials(user?.name ?? user?.email ?? "")}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Bernard Ng</span>
-                <span className="truncate text-xs">bernard.ng@example.com</span>
+                <span className="truncate font-medium">{user?.name ?? user?.email ?? ""}</span>
+                <span className="truncate text-xs">{user?.email ?? ""}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -49,38 +64,18 @@ export function AppSidebarUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg">BN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {getInitials(user?.name ?? user?.email ?? "")}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Bernard Ng</span>
-                  <span className="truncate text-xs">bernard.ng@example.com</span>
+                  <span className="truncate font-medium">{user?.name ?? user?.email ?? ""}</span>
+                  <span className="truncate text-xs">{user?.email ?? ""}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

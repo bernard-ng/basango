@@ -27,6 +27,7 @@ Conventions
 - Prefer named exports in libraries. Avoid barrel files unless necessary.
 - Use `workspace:*` for internal dependencies; do not hardcode versions.
 - Keep changes minimal and localized; avoid cross-cutting refactors without discussion.
+- When using tRPC in React, always compose `useQuery`/`useMutation` from TanStack with `trpc.*.queryOptions`/`mutationOptions` instead of calling `trpc.*.useQuery`/`useMutation` helpers directly (they are deprecated).
 
 Tasks & Commands
 - Install: `bun install` (run at repo root only).
@@ -67,4 +68,3 @@ Gotchas
 Contact Points
 - Architecture overview: `docs/architecture.md`.
 - Forms handling patterns: `docs/forms-handling.md`.
-

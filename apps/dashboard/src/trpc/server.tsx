@@ -12,6 +12,8 @@ import {
 import { cache } from "react";
 import superjson from "superjson";
 
+import { getServerAccessToken } from "#dashboard/utils/auth/server";
+
 import { makeQueryClient } from "./query-client";
 
 // IMPORTANT: Create a stable getter for the query client that
@@ -23,14 +25,16 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
     links: [
       httpBatchLink({
         async headers() {
-          //const token = window.localStorage.getItem("auth_token");
+          const token = await getServerAccessToken();
 
-          return {
-            //Authorization: `Bearer ${token}`,
-            // "x-user-country": await getCountryCode(),
-            // "x-user-locale": await getLocale(),
-            // "x-user-timezone": await getTimezone(),
-          };
+          return token
+            ? {
+                Authorization: `Bearer ${token}`,
+                // "x-user-country": await getCountryCode(),
+                // "x-user-locale": await getLocale(),
+                // "x-user-timezone": await getTimezone(),
+              }
+            : {};
         },
         transformer: superjson,
         url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
