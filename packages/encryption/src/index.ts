@@ -1,12 +1,15 @@
 import crypto from "node:crypto";
 
+import {
+  DEFAULT_AUTH_TAG_LENGTH,
+  DEFAULT_BCRYPT_SALT_ROUNDS,
+  DEFAULT_ENCRYPTION_ALGORITHM,
+  DEFAULT_IV_LENGTH,
+} from "@basango/domain/constants";
 import { createEnvAccessor } from "@devscast/config";
+import * as bcrypt from "bcrypt";
 
 export const env = createEnvAccessor(["BASANGO_ENCRYPTION_KEY"] as const);
-
-const ALGORITHM = "aes-256-gcm";
-const IV_LENGTH = 16;
-const AUTH_TAG_LENGTH = 16;
 
 function getKey(): Buffer {
   const key = env("BASANGO_ENCRYPTION_KEY");
@@ -24,8 +27,8 @@ function getKey(): Buffer {
  */
 export function encrypt(text: string): string {
   const key = getKey();
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+  const iv = crypto.randomBytes(DEFAULT_IV_LENGTH);
+  const cipher = crypto.createCipheriv(DEFAULT_ENCRYPTION_ALGORITHM, key, iv);
 
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
@@ -50,11 +53,14 @@ export function decrypt(encryptedPayload: string): string {
   const dataBuffer = Buffer.from(encryptedPayload, "base64");
 
   // Extract IV, auth tag, and encrypted data
-  const iv = dataBuffer.subarray(0, IV_LENGTH);
-  const authTag = dataBuffer.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
-  const encryptedText = dataBuffer.subarray(IV_LENGTH + AUTH_TAG_LENGTH);
+  const iv = dataBuffer.subarray(0, DEFAULT_IV_LENGTH);
+  const authTag = dataBuffer.subarray(
+    DEFAULT_IV_LENGTH,
+    DEFAULT_IV_LENGTH + DEFAULT_AUTH_TAG_LENGTH,
+  );
+  const encryptedText = dataBuffer.subarray(DEFAULT_IV_LENGTH + DEFAULT_AUTH_TAG_LENGTH);
 
-  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+  const decipher = crypto.createDecipheriv(DEFAULT_ENCRYPTION_ALGORITHM, key, iv);
   decipher.setAuthTag(authTag);
 
   let decrypted = decipher.update(encryptedText.toString("hex"), "hex", "utf8");
@@ -73,4 +79,12 @@ export function md5(str: string): string {
 
 export function generateRandomBytes(size: number): string {
   return crypto.randomBytes(size).toString("hex");
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, DEFAULT_BCRYPT_SALT_ROUNDS);
+}
+
+export async function verifyPassword(password: string, hashed: string): Promise<boolean> {
+  return bcrypt.compare(password, hashed);
 }

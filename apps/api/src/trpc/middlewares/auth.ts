@@ -1,6 +1,5 @@
 import type { Database } from "@basango/db/client";
-
-// import { TRPCError } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 
 import type { Session } from "#api/utils/auth";
 
@@ -18,14 +17,12 @@ export const withAuthentication = async <TReturn>(opts: {
 }) => {
   const { ctx, next } = opts;
 
-  //   const userId = ctx.session?.user?.id;
-
-  //   if (!userId) {
-  //     throw new TRPCError({
-  //       code: "UNAUTHORIZED",
-  //       message: "No permission to access",
-  //     });
-  //   }
+  if (!ctx.session) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Authentication is required to access this resource.",
+    });
+  }
 
   return next({
     ctx: {

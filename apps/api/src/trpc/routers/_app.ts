@@ -2,10 +2,12 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import { createTRPCRouter } from "#api/trpc/init";
 import { articlesRouter } from "#api/trpc/routers/articles";
+import { authRouter } from "#api/trpc/routers/auth";
 import { sourcesRouter } from "#api/trpc/routers/sources";
 
 export const appRouter = createTRPCRouter({
   articles: articlesRouter,
+  auth: authRouter,
   sources: sourcesRouter,
 });
 

@@ -1,6 +1,11 @@
 {
   "dependencies": {
-    "@devscast/config": "catalog:"
+    "@basango/domain": "workspace:*",
+    "@devscast/config": "catalog:",
+    "bcrypt": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0"
   },
   "main": "src/index.ts",
   "name": "@basango/encryption",
