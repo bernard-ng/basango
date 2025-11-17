@@ -1,6 +1,5 @@
 "use client";
 
-import { Source } from "@basango/domain/models";
 import {
   Card,
   CardContent,
@@ -11,9 +10,14 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { RouterOutputs } from "#api/trpc/routers/_app";
 import { SourceEditForm } from "#dashboard/components/forms/source-edit-form";
 
-export function SourceDetailsTab({ source }: { source: Source }) {
+type Props = {
+  source: RouterOutputs["sources"]["getById"];
+};
+
+export function SourceDetailsTab({ source }: Props) {
   const credibility = source.credibility;
 
   return (

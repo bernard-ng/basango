@@ -105,6 +105,10 @@ bun run crawler:sync -- --sourceId radiookapi.net --dateRange 2024-01-01:2024-01
 bun run crawler:sync -- --sourceId example.com --category politics
 ```
 
+Crawled data will be saved in the `data/` directory as JSONL files.
+and can be push to the database using the `bun run crawler:push -- --sourceId radiookapi.net`.
+
+
 ### Asynchronous Crawling
 
 Best for large-scale operations and when you need job queuing:
@@ -148,32 +152,3 @@ bun run crawler:worker -- -q listing -q processing
 | Option | Description | Example |
 |--------|-------------|---------|
 | `--queue`, `-q` | Specify queue(s) to process (can be used multiple times) | `--queue listing --queue details` |
-
-## Project Structure
-
-```
-basango/apps/crawler/
-├── src/
-│   ├── config.ts              # Configuration schema and loading
-│   ├── constants.ts           # Application constants
-│   ├── schema.ts              # Zod validation schemas
-│   ├── utils.ts               # Utility functions
-│   ├── http/                  # HTTP client and utilities
-│   ├── process/               # Core crawling logic
-│   │   ├── async/             # Async processing (queues, workers)
-│   │   ├── sync/              # Synchronous processing
-│   │   ├── parsers/           # Content parsers (HTML, WordPress)
-│   │   ├── crawler.ts         # Main crawler interface
-│   │   └── persistence.ts     # Data persistence layer
-│   ├── scripts/               # CLI entry points
-│   │   ├── sync.ts           # Sync crawling script
-│   │   ├── async.ts           # Async job scheduling
-│   │   ├── worker.ts          # Worker process
-│   │   └── utils.ts           # CLI utilities
-│   └── __tests__/             # Test files
-├── config/
-│   ├── sources.json           # Source configurations
-│   └── pipeline.json          # Pipeline settings
-├── data/                      # Output directory for crawled data
-└── package.json
-```

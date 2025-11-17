@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "@devscast/config": "catalog:"
+  },
   "main": "src/index.ts",
   "name": "@basango/encryption",
   "private": true,

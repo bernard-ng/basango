@@ -46,6 +46,6 @@
     "build": "next build",
     "clean": "rm -rf .next node_modules",
     "dev": "next dev",
-    "start": "next start"
+    "start": "NODE_ENV=production next start"
   }
 }
