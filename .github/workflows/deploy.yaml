@@ -24,6 +24,7 @@ jobs:
               cd /var/www/html/basango.io
               git pull origin main --rebase
               bun install --frozen-lockfile
+              make deploy
               curl -X POST "https://api.telegram.org/bot${{ secrets.DEVY_TOKEN }}/sendMessage" \
                   -H "Content-Type: application/json" \
                   -d '{
