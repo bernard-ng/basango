@@ -8,14 +8,13 @@ export function AppSidebarInfo() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-          size="lg"
-        >
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">Basango Dashboard</span>
-            <span className="truncate text-xs">v{version}</span>
-          </div>
+        <SidebarMenuButton asChild size="lg">
+          <a href="#">
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">Basango Dashboard</span>
+              <span className="truncate text-xs">v{version}</span>
+            </div>
+          </a>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

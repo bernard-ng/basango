@@ -16,21 +16,29 @@ import {
   SidebarMenuSubItem,
 } from "@basango/ui/components/sidebar";
 import { ChevronRight, type LucideIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
-export function AppSidebarContent({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+type ParentItem = {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  isActive?: boolean;
+  items?: ChildItem[];
+};
+
+type ChildItem = {
+  title: string;
+  url: string;
+  isActive?: boolean;
+};
+
+type Props = {
+  items: ParentItem[];
+};
+
+export function AppSidebarContent({ items }: Props) {
+  const pathname = usePathname();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -54,7 +62,10 @@ export function AppSidebarContent({
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={subItem.url === pathname || pathname.includes(subItem.url)}
+                      >
                         <a href={subItem.url}>
                           <span>{subItem.title}</span>
                         </a>

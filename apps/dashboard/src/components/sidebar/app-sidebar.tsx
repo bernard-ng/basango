@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
 } from "@basango/ui/components/sidebar";
 import { LayoutDashboard, SquareTerminal } from "lucide-react";
 import * as React from "react";
@@ -49,7 +48,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <AppSidebarInfo />
       </SidebarHeader>
@@ -59,7 +58,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <AppSidebarUser />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

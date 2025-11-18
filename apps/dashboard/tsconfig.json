@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
+      "@basango/ui/*": ["../../packages/ui/src/*"],
       "#api/*": ["../api/src/*"],
       "#dashboard/*": ["./src/*"],
       "#db/*": ["../../packages/db/src/*"],

@@ -23,8 +23,8 @@ export default async function Page() {
 
   return (
     <HydrateClient>
-      <PageLayout leading="Manage your news sources" title="Sources">
-        <div className="mb-6 flex justify-end">
+      <PageLayout title="Sources">
+        <div className="flex justify-end">
           <Link href="?createSource=true">
             <Button type="button">
               <PlusIcon className="mr-2 size-4" />

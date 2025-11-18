@@ -1,6 +1,5 @@
 import { SidebarInset, SidebarProvider } from "@basango/ui/components/sidebar";
 
-import { PageHeader } from "#dashboard/components/shell/page-header";
 import { AppSidebar } from "#dashboard/components/sidebar/app-sidebar";
 import { HydrateClient } from "#dashboard/trpc/server";
 
@@ -10,10 +9,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <SidebarProvider>
         <AppSidebar />
 
-        <SidebarInset>
-          <PageHeader />
-          {children}
-        </SidebarInset>
+        <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </HydrateClient>
   );

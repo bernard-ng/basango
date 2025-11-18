@@ -12,8 +12,7 @@ import { Input } from "@basango/ui/components/input";
 import { SubmitButton } from "@basango/ui/components/submit-button";
 import { cn } from "@basango/ui/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -27,11 +26,9 @@ type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const router = useRouter();
-  const params = useParams<{ locale?: string }>();
   const searchParams = useSearchParams();
   const trpc = useTRPC();
   const setUser = useUserStore((state) => state.setUser);
-  const locale = params?.locale ?? "en";
 
   const form = useZodForm(loginSchema, {
     defaultValues: {
@@ -53,20 +50,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           refreshTokenExpiresAt: data.refreshTokenExpiresAt,
         });
         setUser(data.user);
+        toast.success("Successfully logged in.");
 
         form.reset();
-        router.push(searchParams?.get("return_to") ?? `/${locale}/dashboard`);
+        router.push(searchParams?.get("return_to") ?? `/dashboard`);
         router.refresh();
       },
     }),
   );
 
-  const handleSubmit = useCallback(
-    (values: LoginValues) => {
-      mutation.mutate(values);
-    },
-    [mutation],
-  );
+  const handleSubmit = (values: LoginValues) => mutation.mutate(values);
 
   return (
     <form

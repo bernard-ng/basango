@@ -8,7 +8,7 @@ import { DEFAULT_OPEN_GRAPH_USER_AGENT, DEFAULT_USER_AGENT } from "@basango/doma
  * @author Bernard Ngandu <bernard@devscast.tech>
  */
 export class UserAgents {
-  private static readonly USER_AGENTS: string[] = [
+  public static readonly USER_AGENTS: string[] = [
     "Mozilla/5.0 (iPhone; CPU iPhone OS 10_4_8; like Mac OS X) AppleWebKit/603.39 (KHTML, like Gecko) Chrome/52.0.3638.271 Mobile Safari/537.5",
     "Mozilla/50.0 (Linux; U; Linux x86_64; en-US) Gecko/20130401 Firefox/52.7",
     "Mozilla/5.0 (Linux; U; Android 5.0; SM-P815 Build/LRX22G) AppleWebKit/600.4 (KHTML, like Gecko) Chrome/48.0.1562.260 Mobile Safari/600.0",
