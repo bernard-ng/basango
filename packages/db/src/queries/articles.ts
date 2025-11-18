@@ -154,14 +154,14 @@ export async function getArticlesPublicationGraph(
   db: Database,
   params: GetPublicationsParams,
 ): Promise<Publications> {
-  const [startDate, endDate] = buildDateRange(params.range);
-  const [previousStart, previousEnd] = buildPreviousRange([startDate, endDate]);
+  const current = buildDateRange(params.range);
+  const previous = buildPreviousRange(current);
 
   const data = await db.execute<Publication>(sql`
     WITH bounds AS (
       SELECT
-        ${startDate}::timestamptz AS start_ts,
-        ${endDate}::timestamptz AS end_ts
+        ${current.start}::timestamptz AS start_ts,
+        ${current.end}::timestamptz AS end_ts
     ),
     series AS (
       SELECT (gs)::date AS d
@@ -189,19 +189,19 @@ export async function getArticlesPublicationGraph(
     ORDER BY s.d ASC
   `);
 
-  const [previous] = await db
+  const [previousResult] = await db
     .execute<{ count: number }>(
       sql`
       SELECT COALESCE(COUNT(*)::int, 0) AS count
       FROM article a
-      WHERE a.published_at >= timezone(${DEFAULT_TIMEZONE}, ${previousStart})
-        AND a.published_at <= timezone(${DEFAULT_TIMEZONE}, ${previousEnd})
+      WHERE a.published_at >= timezone(${DEFAULT_TIMEZONE}, ${previous.start})
+        AND a.published_at <= timezone(${DEFAULT_TIMEZONE}, ${previous.end})
     `,
     )
     .then((res) => res.rows);
 
   const currentTotal = data.rows.reduce((acc, item) => acc + item.count, 0);
-  const previousTotal = previous?.count ?? 0;
+  const previousTotal = previousResult?.count ?? 0;
 
   return {
     items: data.rows,

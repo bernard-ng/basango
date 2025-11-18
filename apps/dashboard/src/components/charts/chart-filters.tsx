@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@basango/ui/components/select";
-import { ToggleGroup, ToggleGroupItem } from "@basango/ui/components/toggle-group";
 import { differenceInCalendarDays, format, subDays } from "date-fns";
 import { CalendarIcon, ChevronDown } from "lucide-react";
 import { parseAsInteger, parseAsIsoDate, useQueryStates } from "nuqs";
@@ -136,8 +135,10 @@ export function ChartPeriodPicker({
     return match ? String(match.value) : "custom";
   }, [calendarRange, options]);
 
-  const handlePresetChange = (value: string) => {
-    if (value === "custom") {
+  const presetValue = selectValue === "custom" ? undefined : selectValue;
+
+  const handlePresetChange = (value?: string) => {
+    if (!value || value === "custom") {
       return;
     }
 
@@ -147,6 +148,10 @@ export function ChartPeriodPicker({
       [keys.fromKey]: presetRange.from ?? null,
       [keys.toKey]: presetRange.to ?? null,
     });
+  };
+
+  const handlePresetClick = (value: string) => {
+    handlePresetChange(value);
   };
 
   const handleCalendarSelect = (value: DateRange | undefined) => {
@@ -181,29 +186,56 @@ export function ChartPeriodPicker({
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-screen space-y-4 p-4 sm:w-[520px]" sideOffset={8}>
-        <Select onValueChange={handlePresetChange} value={selectValue}>
-          <SelectTrigger>
-            <SelectValue placeholder="Quick range" />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={String(option.value)}>
-                {option.label}
-              </SelectItem>
-            ))}
-            <SelectItem value="custom">Custom range</SelectItem>
-          </SelectContent>
-        </Select>
+      <PopoverContent align="start" className="w-auto p-0" sideOffset={8}>
+        <div className="flex flex-col gap-0 sm:flex-row">
+          <div className="border-b border-border sm:hidden">
+            <div className="p-4">
+              <Select onValueChange={handlePresetChange} value={selectValue}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Quick range" />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.map((option) => (
+                    <SelectItem key={option.value} value={String(option.value)}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="custom">Custom range</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="hidden flex-col gap-0 border-r border-border py-4 pl-4 pr-4 sm:flex">
+            {options.map((option) => {
+              const isActive = presetValue === String(option.value);
 
-        <Calendar
-          mode="range"
-          numberOfMonths={2}
-          onSelect={handleCalendarSelect}
-          selected={(selectedRange ?? calendarRange) as DateRange | undefined}
-        />
-
-        <div className="flex justify-end gap-2">
+              return (
+                <button
+                  className={`rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                  key={option.value}
+                  onClick={() => handlePresetClick(String(option.value))}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="p-4">
+            <Calendar
+              disabled={{ after: new Date() }}
+              mode="range"
+              numberOfMonths={1}
+              onSelect={handleCalendarSelect}
+              selected={(selectedRange ?? calendarRange) as DateRange | undefined}
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
           <Button
             onClick={() =>
               setState({

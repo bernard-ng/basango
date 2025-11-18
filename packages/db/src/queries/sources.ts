@@ -100,13 +100,13 @@ export async function getSourcePublicationGraph(
   db: Database,
   params: GetPublicationsParams,
 ): Promise<Publications> {
-  const [startDate, endDate] = buildDateRange(params.range);
+  const range = buildDateRange(params.range);
 
   const data = await db.execute<Publication>(sql`
     WITH bounds AS (
       SELECT
-        ${startDate}::timestamptz AS start_ts,
-        ${endDate}::timestamptz   AS end_ts
+        ${range.start}::timestamptz AS start_ts,
+        ${range.end}::timestamptz   AS end_ts
     ),
     series AS (
       SELECT (gs)::date AS d

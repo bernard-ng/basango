@@ -36,12 +36,12 @@ export class WordPressCrawler extends BaseCrawler {
   readonly source: WordPressSourceConfig;
   private categoryMap: Map<number, string> = new Map();
 
-  private static readonly POST_QUERY =
+  public static readonly POST_QUERY =
     "_fields=date,slug,link,title.rendered,content.rendered,categories&orderby=date&order=desc";
-  private static readonly CATEGORY_QUERY =
+  public static readonly CATEGORY_QUERY =
     "_fields=id,slug,count&orderby=count&order=desc&per_page=100";
-  private static readonly TOTAL_PAGES_HEADER = "x-wp-totalpages";
-  private static readonly TOTAL_POSTS_HEADER = "x-wp-total";
+  public static readonly TOTAL_PAGES_HEADER = "x-wp-totalpages";
+  public static readonly TOTAL_POSTS_HEADER = "x-wp-total";
 
   constructor(settings: FetchCrawlerConfig, options: { persistors?: Persistor[] } = {}) {
     super(settings, options);
@@ -196,7 +196,9 @@ export class WordPressCrawler extends BaseCrawler {
    * @param page - Page number
    */
   buildEndpointUrl(page: number): string {
-    return `${this.baseUrl()}wp-json/wp/v2/posts?${WordPressCrawler.POST_QUERY}&page=${page}&per_page=100`;
+    return `${this.baseUrl()}wp-json/wp/v2/posts?${
+      WordPressCrawler.POST_QUERY
+    }&page=${page}&per_page=100`;
   }
 
   /**

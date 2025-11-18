@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <HydrateClient>
-      <PageLayout leading={source.description ?? "No description available"} title={source.name}>
+      <PageLayout title={source.name}>
         <Tabs className="space-y-4" defaultValue="overview">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>

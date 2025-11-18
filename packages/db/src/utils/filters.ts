@@ -19,30 +19,23 @@ export const buildSearchQuery = (input: string) => {
     .join(" & ");
 };
 
-/**
- * Resolve a date range given an explicit range.
- * Defaults to the last 30 days when no range is provided.
- */
-export function buildDateRange(range?: DateRange): [startDate: Date, endDate: Date] {
-  const endDate = endOfDay(range?.end ?? new Date());
-  const startDate = startOfDay(
-    range?.start ?? subDays(endDate, Math.max(DEFAULT_PUBLICATION_GRAPH_DAYS - 1, 0)),
+export function buildDateRange(range?: DateRange): DateRange {
+  const end = endOfDay(range?.end ?? new Date());
+  const start = startOfDay(
+    range?.start ?? subDays(end, Math.max(DEFAULT_PUBLICATION_GRAPH_DAYS - 1, 0)),
   );
 
-  return [startDate, endDate];
+  return { end, start };
 }
 
-/**
- * Given a [start, end] date range, produce the immediately preceding range of the same length.
- */
-export function buildPreviousRange([startDate, endDate]: [Date, Date]): [Date, Date] {
+export function buildPreviousRange(range: DateRange): DateRange {
   const days = Math.max(
     1,
-    Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1,
+    Math.round((range.end.getTime() - range.start.getTime()) / (1000 * 60 * 60 * 24)) + 1,
   );
 
-  const previousRangeEnd = endOfDay(subDays(startDate, 1));
-  const previousRangeStart = startOfDay(subDays(previousRangeEnd, days - 1));
+  const end = endOfDay(subDays(range.start, 1));
+  const start = startOfDay(subDays(end, days - 1));
 
-  return [previousRangeStart, previousRangeEnd];
+  return { end, start };
 }

@@ -1,5 +1,7 @@
 #!/usr/bin/env bun
 
+/** biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: false positive */
+
 import { RowDataPacket } from "mysql2/promise";
 import { Pool, PoolClient } from "pg";
 
@@ -48,16 +50,16 @@ class Engine {
 
   constructor(
     private readonly sourceOptions: SourceOptions,
-    private readonly targetOptions: TargetOptions,
+    targetOptions: TargetOptions,
   ) {
     this.target = new Pool({
       allowExitOnIdle: true,
-      connectionString: this.targetOptions.database,
+      connectionString: targetOptions.database,
       max: 16,
     });
-    this.ignore = { ...DEFAULT_IGNORE, ...(this.targetOptions.ignoreColumns ?? {}) };
-    this.pageSize = this.targetOptions.pageSize ?? 5000;
-    this.batchSize = Math.max(1, this.targetOptions.batchSize ?? 500);
+    this.ignore = { ...DEFAULT_IGNORE, ...(targetOptions.ignoreColumns ?? {}) };
+    this.pageSize = targetOptions.pageSize ?? 5000;
+    this.batchSize = Math.max(1, targetOptions.batchSize ?? 500);
     console.log(
       `Engine initialized with pageSize=${this.pageSize} and batchSize=${this.batchSize} (resume=${this.resume})`,
     );
@@ -70,11 +72,17 @@ class Engine {
   async import(table: string): Promise<number> {
     await this.ensureProgressTable();
 
-    let startState: SyncProgress = { cursor: null, cursorEncoding: null, offset: 0 };
+    let startState: SyncProgress = {
+      cursor: null,
+      cursorEncoding: null,
+      offset: 0,
+    };
     if (this.resume) {
       startState = await this.getProgressState(table);
       console.log(
-        `Resuming import for ${table} from offset=${startState.offset}, cursor=${startState.cursor ?? "null"}`,
+        `Resuming import for ${table} from offset=${
+          startState.offset
+        }, cursor=${startState.cursor ?? "null"}`,
       );
     } else {
       await this.reset(table);
@@ -107,7 +115,9 @@ class Engine {
         let sql: string;
         let params: unknown[];
         if (useCursor && cursorParam != null) {
-          sql = `SELECT * FROM \`${this.escapeBacktick(table)}\` WHERE \`id\` > ? ORDER BY \`id\` LIMIT ?`;
+          sql = `SELECT * FROM \`${this.escapeBacktick(
+            table,
+          )}\` WHERE \`id\` > ? ORDER BY \`id\` LIMIT ?`;
           params = [cursorParam, size];
         } else {
           sql = `SELECT * FROM \`${this.escapeBacktick(table)}\` ORDER BY \`id\` LIMIT ? OFFSET ?`;

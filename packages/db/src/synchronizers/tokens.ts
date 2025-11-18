@@ -17,10 +17,10 @@ class Engine {
   private readonly pageSize: number = 1000;
   private readonly batchSize: number = 50;
 
-  constructor(private readonly database: string) {
+  constructor(database: string) {
     this.db = new Pool({
       allowExitOnIdle: true,
-      connectionString: this.database,
+      connectionString: database,
       max: 16,
     });
     console.log(

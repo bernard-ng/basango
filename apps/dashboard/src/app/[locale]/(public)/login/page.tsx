@@ -10,9 +10,9 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
+      <div className="relative hidden lg:block">
         <img
-          alt="verification placeholder"
+          alt="Login background"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
           src="https://images.pexels.com/photos/30690932/pexels-photo-30690932.jpeg"
         />
