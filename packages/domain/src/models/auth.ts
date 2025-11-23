@@ -1,18 +1,10 @@
-import { z } from "@hono/zod-openapi";
+import z from "zod";
 
 export const loginSchema = z.object({
-  email: z.email().openapi({
-    description: "Email address used to authenticate the user.",
-    example: "user@example.com",
-  }),
-  password: z.string().min(8).openapi({
-    description: "Account password.",
-    example: "••••••••",
-  }),
+  email: z.email(),
+  password: z.string().min(8),
 });
 
 export const refreshSessionSchema = z.object({
-  refreshToken: z.string().min(1).openapi({
-    description: "Refresh token returned when logging in.",
-  }),
+  refreshToken: z.string().min(1),
 });

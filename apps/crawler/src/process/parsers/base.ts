@@ -1,8 +1,7 @@
-import type { AnySourceConfig } from "@basango/domain/crawler";
+import { AnySourceOptions, CrawlerFetchingOptions, config } from "@basango/domain/config";
 import { Article } from "@basango/domain/models";
 import { HTMLElement, parse as parseHtml } from "node-html-parser";
 
-import { FetchCrawlerConfig, config } from "#crawler/config";
 import { SyncHttpClient } from "#crawler/http/http-client";
 import { OpenGraph } from "#crawler/http/open-graph";
 import type { Persistor } from "#crawler/process/persistence";
@@ -12,23 +11,23 @@ export interface CrawlerOptions {
 }
 
 export abstract class BaseCrawler {
-  protected readonly settings: FetchCrawlerConfig;
-  protected readonly source: AnySourceConfig;
+  protected readonly options: CrawlerFetchingOptions;
+  protected readonly source: AnySourceOptions;
   protected readonly http: SyncHttpClient;
   protected readonly persistors: Persistor[];
   protected readonly openGraph: OpenGraph;
 
-  protected constructor(settings: FetchCrawlerConfig, options: CrawlerOptions = {}) {
-    if (!settings.source) {
+  protected constructor(options: CrawlerFetchingOptions, crawlerOptions: CrawlerOptions = {}) {
+    if (!options.source) {
       throw new Error("Crawler requires a bound source");
     }
 
-    this.http = new SyncHttpClient(config.fetch.client);
-    this.persistors = options.persistors ?? [];
+    this.http = new SyncHttpClient(config.crawler.fetch.client);
+    this.persistors = crawlerOptions.persistors ?? [];
     this.openGraph = new OpenGraph();
 
-    this.settings = settings;
-    this.source = settings.source as AnySourceConfig;
+    this.options = options;
+    this.source = options.source as AnySourceOptions;
   }
 
   /**

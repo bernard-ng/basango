@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { config } from "@basango/domain/config";
 import type { Article } from "@basango/domain/models";
 import { md5 } from "@basango/encryption";
 import logger from "@basango/logger";
 
-import { config, env } from "#crawler/config";
 import { HttpError, SyncHttpClient } from "#crawler/http/http-client";
 
 export interface Persistor {
@@ -66,9 +66,9 @@ export const persist = async (
 };
 
 export const forward = async (payload: Partial<Article>): Promise<void> => {
-  const client = new SyncHttpClient(config.fetch.client);
-  const endpoint = env("BASANGO_CRAWLER_BACKEND_API_ENDPOINT");
-  const token = env("BASANGO_CRAWLER_TOKEN");
+  const client = new SyncHttpClient(config.crawler.fetch.client);
+  const endpoint = config.crawler.backend.endpoint;
+  const token = config.crawler.backend.token;
 
   try {
     const response = await client.post(endpoint, {

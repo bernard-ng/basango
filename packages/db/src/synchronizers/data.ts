@@ -2,10 +2,10 @@
 
 /** biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: false positive */
 
+import { config } from "@basango/domain/config";
 import { RowDataPacket } from "mysql2/promise";
 import { Pool, PoolClient } from "pg";
 
-import { env } from "#db/config";
 import { computeReadingTime } from "#db/utils/computed";
 
 type SourceOptions = {
@@ -598,13 +598,13 @@ async function main() {
 
   const engine = new Engine(
     {
-      database: env("BASANGO_SOURCE_DATABASE_NAME"),
-      host: env("BASANGO_SOURCE_DATABASE_HOST"),
-      password: env("BASANGO_SOURCE_DATABASE_PASS"),
-      user: env("BASANGO_SOURCE_DATABASE_USER"),
+      database: config.database.legacy.name,
+      host: config.database.legacy.host,
+      password: config.database.legacy.password,
+      user: config.database.legacy.user,
     },
     {
-      database: env("BASANGO_DATABASE_URL"),
+      database: config.database.url,
     },
   );
 

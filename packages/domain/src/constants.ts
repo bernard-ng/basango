@@ -1,10 +1,8 @@
-// Domain-specific constants and types
 export const BIAS = ["neutral", "slightly", "partisan", "extreme"] as const;
 export const RELIABILITY = ["trusted", "reliable", "average", "low_trust", "unreliable"] as const;
 export const TRANSPARENCY = ["high", "medium", "low"] as const;
 export const SENTIMENT = ["positive", "neutral", "negative"] as const;
 
-// Crawler-related constants and types
 export const UPDATE_DIRECTIONS = ["forward", "backward"] as const;
 export const SOURCE_KINDS = ["wordpress", "html"] as const;
 
@@ -32,5 +30,5 @@ export const DEFAULT_AUTH_TAG_LENGTH = 16;
 export const DEFAULT_BCRYPT_SALT_ROUNDS = 12;
 export const DEFAULT_TOKEN_AUDIENCE = "basango_dashboard";
 export const DEFAULT_TOKEN_ISSUER = "basango_api";
-export const DEFAULT_ACCESS_TOKEN_TTL = "15m";
+export const DEFAULT_ACCESS_TOKEN_TTL = "35m";
 export const DEFAULT_REFRESH_TOKEN_TTL = "7d";

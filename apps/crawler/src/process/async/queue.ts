@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 
-import { JobsOptions, Queue, QueueOptions } from "bullmq";
+import { type CrawlerAsyncOptions, config } from "@basango/domain/config";
+import { JobsOptions, Queue } from "bullmq";
 import IORedis from "ioredis";
 
-import { FetchAsyncConfig, config } from "#crawler/config";
 import {
   DetailsTaskPayload,
   DetailsTaskPayloadSchema,
@@ -20,28 +20,27 @@ export interface QueueBackend<T = unknown> {
 
 export type QueueFactory = (
   queueName: string,
-  settings: FetchAsyncConfig,
+  options: CrawlerAsyncOptions,
   connection?: IORedis,
 ) => QueueBackend;
 
-const defaultQueueFactory: QueueFactory = (queueName, settings, connection) => {
+const defaultQueueFactory: QueueFactory = (queueName, options, connection) => {
   const redisConnection =
     connection ??
-    new IORedis(settings.redisUrl, {
-      ...parseRedisUrl(settings.redisUrl),
+    new IORedis(options.redisUrl, {
+      ...parseRedisUrl(options.redisUrl),
       maxRetriesPerRequest: null,
     });
-  const options: QueueOptions = {
-    connection: redisConnection,
-    prefix: settings.prefix,
-  };
 
-  const queue = new Queue(queueName, options);
+  const queue = new Queue(queueName, {
+    connection: redisConnection,
+    prefix: options.prefix,
+  });
   return {
     add: async (name, data, opts) => {
       const job = await queue.add(name, data, {
-        removeOnComplete: settings.ttl.result === 0 ? true : undefined,
-        removeOnFail: settings.ttl.failure === 0 ? true : undefined,
+        removeOnComplete: options.ttl.result === 0 ? true : undefined,
+        removeOnFail: options.ttl.failure === 0 ? true : undefined,
         ...opts,
       });
       return { id: job.id ?? randomUUID() };
@@ -55,7 +54,7 @@ export interface CreateQueueManagerOptions {
 }
 
 export interface QueueManager {
-  readonly settings: FetchAsyncConfig;
+  readonly options: CrawlerAsyncOptions;
   readonly connection: IORedis;
   enqueueListing: (payload: ListingTaskPayload) => Promise<{ id: string }>;
   enqueueArticle: (payload: DetailsTaskPayload) => Promise<{ id: string }>;
@@ -66,17 +65,17 @@ export interface QueueManager {
 }
 
 export const createQueueManager = (options: CreateQueueManagerOptions = {}): QueueManager => {
-  const settings = config.fetch.async;
+  const asyncOptions = config.crawler.fetch.async;
 
   const connection =
     options.connection ??
-    new IORedis(settings.redisUrl, {
-      ...parseRedisUrl(settings.redisUrl),
+    new IORedis(asyncOptions.redisUrl, {
+      ...parseRedisUrl(asyncOptions.redisUrl),
       maxRetriesPerRequest: null,
     });
   const factory = options.queueFactory ?? defaultQueueFactory;
 
-  const ensureQueue = (queueName: string) => factory(queueName, settings, connection);
+  const ensureQueue = (queueName: string) => factory(queueName, asyncOptions, connection);
 
   return {
     close: async () => {
@@ -85,25 +84,25 @@ export const createQueueManager = (options: CreateQueueManagerOptions = {}): Que
     connection,
     enqueueArticle: (payload) => {
       const data = DetailsTaskPayloadSchema.parse(payload);
-      const queue = ensureQueue(settings.queues.details);
+      const queue = ensureQueue(asyncOptions.queues.details);
       return queue.add("collect_article", data);
     },
     enqueueListing: (payload) => {
       const data = ListingTaskPayloadSchema.parse(payload);
-      const queue = ensureQueue(settings.queues.listing);
+      const queue = ensureQueue(asyncOptions.queues.listing);
       return queue.add("collect_listing", data);
     },
     enqueueProcessed: (payload) => {
       const data = ProcessingTaskPayloadSchema.parse(payload);
-      const queue = ensureQueue(settings.queues.processing);
+      const queue = ensureQueue(asyncOptions.queues.processing);
       return queue.add("forward_for_processing", data);
     },
     iterQueueNames: () => [
-      settings.queues.listing,
-      settings.queues.details,
-      settings.queues.processing,
+      asyncOptions.queues.listing,
+      asyncOptions.queues.details,
+      asyncOptions.queues.processing,
     ],
-    queueName: (suffix: string) => `${settings.prefix}:${suffix}`,
-    settings,
+    options: asyncOptions,
+    queueName: (suffix: string) => `${asyncOptions.prefix}:${suffix}`,
   };
 };

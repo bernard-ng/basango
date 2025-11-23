@@ -1,4 +1,4 @@
-import type { HtmlSourceConfig, WordPressSourceConfig } from "@basango/domain/crawler";
+import type { HtmlSourceOptions, WordPressSourceOptions } from "@basango/domain/config";
 import { Article } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 
@@ -24,7 +24,7 @@ export const collectHtmlListing = async (
   payload: ListingTaskPayload,
   manager: QueueManager = createQueueManager(),
 ): Promise<number> => {
-  const source = resolveSourceConfig(payload.sourceId) as HtmlSourceConfig;
+  const source = resolveSourceConfig(payload.sourceId) as HtmlSourceOptions;
   if (source.sourceKind !== "html") {
     return await collectWordPressListing(payload, manager);
   }
@@ -63,7 +63,7 @@ export const collectWordPressListing = async (
   payload: ListingTaskPayload,
   manager: QueueManager = createQueueManager(),
 ): Promise<number> => {
-  const source = resolveSourceConfig(payload.sourceId) as WordPressSourceConfig;
+  const source = resolveSourceConfig(payload.sourceId) as WordPressSourceOptions;
   if (source.sourceKind !== "wordpress") {
     return await collectHtmlListing(payload, manager);
   }

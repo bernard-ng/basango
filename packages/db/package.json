@@ -4,7 +4,6 @@
     "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@date-fns/utc": "^2.1.1",
-    "@devscast/config": "catalog:",
     "date-fns": "catalog:",
     "drizzle-orm": "^0.44.7",
     "mysql2": "^3.15.3",

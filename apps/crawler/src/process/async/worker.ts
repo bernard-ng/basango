@@ -45,7 +45,7 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
       {
         concurrency: options.concurrency ?? 5,
         connection,
-        prefix: manager.settings.prefix,
+        prefix: manager.options.prefix,
       },
     );
 
@@ -56,7 +56,7 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
 
     const queueEvents = new QueueEvents(queueName, {
       connection,
-      prefix: manager.settings.prefix,
+      prefix: manager.options.prefix,
     });
 
     workers.push(worker);

@@ -1,11 +1,10 @@
-import type { HtmlSourceConfig, TimestampRange } from "@basango/domain/crawler";
-import { Article } from "@basango/domain/models";
+import { CrawlerFetchingOptions, HtmlSourceOptions } from "@basango/domain/config";
+import { Article, TimestampRange } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 import { fromUnixTime, getUnixTime, isMatch as isDateMatch, parse } from "date-fns";
 import { HTMLElement } from "node-html-parser";
 import TurndownService from "turndown";
 
-import { FetchCrawlerConfig } from "#crawler/config";
 import {
   ArticleOutOfDateRangeError,
   InvalidArticleError,
@@ -26,21 +25,21 @@ const md = new TurndownService({
  * Crawler for generic HTML pages.
  */
 export class HtmlCrawler extends BaseCrawler {
-  readonly source: HtmlSourceConfig;
+  readonly source: HtmlSourceOptions;
   private currentNode: string | null = null;
 
-  constructor(settings: FetchCrawlerConfig, options: { persistors?: Persistor[] } = {}) {
+  constructor(settings: CrawlerFetchingOptions, options: { persistors?: Persistor[] } = {}) {
     super(settings, options);
 
     if (!settings.source || settings.source.sourceKind !== "html") {
       throw new UnsupportedSourceKindError("HtmlCrawler requires a source of kind 'html'");
     }
-    this.source = this.settings.source as HtmlSourceConfig;
+    this.source = this.options.source as HtmlSourceOptions;
   }
 
   async fetch(): Promise<void> {
-    const pageRange = this.settings.pageRange ?? (await this.getPagination());
-    const dateRange = this.settings.dateRange;
+    const pageRange = this.options.pageRange ?? (await this.getPagination());
+    const dateRange = this.options.dateRange;
     const selectors = this.source.sourceSelectors;
 
     if (!selectors.articles) {
@@ -218,7 +217,7 @@ export class HtmlCrawler extends BaseCrawler {
    */
   private applyCategory(template: string): string {
     if (template.includes("{category}")) {
-      const replacement = this.settings.category ?? "";
+      const replacement = this.options.category ?? "";
       return template.replace("{category}", replacement);
     }
     return template;
@@ -297,7 +296,7 @@ export class HtmlCrawler extends BaseCrawler {
    * @param selector - The CSS selector
    */
   private extractCategories(root: HTMLElement, selector?: string | null): string[] {
-    if (!selector && this.settings.category) return [this.settings.category.toLowerCase()];
+    if (!selector && this.options.category) return [this.options.category.toLowerCase()];
     if (!selector) return [];
 
     const values: string[] = [];

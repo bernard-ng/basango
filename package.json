@@ -1,6 +1,6 @@
 {
   "catalog": {
-    "@devscast/config": "^1.0.3",
+    "@devscast/config": "^1.1.1",
     "@types/bun": "^1.3.1",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.0",
@@ -52,6 +52,7 @@
     "dev:dashboard": "turbo dev --filter=@basango/dashboard",
     "format": "biome format --write && biome check --write && biome lint --write",
     "lint": "biome check && biome lint && manypkg check",
+    "migrate": "cd packages/db && bunx drizzle-kit migrate",
     "prepare": "husky",
     "start:api": "turbo start --filter=@basango/api",
     "start:dashboard": "turbo start --filter=@basango/dashboard",
