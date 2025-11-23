@@ -13,7 +13,7 @@ export const authRouter = createTRPCRouter({
     if (!user || user.isLocked) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
-        message: "Invalid credentials.",
+        message: "Account is locked",
       });
     }
 

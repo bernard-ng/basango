@@ -1,12 +1,12 @@
 import { setTimeout as delay } from "node:timers/promises";
 
+import type { CrawlerHttpOptions } from "@basango/domain/config";
 import {
   DEFAULT_RETRY_AFTER_HEADER,
   DEFAULT_TRANSIENT_HTTP_STATUSES,
   DEFAULT_USER_AGENT,
 } from "@basango/domain/constants";
 
-import { FetchClientConfig } from "#crawler/config";
 import { UserAgents } from "#crawler/http/user-agent";
 
 export type HttpHeaders = Record<string, string>;
@@ -71,7 +71,7 @@ const buildUrl = (url: string, params?: HttpParams): string => {
  * @param config - Fetch client configuration
  * @param attempt - Current attempt number
  */
-const computeBackoff = (config: FetchClientConfig, attempt: number): number => {
+const computeBackoff = (config: CrawlerHttpOptions, attempt: number): number => {
   const base = Math.min(
     config.backoffInitial * config.backoffMultiplier ** attempt,
     config.backoffMax,
@@ -101,26 +101,26 @@ const parseRetryAfter = (header: string): number => {
  * @author Bernard Ngandu <bernard@devscast.tech>
  */
 export class BaseHttpClient {
-  protected readonly config: FetchClientConfig;
+  protected readonly options: CrawlerHttpOptions;
   protected readonly fetchImpl: typeof fetch;
   protected readonly sleep: (ms: number) => Promise<void>;
   protected readonly headers: HttpHeaders;
 
-  constructor(config: FetchClientConfig, options: HttpClientOptions = {}) {
-    this.config = config;
+  constructor(options: CrawlerHttpOptions, clientOptions: HttpClientOptions = {}) {
+    this.options = options;
     const provider =
-      options.userAgentProvider ??
-      new UserAgents(config.rotate, config.userAgent ?? DEFAULT_USER_AGENT);
-    const userAgent = provider.get() ?? config.userAgent ?? DEFAULT_USER_AGENT;
+      clientOptions.userAgentProvider ??
+      new UserAgents(options.rotate, options.userAgent ?? DEFAULT_USER_AGENT);
+    const userAgent = provider.get() ?? options.userAgent ?? DEFAULT_USER_AGENT;
 
     const baseHeaders: HttpHeaders = { "User-Agent": userAgent };
-    if (options.defaultHeaders) {
-      Object.assign(baseHeaders, options.defaultHeaders);
+    if (clientOptions.defaultHeaders) {
+      Object.assign(baseHeaders, clientOptions.defaultHeaders);
     }
 
     this.headers = baseHeaders;
-    this.fetchImpl = options.fetchImpl ?? fetch;
-    this.sleep = options.sleep ?? defaultSleep;
+    this.fetchImpl = clientOptions.fetchImpl ?? fetch;
+    this.sleep = clientOptions.sleep ?? defaultSleep;
   }
 
   protected buildHeaders(headers?: HttpHeaders): HeadersInit {
@@ -136,13 +136,13 @@ export class BaseHttpClient {
 
     if (response) {
       const retryAfter = response.headers.get(retryAfterHeader);
-      if (retryAfter && this.config.respectRetryAfter) {
+      if (retryAfter && this.options.respectRetryAfter) {
         waitMs = parseRetryAfter(retryAfter);
       }
     }
 
     if (waitMs === 0) {
-      waitMs = computeBackoff(this.config, attempt);
+      waitMs = computeBackoff(this.options, attempt);
     }
 
     if (waitMs > 0) {
@@ -161,7 +161,7 @@ export class SyncHttpClient extends BaseHttpClient {
     const retryAfterHeader = options.retryAfterHeader ?? DEFAULT_RETRY_AFTER_HEADER;
     const target = buildUrl(url, options.params);
 
-    const maxAttempts = this.config.maxRetries + 1;
+    const maxAttempts = this.options.maxRetries + 1;
     let attempt = 0;
     let lastError: unknown;
 
@@ -169,14 +169,14 @@ export class SyncHttpClient extends BaseHttpClient {
       const controller = new AbortController();
       let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
       try {
-        timeoutHandle = setTimeout(() => controller.abort(), this.config.timeout * 1000);
+        timeoutHandle = setTimeout(() => controller.abort(), this.options.timeout * 1000);
 
         const headers = this.buildHeaders(options.headers);
         const init: RequestInit = {
           body: options.data as BodyInit | undefined,
           headers,
           method,
-          redirect: this.config.followRedirects ? "follow" : "manual",
+          redirect: this.options.followRedirects ? "follow" : "manual",
           signal: controller.signal,
         };
 
@@ -189,7 +189,7 @@ export class SyncHttpClient extends BaseHttpClient {
 
         if (
           DEFAULT_TRANSIENT_HTTP_STATUSES.includes(response.status as number) &&
-          attempt < this.config.maxRetries
+          attempt < this.options.maxRetries
         ) {
           await this.maybeDelay(attempt, response, retryAfterHeader);
           attempt += 1;
@@ -209,12 +209,12 @@ export class SyncHttpClient extends BaseHttpClient {
 
         if (error instanceof DOMException && error.name === "AbortError") {
           lastError = error;
-          if (attempt >= this.config.maxRetries) {
+          if (attempt >= this.options.maxRetries) {
             throw error;
           }
         } else {
           lastError = error;
-          if (attempt >= this.config.maxRetries) {
+          if (attempt >= this.options.maxRetries) {
             throw error;
           }
         }

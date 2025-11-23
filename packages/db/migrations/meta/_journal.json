@@ -14,6 +14,13 @@
       "tag": "0001_init",
       "version": "7",
       "when": 1762775267679
+    },
+    {
+      "breakpoints": true,
+      "idx": 2,
+      "tag": "0002_modern_joseph",
+      "version": "7",
+      "when": 1763920009482
     }
   ],
   "version": "7"

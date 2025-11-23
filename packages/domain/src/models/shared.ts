@@ -1,137 +1,49 @@
 import { z } from "@hono/zod-openapi";
 
-import { BIAS, RELIABILITY, SENTIMENT, TRANSPARENCY } from "#domain/constants";
+import { BIAS, RELIABILITY, SENTIMENT, TRANSPARENCY } from "../constants";
 
 // schemas
-export const idSchema = z.uuid().openapi({
-  description: "The unique identifier of the resource.",
-  example: "b3e1c8f4-5d6a-4c9e-8f1e-2d3c4b5a6f7g",
+export const idSchema = z.uuid();
+
+export const dateRangeSchema = z.object({
+  end: z.coerce.date(),
+  start: z.coerce.date(),
 });
 
-export const dateRangeSchema = z
-  .object({
-    end: z.date().openapi({
-      description: "The end date of the range.",
-      example: "2023-01-30T23:59:59Z",
-    }),
-    start: z.date().openapi({
-      description: "The start date of the range.",
-      example: "2023-01-01T00:00:00Z",
-    }),
-  })
-  .openapi({
-    description: "Inclusive date range for publication metrics.",
-  });
+export const limitSchema = z.number().int().min(1).max(100);
+export const sentimentSchema = z.enum(SENTIMENT);
+export const biasSchema = z.enum(BIAS);
+export const reliabilitySchema = z.enum(RELIABILITY);
+export const transparencySchema = z.enum(TRANSPARENCY);
 
-export const limitSchema = z.number().int().min(1).max(100).openapi({
-  default: 10,
-  description: "The maximum number of items to return.",
-  example: 10,
+export const credibilitySchema = z.object({
+  bias: biasSchema.default("neutral"),
+  reliability: reliabilitySchema.default("average"),
+  transparency: transparencySchema.default("medium"),
 });
 
-export const sentimentSchema = z.enum(SENTIMENT).openapi({
-  description: "Sentiment detected for the article.",
-  example: "positive",
+export const deviceSchema = z.object({
+  client: z.string().optional(),
+  device: z.string().optional(),
+  isBot: z.boolean(),
+  operatingSystem: z.string().optional(),
 });
 
-export const biasSchema = z.enum(BIAS).openapi({
-  description: "The bias level of the source.",
-  example: "neutral",
+export const geoLocationSchema = z.object({
+  accuracyRadius: z.number().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  timeZone: z.string().optional(),
 });
 
-export const reliabilitySchema = z.enum(RELIABILITY).openapi({
-  description: "The reliability level of the source.",
-  example: "trusted",
+export const distrubtionSchema = z.object({
+  count: z.number().int(),
+  id: idSchema,
+  name: z.string(),
+  percentage: z.number(),
 });
-
-export const transparencySchema = z.enum(TRANSPARENCY).openapi({
-  description: "The transparency level of the source.",
-  example: "high",
-});
-
-export const credibilitySchema = z
-  .object({
-    bias: biasSchema.default("neutral"),
-    reliability: reliabilitySchema.default("average"),
-    transparency: transparencySchema.default("medium"),
-  })
-  .openapi({
-    description: "Credibility information about the resource.",
-  });
-
-export const deviceSchema = z
-  .object({
-    client: z.string().optional().openapi({
-      description: "The client software of the device.",
-      example: "Chrome 90",
-    }),
-    device: z.string().optional().openapi({
-      description: "The device model.",
-      example: "Dell XPS 13",
-    }),
-    isBot: z.boolean().openapi({
-      description: "Indicates if the device is a bot.",
-      example: false,
-    }),
-    operatingSystem: z.string().optional().openapi({
-      description: "The operating system of the device.",
-      example: "Windows 10",
-    }),
-  })
-  .openapi({
-    description: "Information about the user's device.",
-  });
-
-export const geoLocationSchema = z
-  .object({
-    accuracyRadius: z.number().optional().openapi({
-      description: "The accuracy radius in kilometers.",
-      example: 50,
-    }),
-    city: z.string().optional().openapi({
-      description: "The city of the user.",
-      example: "San Francisco",
-    }),
-    country: z.string().optional().openapi({
-      description: "The country of the user.",
-      example: "United States",
-    }),
-    latitude: z.number().optional().openapi({
-      description: "The latitude of the user's location.",
-      example: 37.7749,
-    }),
-    longitude: z.number().optional().openapi({
-      description: "The longitude of the user's location.",
-      example: -122.4194,
-    }),
-    timeZone: z.string().optional().openapi({
-      description: "The time zone of the user.",
-      example: "America/Los_Angeles",
-    }),
-  })
-  .openapi({
-    description: "Geolocation information about the user.",
-  });
-
-export const distrubtionSchema = z
-  .object({
-    count: z.number().int().openapi({
-      description: "The count of items in the distribution.",
-      example: 42,
-    }),
-    id: idSchema,
-    name: z.string().openapi({
-      description: "The name of the distribution.",
-      example: "Technology",
-    }),
-    percentage: z.number().openapi({
-      description: "The percentage of items in the distribution.",
-      example: 12.5,
-    }),
-  })
-  .openapi({
-    description: "Distribution information.",
-  });
 
 export const getDistributionsSchema = z.object({
   id: idSchema.optional(),
@@ -143,172 +55,60 @@ export const getPublicationsSchema = z.object({
   range: dateRangeSchema.optional(),
 });
 
-export const distributionsSchema = z
-  .object({
-    items: z.array(distrubtionSchema).openapi({
-      description: "List of distributions.",
-    }),
-    total: z.number().int().openapi({
-      description: "Total number of distributions.",
-      example: 100,
-    }),
-  })
-  .openapi({
-    description: "Distributions data.",
-  });
+export const distributionsSchema = z.object({
+  items: z.array(distrubtionSchema),
+  total: z.number().int(),
+});
 
-export const publicationSchema = z
-  .object({
-    count: z.number().int().openapi({
-      description: "The number of articles published on that date.",
-      example: 42,
-    }),
-    date: z.string().openapi({
-      description: "The date of the publication.",
-      example: "2023-01-15",
-    }),
-  })
-  .openapi({
-    description: "Publication metrics for a specific date.",
-  });
+export const publicationSchema = z.object({
+  count: z.number().int(),
+  date: z.string(),
+});
 
-export const deltaSchema = z
-  .object({
-    delta: z.number().openapi({
-      description: "The absolute change in value.",
-      example: 10,
-    }),
-    percentage: z.number().openapi({
-      description: "The percentage change in value.",
-      example: 25.0,
-    }),
-    sign: z.enum(["+", "-"]).openapi({
-      description: "The sign of the change.",
-      example: "+",
-    }),
-    variant: z.enum(["increase", "decrease", "positive"]).openapi({
-      description: "The variant of the change.",
-      example: "increase",
-    }),
-  })
-  .openapi({
-    description: "Delta information representing change over time.",
-  });
+export const deltaSchema = z.object({
+  delta: z.number(),
+  percentage: z.number(),
+  sign: z.enum(["+", "-"]),
+  variant: z.enum(["increase", "decrease", "positive"]),
+});
 
-export const publicationMetaSchema = z
-  .object({
-    current: z.number().openapi({
-      description: "The current total value.",
-      example: 150,
-    }),
-    delta: deltaSchema,
-    previous: z.number().openapi({
-      description: "The previous total value.",
-      example: 120,
-    }),
-  })
-  .openapi({
-    description: "Metadata for publication metrics.",
-  });
+export const publicationMetaSchema = z.object({
+  current: z.number(),
+  delta: deltaSchema,
+  previous: z.number(),
+});
 
-export const publicationsSchema = z
-  .object({
-    items: z.array(publicationSchema).openapi({
-      description: "List of publication metrics for the source.",
-    }),
-    meta: publicationMetaSchema.optional(),
-  })
-  .openapi({
-    description: "Publication metrics for the source.",
-  });
+export const publicationsSchema = z.object({
+  items: z.array(publicationSchema),
+  meta: publicationMetaSchema.optional(),
+});
 
-export const paginationCursorSchema = z
-  .object({
-    date: z.string().openapi({
-      description: "The date associated with the last item in the current page.",
-      example: "2023-01-15",
-    }),
-    id: z.string().openapi({
-      description: "The unique identifier of the last item in the current page.",
-      example: "b3e1c8f4-5d6a-4c9e-8f1e-2d3c4b5a6f7g",
-    }),
-  })
-  .openapi({
-    description: "Cursor information for pagination.",
-  });
+export const paginationCursorSchema = z.object({
+  date: z.string(),
+  id: z.string(),
+});
 
-export const paginationRequestSchema = z
-  .object({
-    cursor: z.string().nullable().optional().openapi({
-      description: "The pagination cursor for cursor-based pagination.",
-      example:
-        "eyJkYXRlIjoiMjAyMy0wMS0xNSIsImlkIjoiYjNlMWM4ZjQtNWQ2YS00YzllLThmMWUtMmQzYzRiNWE2ZjdifQ==",
-    }),
-    limit: limitSchema.optional(),
-    page: z.number().int().min(1).optional().openapi({
-      description: "The page number to retrieve.",
-      example: 1,
-    }),
-  })
-  .openapi({
-    description: "Pagination request parameters.",
-  });
+export const paginationRequestSchema = z.object({
+  cursor: z.string().nullable().optional(),
+  limit: limitSchema.optional(),
+  page: z.number().nonnegative().default(1).optional(),
+});
 
-export const paginationStateSchema = z
-  .object({
-    cursor: z.string().nullable().openapi({
-      description: "The current pagination cursor.",
-      example:
-        "eyJkYXRlIjoiMjAyMy0wMS0xNSIsImlkIjoiYjNlMWM4ZjQtNWQ2YS00YzllLThmMWUtMmQzYzRiNWE2ZjdifQ==",
-    }),
-    limit: z.number().int().openapi({
-      description: "The number of items per page.",
-      example: 10,
-    }),
-    offset: z.number().int().openapi({
-      description: "The offset for the current page.",
-      example: 0,
-    }),
-    page: z.number().int().openapi({
-      description: "The current page number.",
-      example: 1,
-    }),
-    payload: paginationCursorSchema.nullable().openapi({
-      description: "The decoded payload from the pagination cursor.",
-    }),
-  })
-  .openapi({
-    description: "Internal pagination state.",
-  });
+export const paginationStateSchema = z.object({
+  cursor: z.string().nullable(),
+  limit: z.number().int(),
+  offset: z.number().int(),
+  page: z.number().int(),
+  payload: paginationCursorSchema.nullable(),
+});
 
-export const paginationMetaSchema = z
-  .object({
-    current: z.number().int().openapi({
-      description: "The current page number or offset.",
-      example: 1,
-    }),
-    cursor: z.string().nullable().openapi({
-      description: "The current pagination cursor.",
-      example:
-        "eyJkYXRlIjoiMjAyMy0wMS0xNSIsImlkIjoiYjNlMWM4ZjQtNWQ2YS00YzllLThmMWUtMmQzYzRiNWE2ZjdifQ==",
-    }),
-    hasNext: z.boolean().openapi({
-      description: "Indicates if there is a next page available.",
-      example: true,
-    }),
-    limit: z.number().int().openapi({
-      description: "The number of items per page.",
-      example: 10,
-    }),
-    nextCursor: z.string().nullable().openapi({
-      description: "The next pagination cursor, if available.",
-      example:
-        "eyJkYXRlIjoiMjAyMy0wMS0yMCIsImlkIjoiZDRmNWU2ZTAtNzY4Ny00Y2E3LTg5ZTItYjY0ZGI3Y2E3ZGIifQ==",
-    }),
-  })
-  .openapi({
-    description: "Pagination metadata.",
-  });
+export const paginationMetaSchema = z.object({
+  current: z.number().int(),
+  cursor: z.string().nullable(),
+  hasNext: z.boolean(),
+  limit: z.number().int(),
+  nextCursor: z.string().nullable(),
+});
 
 // types
 export type PaginatedResult<T> = {

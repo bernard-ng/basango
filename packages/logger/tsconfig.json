@@ -1,4 +1,10 @@
 {
+  "compilerOptions": {
+    "paths": {
+      "#domain/*": ["../domain/src/*"],
+      "#logger/*": ["./src/*"]
+    }
+  },
   "exclude": ["node_modules"],
   "extends": "@basango/tsconfig/base.json",
   "include": ["src"]

@@ -1,0 +1,9 @@
+{
+  "encryption": {
+    "algorithm": "aes-256-gcm",
+    "authTagLength": 16,
+    "bcryptSaltRounds": 12,
+    "ivLength": 16,
+    "key": "%env(BASANGO_ENCRYPTION_KEY)%"
+  }
+}

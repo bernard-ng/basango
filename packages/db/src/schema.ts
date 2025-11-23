@@ -114,10 +114,7 @@ export const articles = pgTable(
     title: varchar({ length: 1024 }).notNull(),
     tokenStatistics: jsonb("token_statistics").$type<TokenStatistics>(),
     tsv: tsvector("tsv").generatedAlwaysAs(
-      sql`(
-        setweight(to_tsvector('french'::regconfig, COALESCE(title, '')::text), 'A'::"char")
-        || setweight(to_tsvector('french'::regconfig, COALESCE(body,  ''::text)), 'B'::"char")
-      )`,
+      sql`setweight(to_tsvector('french'::regconfig, COALESCE(title, '')::text), 'A'::"char")`,
     ),
     updatedAt: timestamp("updated_at"),
   },

@@ -1,6 +1,6 @@
-import { z } from "zod";
+import z from "zod";
 
-import { UPDATE_DIRECTIONS } from "#domain/constants";
+import { UPDATE_DIRECTIONS } from "../constants";
 
 // schemas
 export const UpdateDirectionSchema = z.enum(UPDATE_DIRECTIONS);

@@ -12,7 +12,7 @@ import {
 import { md5 } from "@basango/encryption";
 import type { SQL } from "drizzle-orm";
 import { count, desc, eq, getTableColumns, sql } from "drizzle-orm";
-import { v7 as uuidV7 } from "uuid";
+import * as uuid from "uuid";
 
 import { Database } from "#db/client";
 import { getSourceIdByName } from "#db/queries/sources";
@@ -56,7 +56,7 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
 
   const [result] = await db
     .insert(articles)
-    .values({ id: uuidV7(), ...data })
+    .values({ id: uuid.v7(), ...data })
     .returning({
       id: articles.id,
       sourceId: articles.sourceId,

@@ -1,14 +1,7 @@
 import { Database } from "@basango/db/client";
 import { getUserById } from "@basango/db/queries";
-import {
-  DEFAULT_ACCESS_TOKEN_TTL,
-  DEFAULT_REFRESH_TOKEN_TTL,
-  DEFAULT_TOKEN_AUDIENCE,
-  DEFAULT_TOKEN_ISSUER,
-} from "@basango/domain/constants";
+import { config } from "@basango/domain/config";
 import { type JWTPayload, SignJWT, jwtVerify } from "jose";
-
-import { env } from "#api/config";
 
 export type Session = {
   user: {
@@ -39,7 +32,7 @@ export type SessionTokens = {
 const encoder = new TextEncoder();
 
 function getSecretKey() {
-  return encoder.encode(env("BASANGO_JWT_SECRET"));
+  return encoder.encode(config.api.security.jwtSecret);
 }
 
 export async function getSession(db: Database, accessToken?: string): Promise<Session | null> {
@@ -74,24 +67,24 @@ async function createToken(session: Session, tokenType: TokenType, expiresIn: st
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setAudience(DEFAULT_TOKEN_AUDIENCE)
-    .setIssuer(DEFAULT_TOKEN_ISSUER)
+    .setAudience(config.api.security.audience)
+    .setIssuer(config.api.security.issuer)
     .setExpirationTime(expiresIn)
     .sign(getSecretKey());
 }
 
 export async function createSessionTokens(session: Session): Promise<SessionTokens> {
   const [accessToken, refreshToken] = await Promise.all([
-    createToken(session, "access", DEFAULT_ACCESS_TOKEN_TTL),
-    createToken(session, "refresh", DEFAULT_REFRESH_TOKEN_TTL),
+    createToken(session, "access", config.api.security.accessTokenTtl),
+    createToken(session, "refresh", config.api.security.refreshTokenTtl),
   ]);
 
   const issuedAt = Date.now();
   const accessTokenExpiresAt = new Date(
-    issuedAt + formatTTL(DEFAULT_ACCESS_TOKEN_TTL),
+    issuedAt + formatTTL(config.api.security.accessTokenTtl),
   ).toISOString();
   const refreshTokenExpiresAt = new Date(
-    issuedAt + formatTTL(DEFAULT_REFRESH_TOKEN_TTL),
+    issuedAt + formatTTL(config.api.security.refreshTokenTtl),
   ).toISOString();
 
   return {
@@ -118,8 +111,8 @@ async function verifyToken(
 
   try {
     const { payload } = await jwtVerify<VerifiedJWTPayload>(token, getSecretKey(), {
-      audience: DEFAULT_TOKEN_AUDIENCE,
-      issuer: DEFAULT_TOKEN_ISSUER,
+      audience: config.api.security.audience,
+      issuer: config.api.security.issuer,
     });
 
     if (payload.tokenType !== expectedType) {

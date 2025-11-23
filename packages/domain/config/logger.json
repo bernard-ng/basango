@@ -1,0 +1,5 @@
+{
+  "logger": {
+    "level": "%env(BASANGO_LOGGER_LEVEL)%"
+  }
+}

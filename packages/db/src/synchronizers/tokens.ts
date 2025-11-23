@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
+import { config } from "@basango/domain/config";
 import { Pool } from "pg";
 
-import { env } from "#db/config";
 import { computeTokenStatistics } from "#db/utils/computed";
 
 type ArticleRow = {
@@ -114,7 +114,7 @@ class Engine {
 }
 
 async function main() {
-  const engine = new Engine(env("BASANGO_DATABASE_URL"));
+  const engine = new Engine(config.database.url);
 
   try {
     await engine.synchronize();

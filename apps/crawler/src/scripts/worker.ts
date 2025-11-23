@@ -1,4 +1,4 @@
-#! /usr/bin/env bun
+#!/usr/bin/env bun
 
 import { logger } from "@basango/logger";
 

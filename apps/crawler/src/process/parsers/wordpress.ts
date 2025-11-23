@@ -1,10 +1,9 @@
-import type { PageRange, TimestampRange, WordPressSourceConfig } from "@basango/domain/crawler";
-import { Article } from "@basango/domain/models";
+import { CrawlerFetchingOptions, WordPressSourceOptions } from "@basango/domain/config";
+import { Article, PageRange, TimestampRange } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 import { fromUnixTime } from "date-fns";
 import TurndownService from "turndown";
 
-import { FetchCrawlerConfig } from "#crawler/config";
 import {
   ArticleOutOfDateRangeError,
   InvalidArticleError,
@@ -33,7 +32,7 @@ interface WordPressPost {
  * Crawler for WordPress sites using the REST API.
  */
 export class WordPressCrawler extends BaseCrawler {
-  readonly source: WordPressSourceConfig;
+  readonly source: WordPressSourceOptions;
   private categoryMap: Map<number, string> = new Map();
 
   public static readonly POST_QUERY =
@@ -43,7 +42,7 @@ export class WordPressCrawler extends BaseCrawler {
   public static readonly TOTAL_PAGES_HEADER = "x-wp-totalpages";
   public static readonly TOTAL_POSTS_HEADER = "x-wp-total";
 
-  constructor(settings: FetchCrawlerConfig, options: { persistors?: Persistor[] } = {}) {
+  constructor(settings: CrawlerFetchingOptions, options: { persistors?: Persistor[] } = {}) {
     super(settings, options);
 
     if (!settings.source || settings.source.sourceKind !== "wordpress") {
@@ -51,15 +50,15 @@ export class WordPressCrawler extends BaseCrawler {
         "WordPressCrawler requires a source of kind 'wordpress'",
       );
     }
-    this.source = this.settings.source as WordPressSourceConfig;
+    this.source = this.options.source as WordPressSourceOptions;
   }
 
   /**
    * Fetch and process WordPress posts.
    */
   async fetch(): Promise<void> {
-    const pageRange = this.settings.pageRange ?? (await this.getPagination());
-    const dateRange = this.settings.dateRange;
+    const pageRange = this.options.pageRange ?? (await this.getPagination());
+    const dateRange = this.options.dateRange;
 
     for (let page = pageRange.start; page <= pageRange.end; page += 1) {
       const endpoint = this.buildEndpointUrl(page);

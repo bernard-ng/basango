@@ -1,0 +1,31 @@
+{
+  "api": {
+    "cors": {
+      "allowedHeaders": [
+        "Authorization",
+        "Content-Type",
+        "accept-language",
+        "x-trpc-source",
+        "x-user-locale",
+        "x-user-timezone",
+        "x-user-country"
+      ],
+      "allowMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      "exposeHeaders": ["Content-Length"],
+      "maxAge": 86400
+    },
+    "security": {
+      "accessTokenTtl": "15m",
+      "audience": "basango_dashboard",
+      "crawlerToken": "%env(BASANGO_API_CRAWLER_TOKEN)%",
+      "issuer": "basango_api",
+      "jwtSecret": "%env(BASANGO_API_JWT_SECRET)%",
+      "refreshTokenTtl": "7d"
+    },
+    "server": {
+      "host": "%env(BASANGO_API_HOST)%",
+      "port": "%env(number:BASANGO_API_PORT)%",
+      "version": "1.0.0"
+    }
+  }
+}

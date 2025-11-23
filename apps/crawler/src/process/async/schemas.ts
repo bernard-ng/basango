@@ -1,5 +1,4 @@
-import { PageRangeSchema, TimestampRangeSchema } from "@basango/domain/crawler";
-import { articleSchema } from "@basango/domain/models";
+import { PageRangeSchema, TimestampRangeSchema, articleSchema } from "@basango/domain/models";
 import { z } from "zod";
 
 export const ListingTaskPayloadSchema = z.object({

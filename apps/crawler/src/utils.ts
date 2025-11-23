@@ -1,28 +1,29 @@
+import {
+  AnySourceOptions,
+  HtmlSourceOptions,
+  WordPressSourceOptions,
+  config,
+} from "@basango/domain/config";
 import { DEFAULT_DATE_FORMAT } from "@basango/domain/constants";
 import {
-  AnySourceConfig,
   DateSpecSchema,
-  HtmlSourceConfig,
   PageRange,
   PageRangeSchema,
   PageSpecSchema,
   TimestampRange,
   TimestampRangeSchema,
-  WordPressSourceConfig,
-} from "@basango/domain/crawler";
+} from "@basango/domain/models";
 import { format, fromUnixTime, getUnixTime, isMatch, parse } from "date-fns";
 import type { RedisOptions } from "ioredis";
-
-import { config } from "#crawler/config";
 
 /**
  * Resolve a source configuration by its ID.
  * @param id - The source ID
  */
-export const resolveSourceConfig = (id: string): AnySourceConfig => {
+export const resolveSourceConfig = (id: string): AnySourceOptions => {
   const source =
-    config.sources.html.find((s: HtmlSourceConfig) => s.sourceId === id) ||
-    config.sources.wordpress.find((s: WordPressSourceConfig) => s.sourceId === id);
+    config.crawler.sources.html.find((s: HtmlSourceOptions) => s.sourceId === id) ||
+    config.crawler.sources.wordpress.find((s: WordPressSourceOptions) => s.sourceId === id);
 
   if (source === undefined) {
     throw new Error(`Source '${id}' not found in configuration`);

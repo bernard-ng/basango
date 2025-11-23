@@ -1,7 +1,7 @@
 import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import { ID, Publication, Publications } from "@basango/domain/models";
 import { eq, sql } from "drizzle-orm";
-import { v7 as uuidV7 } from "uuid";
+import * as uuid from "uuid";
 
 import { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
@@ -32,7 +32,7 @@ export async function getSources(db: Database) {
 export async function createSource(db: Database, params: CreateSourceParams) {
   const [result] = await db
     .insert(sources)
-    .values({ id: uuidV7(), ...params })
+    .values({ id: uuid.v7(), ...params })
     .returning();
 
   return result;

@@ -1,0 +1,15 @@
+{
+  "shared": {
+    "categorySharesLimit": 10,
+    "dateFormat": "yyyy-LL-dd",
+    "dateTimeFormat": "yyyy-LL-dd'T'HH:mm:ss",
+    "name": "Basango",
+    "pagination": {
+      "defaultLimit": 20,
+      "maxLimit": 100,
+      "page": 1
+    },
+    "publicationGraphDays": 30,
+    "timezone": "Africa/Lubumbashi"
+  }
+}

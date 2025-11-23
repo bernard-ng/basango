@@ -1,8 +1,8 @@
+import { config } from "@basango/domain/config";
 import { DEFAULT_OPEN_GRAPH_USER_AGENT } from "@basango/domain/constants";
 import { ArticleMetadata } from "@basango/domain/models";
 import { parse } from "node-html-parser";
 
-import { config } from "#crawler/config";
 import { SyncHttpClient } from "#crawler/http/http-client";
 import { UserAgents } from "#crawler/http/user-agent";
 import { createAbsoluteUrl } from "#crawler/utils";
@@ -44,7 +44,7 @@ export class OpenGraph {
   private readonly client: Pick<SyncHttpClient, "get">;
 
   constructor() {
-    const settings = config.fetch.client;
+    const settings = config.crawler.fetch.client;
     const provider = new UserAgents(true, DEFAULT_OPEN_GRAPH_USER_AGENT);
 
     this.client = new SyncHttpClient(settings, {
@@ -89,16 +89,28 @@ export class OpenGraph {
       root.querySelector("link[rel='canonical']")?.getAttribute("href") ?? null,
       url ?? null,
     ]);
+    const author = pick([extract(root, "article:author"), extract(root, "og:article:author")]);
+    const publishedAt = pick([
+      extract(root, "article:published_time"),
+      extract(root, "og:article:published_time"),
+    ]);
+    const updatedAt = pick([
+      extract(root, "article:modified_time"),
+      extract(root, "og:article:modified_time"),
+    ]);
 
     if (!title && !description && !image && !canonical) {
       return undefined;
     }
 
     return {
+      author,
       description,
       image: createAbsoluteUrl(url, image ?? "") || undefined,
+      publishedAt,
       title,
+      updatedAt,
       url: createAbsoluteUrl(url, canonical ?? "") || undefined,
-    };
+    } as ArticleMetadata;
   }
 }

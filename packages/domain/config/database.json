@@ -1,0 +1,12 @@
+{
+  "database": {
+    "legacy": {
+      "host": "%env(BASANGO_DATABASE_LEGACY_HOST)%",
+      "name": "%env(BASANGO_DATABASE_LEGACY_NAME)%",
+      "password": "%env(BASANGO_DATABASE_LEGACY_PASSWORD)%",
+      "port": "%env(number:BASANGO_DATABASE_LEGACY_PORT)%",
+      "user": "%env(BASANGO_DATABASE_LEGACY_USER)%"
+    },
+    "url": "%env(BASANGO_DATABASE_URL)%"
+  }
+}

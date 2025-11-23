@@ -1,37 +1,17 @@
-import { z } from "@hono/zod-openapi";
+import z from "zod";
 
-import {
-  credibilitySchema,
-  idSchema,
-  limitSchema,
-  publicationsSchema,
-} from "#domain/models/shared";
+import { credibilitySchema, idSchema, limitSchema, publicationsSchema } from "./shared";
 
 // schemas
 export const sourceSchema = z.object({
-  articles: z.number().int().min(0).optional().openapi({
-    description: "The total number of articles from this source.",
-    example: 1250,
-  }),
+  articles: z.number().int().min(0).optional(),
   credibility: credibilitySchema.optional(),
-  description: z.string().max(1024).optional().openapi({
-    description: "A brief description of the source.",
-    example: "Radio Okapi is a Congolese radio station that provides news and information.",
-  }),
-  displayName: z.string().min(1).max(255).optional().openapi({
-    description: "The display name of the source.",
-    example: "Radio Okapi",
-  }),
+  description: z.string().max(1024).optional(),
+  displayName: z.string().min(1).max(255).optional(),
   id: idSchema,
-  name: z.string().min(1).max(255).openapi({
-    description: "The name of the source.",
-    example: "radiookapi.com",
-  }),
+  name: z.string().min(1).max(255),
   publications: publicationsSchema.optional(),
-  url: z.url().max(255).openapi({
-    description: "The URL of the source.",
-    example: "https://techcrunch.com",
-  }),
+  url: z.url().max(255),
 });
 
 export const createSourceSchema = sourceSchema.pick({

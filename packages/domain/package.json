@@ -7,6 +7,7 @@
     "@basango/tsconfig": "workspace:*"
   },
   "exports": {
+    "./config": "./src/config/index.ts",
     "./constants": "./src/constants.ts",
     "./crawler": "./src/crawler/index.ts",
     "./models": "./src/models/index.ts"

@@ -1,13 +1,13 @@
-#! /usr/bin/env bun
+#!/usr/bin/env bun
 import fs from "node:fs";
 import path from "node:path";
 import { createInterface } from "node:readline";
 import { parseArgs } from "node:util";
 
+import { config } from "@basango/domain/config";
 import type { Article } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 
-import { config } from "#crawler/config";
 import { forward } from "#crawler/process/persistence";
 
 const USAGE = `
@@ -31,7 +31,7 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const filePath = path.join(config.paths.data, `${sourceId}.jsonl`);
+  const filePath = path.join(config.crawler.paths.data, `${sourceId}.jsonl`);
 
   if (!fs.existsSync(filePath)) {
     logger.error({ filePath, sourceId }, "Source must be crawled first; JSONL not found");
