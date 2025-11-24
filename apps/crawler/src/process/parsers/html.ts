@@ -90,7 +90,7 @@ export class HtmlCrawler extends BaseCrawler {
               { url: this.currentNode },
               "Article out of date range, stopping further processing",
             );
-            break;
+            process.exit(0); // stop further processing
           }
 
           logger.error({ error, url: this.currentNode }, "Failed to process HTML article");

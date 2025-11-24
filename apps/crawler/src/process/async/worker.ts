@@ -2,7 +2,7 @@ import { QueueEvents, Worker } from "bullmq";
 import IORedis from "ioredis";
 
 import { QueueFactory, QueueManager } from "#crawler/process/async/queue";
-import { collectArticle, collectListing, forwardForProcessing } from "#crawler/process/async/tasks";
+import { collectArticle, collectListing } from "#crawler/process/async/tasks";
 
 export interface WorkerOptions {
   queueNames?: string[];
@@ -36,8 +36,6 @@ export const startWorker = (options: WorkerOptions): WorkerHandle => {
             return collectListing(job.data);
           case "collect_article":
             return collectArticle(job.data);
-          case "forward_for_processing":
-            return forwardForProcessing(job.data);
           default:
             throw new Error(`Unknown job name: ${job.name}`);
         }

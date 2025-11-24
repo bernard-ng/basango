@@ -1,6 +1,6 @@
 import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import { ID, Publication, Publications } from "@basango/domain/models";
-import { eq, sql } from "drizzle-orm";
+import { eq, max, min, sql } from "drizzle-orm";
 import * as uuid from "uuid";
 
 import { Database } from "#db/client";
@@ -160,4 +160,28 @@ export async function getSourceCategoryShares(
   `);
 
   return { items: data.rows, total: data.rowCount ?? 0 };
+}
+
+export async function getLatestPublished(db: Database, source: string): Promise<Date> {
+  const result = await db
+    .select({
+      publishedAt: max(articles.publishedAt),
+    })
+    .from(articles)
+    .innerJoin(sources, eq(articles.sourceId, sources.id))
+    .where(eq(sources.name, source));
+
+  return result[0]?.publishedAt ?? new Date();
+}
+
+export async function getEarliestPublished(db: Database, source: string): Promise<Date> {
+  const result = await db
+    .select({
+      publishedAt: min(articles.publishedAt),
+    })
+    .from(articles)
+    .innerJoin(sources, eq(articles.sourceId, sources.id))
+    .where(eq(sources.name, source));
+
+  return result[0]?.publishedAt ?? new Date();
 }

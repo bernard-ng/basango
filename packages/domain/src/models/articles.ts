@@ -8,9 +8,9 @@ export const articleMetadataSchema = z.object({
   author: z.string().optional(),
   description: z.string().optional(),
   image: z.url().optional(),
-  publishedAt: z.date().optional(),
+  publishedAt: z.string().optional(),
   title: z.string().optional(),
-  updatedAt: z.date().optional(),
+  updatedAt: z.string().optional(),
   url: z.url().optional(),
 });
 
@@ -25,7 +25,7 @@ export const tokenStatisticsSchema = z.object({
 export const articleSchema = z.object({
   body: z.string().min(1),
   categories: z.array(z.string()),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
   excerpt: z.string().optional(),
   hash: z.string().min(1),
   id: idSchema,
@@ -38,7 +38,7 @@ export const articleSchema = z.object({
   sourceId: z.union([z.uuid(), z.string().min(1)]),
   title: z.string().min(1),
   tokenStatistics: tokenStatisticsSchema.optional(),
-  updatedAt: z.date().optional(),
+  updatedAt: z.coerce.date().optional(),
 });
 
 // API

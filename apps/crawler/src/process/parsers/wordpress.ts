@@ -76,7 +76,7 @@ export class WordPressCrawler extends BaseCrawler {
                 { url: node.link },
                 "Article out of date range, stopping further processing",
               );
-              break;
+              process.exit(0); // stop further processing
             }
 
             logger.error({ error, url: node.link }, "Failed to process WordPress article");
