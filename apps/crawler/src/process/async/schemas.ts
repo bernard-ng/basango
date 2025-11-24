@@ -1,4 +1,4 @@
-import { PageRangeSchema, TimestampRangeSchema, articleSchema } from "@basango/domain/models";
+import { PageRangeSchema, TimestampRangeSchema } from "@basango/domain/models";
 import { z } from "zod";
 
 export const ListingTaskPayloadSchema = z.object({
@@ -18,11 +18,5 @@ export const DetailsTaskPayloadSchema = z.object({
   url: z.url(),
 });
 
-export const ProcessingTaskPayloadSchema = z.object({
-  article: articleSchema,
-  sourceId: z.string(),
-});
-
 export type ListingTaskPayload = z.infer<typeof ListingTaskPayloadSchema>;
 export type DetailsTaskPayload = z.infer<typeof DetailsTaskPayloadSchema>;
-export type ProcessingTaskPayload = z.infer<typeof ProcessingTaskPayloadSchema>;

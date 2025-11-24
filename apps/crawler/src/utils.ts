@@ -13,8 +13,11 @@ import {
   TimestampRange,
   TimestampRangeSchema,
 } from "@basango/domain/models";
+import logger from "@basango/logger";
 import { format, fromUnixTime, getUnixTime, isMatch, parse } from "date-fns";
 import type { RedisOptions } from "ioredis";
+
+import { getSourceUpdateDates } from "./process/persistence";
 
 /**
  * Resolve a source configuration by its ID.
@@ -30,6 +33,41 @@ export const resolveSourceConfig = (id: string): AnySourceOptions => {
   }
 
   return source;
+};
+
+export const resolveSourceUpdateDates = async (settings: {
+  dateRange?: TimestampRange;
+  direction: "forward" | "backward";
+  source?: AnySourceOptions;
+}) => {
+  if (settings.dateRange === undefined && settings.source) {
+    const dates = await getSourceUpdateDates(settings.source.sourceId);
+
+    switch (settings.direction) {
+      case "backward":
+        settings.dateRange = {
+          end: getUnixTime(dates.earliest),
+          start: getUnixTime(new Date()),
+        };
+        logger.info(
+          { dateRange: settings.dateRange, sourceId: settings.source.sourceId },
+          "Set date range start from earliest published date",
+        );
+        break;
+      case "forward":
+        if (dates.latest) {
+          settings.dateRange = {
+            end: getUnixTime(new Date()),
+            start: getUnixTime(dates.latest),
+          };
+          logger.info(
+            { dateRange: settings.dateRange, sourceId: settings.source.sourceId },
+            "Set date range start from latest published date",
+          );
+        }
+        break;
+    }
+  }
 };
 
 /**

@@ -1,23 +1,18 @@
 import type { HtmlSourceOptions, WordPressSourceOptions } from "@basango/domain/config";
-import { Article } from "@basango/domain/models";
 import { logger } from "@basango/logger";
 
 import { UnsupportedSourceKindError } from "#crawler/errors";
 import { QueueManager, createQueueManager } from "#crawler/process/async/queue";
-import {
-  DetailsTaskPayload,
-  ListingTaskPayload,
-  ProcessingTaskPayload,
-} from "#crawler/process/async/schemas";
+import { DetailsTaskPayload, ListingTaskPayload } from "#crawler/process/async/schemas";
 import { createPersistors, resolveCrawlerConfig } from "#crawler/process/crawler";
 import { HtmlCrawler } from "#crawler/process/parsers/html";
 import { WordPressCrawler } from "#crawler/process/parsers/wordpress";
-import { forward } from "#crawler/process/persistence";
 import {
   createTimestampRange,
   formatPageRange,
   formatTimestampRange,
   resolveSourceConfig,
+  resolveSourceUpdateDates,
 } from "#crawler/utils";
 
 export const collectHtmlListing = async (
@@ -30,6 +25,8 @@ export const collectHtmlListing = async (
   }
 
   const settings = resolveCrawlerConfig(source, payload);
+  await resolveSourceUpdateDates(settings);
+
   const crawler = new HtmlCrawler(settings);
   const pageRange = settings.pageRange ?? (await crawler.getPagination());
 
@@ -69,6 +66,8 @@ export const collectWordPressListing = async (
   }
 
   const settings = resolveCrawlerConfig(source, payload);
+  await resolveSourceUpdateDates(settings);
+
   const crawler = new WordPressCrawler(settings);
   const pageRange = settings.pageRange ?? (await crawler.getPagination());
 
@@ -99,10 +98,7 @@ export const collectWordPressListing = async (
   return queued;
 };
 
-export const collectArticle = async (
-  payload: DetailsTaskPayload,
-  manager: QueueManager = createQueueManager(),
-): Promise<unknown> => {
+export const collectArticle = async (payload: DetailsTaskPayload): Promise<unknown> => {
   const source = resolveSourceConfig(payload.sourceId);
   const settings = resolveCrawlerConfig(source, {
     category: payload.category,
@@ -116,35 +112,14 @@ export const collectArticle = async (
     const crawler = new HtmlCrawler(settings, { persistors });
     const html = await crawler.crawl(payload.url);
 
-    const article = await crawler.fetchOne(html, settings.dateRange);
-    await manager.enqueueProcessed({
-      article,
-      sourceId: payload.sourceId,
-    } as ProcessingTaskPayload);
+    return await crawler.fetchOne(html, settings.dateRange);
   }
 
   if (source.sourceKind === "wordpress") {
     const crawler = new WordPressCrawler(settings, { persistors });
 
-    const article = await crawler.fetchOne(payload.data ?? {}, settings.dateRange);
-    await manager.enqueueProcessed({
-      article,
-      sourceId: payload.sourceId,
-    } as ProcessingTaskPayload);
+    return await crawler.fetchOne(payload.data ?? {}, settings.dateRange);
   }
 
   throw new UnsupportedSourceKindError(`Unsupported source kind`);
-};
-
-export const forwardForProcessing = async (payload: ProcessingTaskPayload): Promise<Article> => {
-  logger.info({ article: payload.article.title }, "Ready for downstream processing");
-
-  try {
-    logger.info({ article: payload.article.title }, "Forwarding article to API");
-    await forward(payload.article);
-  } catch (error) {
-    logger.error({ error }, "Failed to forward article to API");
-  }
-
-  return payload.article;
 };

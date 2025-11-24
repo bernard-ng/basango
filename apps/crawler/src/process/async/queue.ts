@@ -9,8 +9,6 @@ import {
   DetailsTaskPayloadSchema,
   ListingTaskPayload,
   ListingTaskPayloadSchema,
-  ProcessingTaskPayload,
-  ProcessingTaskPayloadSchema,
 } from "#crawler/process/async/schemas";
 import { parseRedisUrl } from "#crawler/utils";
 
@@ -58,7 +56,6 @@ export interface QueueManager {
   readonly connection: IORedis;
   enqueueListing: (payload: ListingTaskPayload) => Promise<{ id: string }>;
   enqueueArticle: (payload: DetailsTaskPayload) => Promise<{ id: string }>;
-  enqueueProcessed: (payload: ProcessingTaskPayload) => Promise<{ id: string }>;
   iterQueueNames: () => string[];
   queueName: (suffix: string) => string;
   close: () => Promise<void>;
@@ -92,16 +89,7 @@ export const createQueueManager = (options: CreateQueueManagerOptions = {}): Que
       const queue = ensureQueue(asyncOptions.queues.listing);
       return queue.add("collect_listing", data);
     },
-    enqueueProcessed: (payload) => {
-      const data = ProcessingTaskPayloadSchema.parse(payload);
-      const queue = ensureQueue(asyncOptions.queues.processing);
-      return queue.add("forward_for_processing", data);
-    },
-    iterQueueNames: () => [
-      asyncOptions.queues.listing,
-      asyncOptions.queues.details,
-      asyncOptions.queues.processing,
-    ],
+    iterQueueNames: () => [asyncOptions.queues.listing, asyncOptions.queues.details],
     options: asyncOptions,
     queueName: (suffix: string) => `${asyncOptions.prefix}:${suffix}`,
   };

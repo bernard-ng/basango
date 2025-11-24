@@ -2,11 +2,7 @@ import { logger } from "@basango/logger";
 
 import * as handlers from "#crawler/process/async/handlers";
 import { createQueueManager } from "#crawler/process/async/queue";
-import {
-  DetailsTaskPayloadSchema,
-  ListingTaskPayloadSchema,
-  ProcessingTaskPayloadSchema,
-} from "#crawler/process/async/schemas";
+import { DetailsTaskPayloadSchema, ListingTaskPayloadSchema } from "#crawler/process/async/schemas";
 import { CrawlingOptions } from "#crawler/process/crawler";
 
 export const collectListing = async (payload: unknown): Promise<number> => {
@@ -25,16 +21,6 @@ export const collectArticle = async (payload: unknown): Promise<unknown> => {
 
   const result = await handlers.collectArticle(data);
   logger.info({ url: data.url }, "Article collection completed");
-
-  return result;
-};
-
-export const forwardForProcessing = async (payload: unknown): Promise<unknown> => {
-  const data = ProcessingTaskPayloadSchema.parse(payload);
-  logger.debug({ sourceId: data.sourceId }, "Forwarding article for processing");
-
-  const result = await handlers.forwardForProcessing(data);
-  logger.info({ result }, "Article forwarded for processing");
 
   return result;
 };

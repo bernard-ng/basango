@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { config } from "@basango/domain/config";
-import type { Article } from "@basango/domain/models";
+import type { Article, SourceUpdateDates } from "@basango/domain/models";
 import { md5 } from "@basango/encryption";
 import logger from "@basango/logger";
 
@@ -61,19 +61,46 @@ export const persist = async (
     }
   }
 
+  forward(article).catch((error) => {
+    logger.error({ error }, "Failed to forward article");
+  });
+
   logger.info({ url: article.link }, "article successfully persisted");
   return article;
+};
+
+export const getSourceUpdateDates = async (sourceId: string): Promise<SourceUpdateDates> => {
+  const client = new SyncHttpClient(config.crawler.fetch.client);
+  const endpoint = config.crawler.backend.endpoint;
+
+  logger.info({ sourceId }, "Fetching source update dates");
+  const response = await client.post(`${endpoint}/sources/update-dates`, {
+    headers: {
+      Authorization: config.crawler.backend.token,
+    },
+    json: {
+      name: sourceId,
+    },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    logger.info({ ...data }, "Retrieved source update dates");
+    return data;
+  }
+
+  logger.error({ sourceId, status: response.status }, "Failed to retrieve source update dates");
+  return { earliest: new Date(), latest: new Date() };
 };
 
 export const forward = async (payload: Partial<Article>): Promise<void> => {
   const client = new SyncHttpClient(config.crawler.fetch.client);
   const endpoint = config.crawler.backend.endpoint;
-  const token = config.crawler.backend.token;
 
   try {
-    const response = await client.post(endpoint, {
+    const response = await client.post(`${endpoint}/articles`, {
       headers: {
-        Authorization: `${token}`,
+        Authorization: config.crawler.backend.token,
       },
       json: payload,
     });

@@ -8,12 +8,13 @@ import {
 } from "#crawler/process/crawler";
 import { HtmlCrawler } from "#crawler/process/parsers/html";
 import { WordPressCrawler } from "#crawler/process/parsers/wordpress";
-import { resolveSourceConfig } from "#crawler/utils";
+import { resolveSourceConfig, resolveSourceUpdateDates } from "#crawler/utils";
 
 export const runSyncCrawl = async (options: CrawlingOptions): Promise<void> => {
   const source = resolveSourceConfig(options.sourceId);
   const settings = resolveCrawlerConfig(source, options);
   const persistors = createPersistors(source);
+  await resolveSourceUpdateDates(settings);
 
   const crawler =
     source.sourceKind === "wordpress"
