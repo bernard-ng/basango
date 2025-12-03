@@ -17,6 +17,7 @@ import * as uuid from "uuid";
 import { Database } from "#db/client";
 import { getSourceIdByName } from "#db/queries/sources";
 import { articles, categories, sources } from "#db/schema";
+import { classifyCategory } from "#db/services/category-classifier";
 import { CreateArticleParams, GetArticlesParams } from "#db/types/articles";
 import { GetDistributionsParams, GetPublicationsParams } from "#db/types/shared";
 import {
@@ -41,24 +42,26 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
     };
   }
 
-  const categoryList = params.categories ?? [];
   const data = {
     ...params,
-    categories: categoryList,
+    categories: params.categories ?? [],
     hash: md5(params.link),
+    id: uuid.v7(),
     readingTime: computeReadingTime(params.body),
     sentiment: (params.sentiment ?? "neutral") as Sentiment,
     sourceId: await getSourceIdByName(db, params.sourceId),
     tokenStatistics: computeTokenStatistics({
       body: params.body,
-      categories: categoryList,
+      categories: params.categories ?? [],
       title: params.title,
     }),
   };
 
+  data.categoryId = classifyCategory(data).category.id;
+
   const [result] = await db
     .insert(articles)
-    .values({ id: uuid.v7(), ...data })
+    .values({ ...data })
     .returning({
       id: articles.id,
       sourceId: articles.sourceId,

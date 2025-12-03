@@ -12,6 +12,7 @@ import { cn } from "@basango/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 
+import { Show } from "#dashboard/components/shell/show";
 import { useTRPC } from "#dashboard/trpc/client";
 
 type Props = {
@@ -25,7 +26,6 @@ export function CategoriesCarousel({ onSelect, selectedCategory }: Props) {
   const trpc = useTRPC();
   const { data, isLoading } = useQuery(trpc.categories.list.queryOptions());
   const categories = data ?? [];
-  const showSkeletons = isLoading && categories.length === 0;
 
   return (
     <div className="relative">
@@ -43,22 +43,25 @@ export function CategoriesCarousel({ onSelect, selectedCategory }: Props) {
               All
             </CategoryPill>
           </CarouselItem>
-          {showSkeletons
-            ? Array.from({ length: PLACEHOLDER_COUNT }).map((_, index) => (
-                <CarouselItem className="basis-auto pl-2" key={`category-skeleton-${index}`}>
-                  <Skeleton className="h-8 w-20 rounded-full bg-muted/70" />
-                </CarouselItem>
-              ))
-            : categories.map((category) => (
-                <CarouselItem className="basis-auto pl-2" key={category.id}>
-                  <CategoryPill
-                    active={selectedCategory === category.id}
-                    onClick={() => onSelect(category.id)}
-                  >
-                    {category.name}
-                  </CategoryPill>
-                </CarouselItem>
-              ))}
+          <Show
+            fallback={Array.from({ length: PLACEHOLDER_COUNT }).map((_, index) => (
+              <CarouselItem className="basis-auto pl-2" key={`category-skeleton-${index}`}>
+                <Skeleton className="h-8 w-20 rounded-full bg-muted/70" />
+              </CarouselItem>
+            ))}
+            when={isLoading && categories.length > 0}
+          >
+            {categories.map((category) => (
+              <CarouselItem className="basis-auto pl-2" key={category.id}>
+                <CategoryPill
+                  active={selectedCategory === category.id}
+                  onClick={() => onSelect(category.id)}
+                >
+                  {category.name}
+                </CategoryPill>
+              </CarouselItem>
+            ))}
+          </Show>
         </CarouselContent>
         <CarouselPrevious className="hidden md:flex" size="icon" />
         <CarouselNext className="hidden md:flex" size="icon" />
