@@ -20,6 +20,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     trpc.sources.getById.queryOptions({ id }),
     trpc.sources.getCategoryShares.queryOptions({ id, limit: 10 }),
     trpc.sources.getPublications.queryOptions({ id }),
+    trpc.categories.list.queryOptions(),
     trpc.articles.list.infiniteQueryOptions({ limit: 12, sourceId: id }),
   ]);
 

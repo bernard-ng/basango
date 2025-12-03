@@ -9,6 +9,7 @@ import * as React from "react";
 import { useTRPC } from "#dashboard/trpc/client";
 
 import { ArticleCard, ArticleCardSkeleton } from "./article-card";
+import { CategoriesCarousel } from "./categories-carousel";
 
 type ArticlesTableProps = {
   sourceId?: string;
@@ -18,10 +19,16 @@ const PLACEHOLDER_COUNT = 8;
 
 export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
   const trpc = useTRPC();
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+
+  const handleCategorySelect = React.useCallback((categoryId: string | null) => {
+    setSelectedCategory((current) => (current === categoryId ? null : categoryId));
+  }, []);
 
   const query = useInfiniteQuery(
     trpc.articles.list.infiniteQueryOptions(
       {
+        category: selectedCategory ?? undefined,
         limit: 12,
         sourceId,
       },
@@ -41,6 +48,8 @@ export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
 
   return (
     <div className="space-y-4">
+      <CategoriesCarousel onSelect={handleCategorySelect} selectedCategory={selectedCategory} />
+
       {query.isError && (
         <Alert variant="destructive">
           <AlertTitle>Unable to load articles</AlertTitle>

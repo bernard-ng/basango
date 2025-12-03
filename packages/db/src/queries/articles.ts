@@ -11,7 +11,7 @@ import {
 } from "@basango/domain/models";
 import { md5 } from "@basango/encryption";
 import type { SQL } from "drizzle-orm";
-import { count, desc, eq, getTableColumns, or, sql } from "drizzle-orm";
+import { count, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import * as uuid from "uuid";
 
 import { Database } from "#db/client";
@@ -105,14 +105,7 @@ function buildFilters(params: GetArticlesParams, pagination: PaginationState) {
   }
 
   if (params.category) {
-    const categoryFilter = or(
-      eq(categories.slug, params.category),
-      eq(articles.categoryId, params.category),
-    );
-
-    if (categoryFilter) {
-      filters.push(categoryFilter);
-    }
+    filters.push(eq(articles.categoryId, params.category));
   }
 
   if (params.search?.trim()) {
