@@ -124,7 +124,7 @@ export class CategoryClassifier {
   }
 }
 
-function classifyCategory(article: ArticleCategories): CategoryScore {
+export function classifyCategory(article: ArticleCategories): CategoryScore {
   const rawCategories = article.categories ?? [];
   const normalizedCategories = Array.from(
     new Set(
