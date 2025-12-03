@@ -21,6 +21,13 @@
       "tag": "0002_modern_joseph",
       "version": "7",
       "when": 1763920009482
+    },
+    {
+      "breakpoints": true,
+      "idx": 3,
+      "tag": "0003_categories",
+      "version": "7",
+      "when": 1764767993880
     }
   ],
   "version": "7"

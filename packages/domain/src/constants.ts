@@ -32,3 +32,4 @@ export const DEFAULT_TOKEN_AUDIENCE = "basango_dashboard";
 export const DEFAULT_TOKEN_ISSUER = "basango_api";
 export const DEFAULT_ACCESS_TOKEN_TTL = "35m";
 export const DEFAULT_REFRESH_TOKEN_TTL = "7d";
+export const DEFAULT_CATEGORY = "divers-autres";

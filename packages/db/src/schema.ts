@@ -94,11 +94,33 @@ export const sources = pgTable(
   ],
 );
 
+export const categories = pgTable(
+  "category",
+  {
+    candidates: text().array().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    description: varchar({ length: 512 }),
+    embeddings: jsonb("embeddings").$type<number[]>(),
+    id: uuid().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    slug: varchar({ length: 255 }).notNull(),
+    updatedAt: timestamp("updated_at"),
+    weight: integer().default(0).notNull(),
+  },
+  (table) => [
+    uniqueIndex("unq_category_name").using("btree", sql`lower((name)::text)`),
+    uniqueIndex("unq_category_slug").using("btree", sql`lower((slug)::text)`),
+    index("idx_category_weight").using("btree", table.weight.asc().nullsLast()),
+  ],
+);
+
 export const articles = pgTable(
   "article",
   {
     body: text().notNull(),
     categories: text().array(),
+    categoryId: uuid("category_id"),
+    clustered: boolean("clustered").default(false).notNull(),
     crawledAt: timestamp("crawled_at").defaultNow().notNull(),
     credibility: jsonb("credibility").$type<Credibility>(),
     excerpt: varchar({ length: 255 }).generatedAlwaysAs(sql`("left"(body, 200) || '...'::text)`),
@@ -123,6 +145,8 @@ export const articles = pgTable(
       "gin",
       table.categories.asc().nullsLast().op("array_ops"),
     ),
+    index("idx_article_category_id").using("btree", table.categoryId.asc().nullsLast()),
+    index("idx_article_clustered").using("btree", table.clustered.asc().nullsLast()),
     index("gin_article_link_trgm").using("gin", table.link.asc().nullsLast().op("gin_trgm_ops")),
     index("gin_article_title_trgm").using("gin", table.title.asc().nullsLast().op("gin_trgm_ops")),
     index("gin_article_tsv").using("gin", table.tsv.asc().nullsLast().op("tsvector_ops")),
@@ -133,6 +157,11 @@ export const articles = pgTable(
       table.id.desc().nullsFirst(),
     ),
     uniqueIndex("unq_article_hash").using("btree", table.hash.asc().nullsLast()),
+    foreignKey({
+      columns: [table.categoryId],
+      foreignColumns: [categories.id],
+      name: "fk_article_category_id",
+    }).onDelete("set null"),
     foreignKey({
       columns: [table.sourceId],
       foreignColumns: [sources.id],
@@ -425,11 +454,19 @@ export const commentRelations = relations(comments, ({ one }) => ({
 
 export const articleRelations = relations(articles, ({ one, many }) => ({
   bookmarkArticles: many(bookmarkArticles),
+  category: one(categories, {
+    fields: [articles.categoryId],
+    references: [categories.id],
+  }),
   comments: many(comments),
   source: one(sources, {
     fields: [articles.sourceId],
     references: [sources.id],
   }),
+}));
+
+export const categoryRelations = relations(categories, ({ many }) => ({
+  articles: many(articles),
 }));
 
 export const bookmarkArticleRelations = relations(bookmarkArticles, ({ one }) => ({

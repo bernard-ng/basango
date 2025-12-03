@@ -11,9 +11,13 @@ interface PageProps {
 export const PageLayout = (props: React.PropsWithChildren<PageProps>) => {
   const { title, header = <PageHeader title={title} />, children } = props;
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      {header}
-      {children}
+    <div className="h-svh overflow-hidden lg:p-2 w-full">
+      <div className="lg:border lg:rounded-md overflow-hidden flex flex-col items-center justify-start h-full w-full">
+        {header}
+        <div className="overflow-auto w-full h-[calc(100svh-40px)] lg:h-[calc(100svh-56px)] p-4 space-y-6">
+          {children}
+        </div>
+      </div>
     </div>
   );
 };

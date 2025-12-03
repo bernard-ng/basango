@@ -1,9 +1,11 @@
 import { ArticleMetadata, ID, Sentiment, TokenStatistics } from "@basango/domain/models";
 
 export type CreateArticleParams = {
+  categoryId?: string | null;
+  clustered?: boolean;
   title: string;
   body: string;
-  categories: string[];
+  categories?: string[];
   link: string;
   sourceId: string;
   publishedAt: Date;

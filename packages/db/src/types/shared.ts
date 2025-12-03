@@ -1,9 +1,11 @@
 import { DateRange, ID } from "@basango/domain/models";
 
 export type CategoryShare = {
+  categoryId: string;
   category: string;
   count: number;
   percentage: number;
+  slug: string;
 };
 
 export type CategoryShares = {

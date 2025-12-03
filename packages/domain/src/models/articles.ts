@@ -1,5 +1,6 @@
 import z from "zod";
 
+import { categorySchema } from "./categories";
 import { idSchema, sentimentSchema } from "./shared";
 import { sourceSchema } from "./sources";
 
@@ -24,7 +25,10 @@ export const tokenStatisticsSchema = z.object({
 
 export const articleSchema = z.object({
   body: z.string().min(1),
-  categories: z.array(z.string()),
+  categories: z.array(z.string()).optional().default([]),
+  category: categorySchema.optional(),
+  categoryId: idSchema.optional(),
+  clustered: z.boolean().default(false),
   createdAt: z.coerce.date(),
   excerpt: z.string().optional(),
   hash: z.string().min(1),

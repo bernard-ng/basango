@@ -1,5 +1,6 @@
 export * from "./articles";
 export * from "./auth";
+export * from "./categories";
 export * from "./crawler";
 export * from "./reports";
 export * from "./shared";

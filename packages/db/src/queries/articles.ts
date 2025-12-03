@@ -11,12 +11,12 @@ import {
 } from "@basango/domain/models";
 import { md5 } from "@basango/encryption";
 import type { SQL } from "drizzle-orm";
-import { count, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { count, desc, eq, getTableColumns, or, sql } from "drizzle-orm";
 import * as uuid from "uuid";
 
 import { Database } from "#db/client";
 import { getSourceIdByName } from "#db/queries/sources";
-import { articles, sources } from "#db/schema";
+import { articles, categories, sources } from "#db/schema";
 import { CreateArticleParams, GetArticlesParams } from "#db/types/articles";
 import { GetDistributionsParams, GetPublicationsParams } from "#db/types/shared";
 import {
@@ -41,15 +41,17 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
     };
   }
 
+  const categoryList = params.categories ?? [];
   const data = {
     ...params,
+    categories: categoryList,
     hash: md5(params.link),
     readingTime: computeReadingTime(params.body),
-    sentiment: "neutral" as Sentiment,
+    sentiment: (params.sentiment ?? "neutral") as Sentiment,
     sourceId: await getSourceIdByName(db, params.sourceId),
     tokenStatistics: computeTokenStatistics({
       body: params.body,
-      categories: params.categories,
+      categories: categoryList,
       title: params.title,
     }),
   };
@@ -103,7 +105,14 @@ function buildFilters(params: GetArticlesParams, pagination: PaginationState) {
   }
 
   if (params.category) {
-    filters.push(sql`${params.category} = ANY(${articles.categories})`);
+    const categoryFilter = or(
+      eq(categories.slug, params.category),
+      eq(articles.categoryId, params.category),
+    );
+
+    if (categoryFilter) {
+      filters.push(categoryFilter);
+    }
   }
 
   if (params.search?.trim()) {
@@ -133,11 +142,15 @@ export async function getArticles(db: Database, params: GetArticlesParams) {
   const query = db
     .select({
       ...getTableColumns(articles),
+      category: {
+        ...getTableColumns(categories),
+      },
       source: {
         ...getTableColumns(sources),
       },
     })
     .from(articles)
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
     .innerJoin(sources, eq(articles.sourceId, sources.id));
 
   const rows = await applyFilters(query, filters)
