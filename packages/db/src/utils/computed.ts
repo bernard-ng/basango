@@ -28,21 +28,20 @@ export const computeTokenCount = (
 export const computeTokenStatistics = (data: {
   title: string;
   body: string;
-  categories: string[];
+  categories?: string[];
 }): TokenStatistics => {
-  const [title, body, categories, excerpt] = [
-    computeTokenCount(data.title),
-    computeTokenCount(data.body),
-    computeTokenCount(data.categories.join(",")),
-    computeTokenCount(data.body.substring(0, 200)),
-  ];
+  const normalizedCategories = data.categories ?? [];
+  const titleTokens = computeTokenCount(data.title);
+  const bodyTokens = computeTokenCount(data.body);
+  const categoryTokens = computeTokenCount(normalizedCategories.join(","));
+  const excerptTokens = computeTokenCount(data.body.substring(0, 200));
 
   return {
-    body,
-    categories,
-    excerpt,
-    title,
-    total: title + body + categories + excerpt,
+    body: bodyTokens,
+    categories: categoryTokens,
+    excerpt: excerptTokens,
+    title: titleTokens,
+    total: titleTokens + bodyTokens + categoryTokens + excerptTokens,
   };
 };
 

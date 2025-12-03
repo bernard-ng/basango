@@ -5,7 +5,7 @@ import * as uuid from "uuid";
 
 import { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
-import { articles, sources } from "#db/schema";
+import { articles, categories, sources } from "#db/schema";
 import {
   CategoryShare,
   CategoryShares,
@@ -144,17 +144,18 @@ export async function getSourceCategoryShares(
 ): Promise<CategoryShares> {
   const data = await db.execute<CategoryShare>(sql`
     SELECT
-      cat AS category,
-      COUNT(*)::int AS count,
-      ROUND((COUNT(*)::numeric / SUM(COUNT(*)) OVER ()) * 100, 2) AS percentage
-    FROM (
-      SELECT NULLIF(BTRIM(c), '') AS cat
-      FROM ${articles}
-      CROSS JOIN LATERAL UNNEST(COALESCE(${articles.categories}, ARRAY[]::text[])) AS c
-      WHERE ${articles.sourceId} = ${params.id}
-    ) t
-    WHERE cat IS NOT NULL
-    GROUP BY cat
+      ${categories.id}::text AS "categoryId",
+      ${categories.slug} AS slug,
+      ${categories.name} AS category,
+      COUNT(${articles.id})::int AS count,
+      COALESCE(
+        ROUND((COUNT(*)::numeric / NULLIF(SUM(COUNT(*)) OVER (), 0)) * 100, 2),
+        0
+      )::float AS percentage
+    FROM ${articles}
+    JOIN ${categories} ON ${categories.id} = ${articles.categoryId}
+    WHERE ${articles.sourceId} = ${params.id} AND ${articles.clustered} = true
+    GROUP BY ${categories.id}, ${categories.slug}, ${categories.name}
     ORDER BY count DESC
     LIMIT ${params.limit ?? DEFAULT_CATEGORY_SHARES_LIMIT}
   `);
