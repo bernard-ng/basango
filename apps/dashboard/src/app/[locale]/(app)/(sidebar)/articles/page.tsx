@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  prefetch(trpc.categories.list.queryOptions());
   prefetch(trpc.articles.list.infiniteQueryOptions({ limit: 12 }));
 
   return (
