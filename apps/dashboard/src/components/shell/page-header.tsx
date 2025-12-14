@@ -14,7 +14,7 @@ type Props = {
 
 export function PageHeader({ title }: Props) {
   return (
-    <header className="w-full flex justify-between items-center border-b py-2 px-6 h-14">
+    <header className="w-full flex justify-between items-center border-b py-2 px-4">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-1" />
         <Breadcrumb>

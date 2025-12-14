@@ -6,25 +6,19 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import * as React from "react";
 
+import { useCategoryFilterParams } from "#dashboard/hooks/use-category-filter-params";
 import { useTRPC } from "#dashboard/trpc/client";
 
 import { ArticleCard, ArticleCardSkeleton } from "./article-card";
-import { CategoriesCarousel } from "./categories-carousel";
 
 type ArticlesTableProps = {
   sourceId?: string;
 };
 
-const PLACEHOLDER_COUNT = 8;
-
 export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
+  const { selectedCategory } = useCategoryFilterParams();
+
   const trpc = useTRPC();
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
-
-  const handleCategorySelect = React.useCallback((categoryId: string | null) => {
-    setSelectedCategory((current) => (current === categoryId ? null : categoryId));
-  }, []);
-
   const query = useInfiniteQuery(
     trpc.articles.list.infiniteQueryOptions(
       {
@@ -48,8 +42,6 @@ export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
 
   return (
     <div className="space-y-4">
-      <CategoriesCarousel onSelect={handleCategorySelect} selectedCategory={selectedCategory} />
-
       {query.isError && (
         <Alert variant="destructive">
           <AlertTitle>Unable to load articles</AlertTitle>
@@ -61,7 +53,7 @@ export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
 
       {isInitialLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: PLACEHOLDER_COUNT }).map((_, index) => (
+          {Array.from({ length: 8 }).map((_, index) => (
             <ArticleCardSkeleton key={index} />
           ))}
         </div>
