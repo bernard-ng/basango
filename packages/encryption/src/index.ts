@@ -1,7 +1,12 @@
 import crypto from "node:crypto";
 
 import { config } from "@basango/domain/config";
-import * as bcrypt from "bcrypt";
+import type * as Bcrypt from "bcrypt";
+
+const loadBcrypt = async (): Promise<typeof Bcrypt> => {
+  const moduleName = "bcrypt";
+  return await import(moduleName);
+};
 
 function getKey(): Buffer {
   const key = config.encryption.key;
@@ -80,9 +85,11 @@ export function generateRandomBytes(size: number): string {
 
 export async function hashPassword(password: string): Promise<string> {
   const rounds = config.encryption.bcryptSaltRounds;
+  const bcrypt = await loadBcrypt();
   return bcrypt.hash(password, rounds);
 }
 
 export async function verifyPassword(password: string, hashed: string): Promise<boolean> {
+  const bcrypt = await loadBcrypt();
   return bcrypt.compare(password, hashed);
 }

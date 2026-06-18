@@ -12,7 +12,7 @@ import { Input } from "@basango/ui/components/input";
 import { SubmitButton } from "@basango/ui/components/submit-button";
 import { cn } from "@basango/ui/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -24,9 +24,13 @@ import { persistSessionTokens } from "#dashboard/utils/auth/client";
 
 type LoginValues = z.infer<typeof loginSchema>;
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
+type LoginFormProps = React.ComponentProps<"form"> & {
+  returnTo?: string;
+};
+
+export function LoginForm({ className, returnTo, ...props }: LoginFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
   const trpc = useTRPC();
   const setUser = useUserStore((state) => state.setUser);
 
@@ -53,8 +57,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
         toast.success("Successfully logged in.");
 
         form.reset();
-        router.push(searchParams?.get("return_to") ?? `/dashboard`);
-        router.refresh();
+        await navigate({ to: returnTo ?? "/dashboard" });
+        await router.invalidate();
       },
     }),
   );

@@ -2,8 +2,10 @@
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@basango/ui/components/sidebar";
 
+import { getPublicVersion } from "#dashboard/utils/environment";
+
 export function AppSidebarInfo() {
-  const version = process.env.NEXT_PUBLIC_VERSION || "0.0.0";
+  const version = getPublicVersion();
 
   return (
     <SidebarMenu>

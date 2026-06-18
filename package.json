@@ -44,6 +44,9 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build:crawler": "bun run --cwd apps/crawler build:binary",
+    "build:crawler:arm64": "bun run --cwd apps/crawler build:binary:arm64",
+    "build:crawler:x64": "bun run --cwd apps/crawler build:binary:x64",
     "build:dashboard": "turbo build --filter=@basango/dashboard",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",

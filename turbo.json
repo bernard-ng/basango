@@ -5,15 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "next-env.d.ts",
-        ".expo/**",
-        "dist/**",
-        "build/**",
-        "lib/**"
-      ],
+      "outputs": [".output/**", ".tanstack/**", ".expo/**", "dist/**", "build/**", "lib/**"],
       "passThroughEnv": []
     },
     "clean": {

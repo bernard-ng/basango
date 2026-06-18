@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Basango crawler scheduler periodically
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=30min
+RandomizedDelaySec=5min
+Persistent=true
+Unit=basango-crawler-schedule.service
+
+[Install]
+WantedBy=timers.target

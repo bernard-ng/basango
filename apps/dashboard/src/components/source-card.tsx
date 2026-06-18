@@ -1,5 +1,6 @@
 "use client";
 
+import { RouterOutputs } from "@basango/api/trpc/routers/_app";
 import {
   Card,
   CardContent,
@@ -16,7 +17,6 @@ import {
 } from "@basango/ui/components/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import { RouterOutputs } from "#api/trpc/routers/_app";
 import { formatDate, formatNumber } from "#dashboard/utils/utils";
 
 const chartConfig = {

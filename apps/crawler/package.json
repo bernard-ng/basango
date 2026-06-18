@@ -20,13 +20,15 @@
   "name": "@basango/crawler",
   "private": true,
   "scripts": {
+    "build:binary": "bun run build:binary:arm64 && bun run build:binary:x64",
+    "build:binary:arm64": "bun build --compile --define BASANGO_CRAWLER_BINARY=true --external pino --target=bun-linux-arm64 src/cli.ts ../../node_modules/bullmq/dist/cjs/commands/*.lua ../../node_modules/bullmq/dist/cjs/commands/includes/*.lua --outfile ../../dist/crawler/basango-crawler-linux-arm64",
+    "build:binary:x64": "bun build --compile --define BASANGO_CRAWLER_BINARY=true --external pino --target=bun-linux-x64 src/cli.ts ../../node_modules/bullmq/dist/cjs/commands/*.lua ../../node_modules/bullmq/dist/cjs/commands/includes/*.lua --outfile ../../dist/crawler/basango-crawler-linux-x64",
     "clean": "rm -rf .turbo node_modules",
-    "crawler:async": "bun run src/scripts/async.ts",
-    "crawler:push": "bun run src/scripts/push.ts",
-    "crawler:sync": "bun run src/scripts/sync.ts",
-    "crawler:worker": "bun run src/scripts/worker.ts",
-    "dev": "bun run src/scripts/worker.ts",
-    "test": "vitest --run",
+    "crawler:async": "bun run src/cli.ts schedule",
+    "crawler:push": "bun run src/cli.ts push",
+    "crawler:sync": "bun run src/cli.ts sync",
+    "crawler:worker": "bun run src/cli.ts worker",
+    "dev": "bun run src/cli.ts worker",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"

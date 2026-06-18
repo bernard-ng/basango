@@ -13,12 +13,15 @@
 # testing
 /coverage
 
-# next.js
+# framework build output
 /.next/
+/.output/
+/.tanstack/
 /out/
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store

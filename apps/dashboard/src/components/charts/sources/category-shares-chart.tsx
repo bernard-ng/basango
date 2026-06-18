@@ -1,5 +1,6 @@
 "use client";
 
+import { RouterOutputs } from "@basango/api/trpc/routers/_app";
 import {
   Card,
   CardContent,
@@ -10,7 +11,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-import { RouterOutputs } from "#api/trpc/routers/_app";
 import { ChartLimitToggle, useChartLimitFilter } from "#dashboard/components/charts/chart-filters";
 import { useTRPC } from "#dashboard/trpc/client";
 import { getColorFromName } from "#dashboard/utils/categories";

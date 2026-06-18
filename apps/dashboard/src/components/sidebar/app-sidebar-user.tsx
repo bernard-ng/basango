@@ -15,8 +15,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@basango/ui/components/sidebar";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { ChevronsUpDown, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { useUser } from "#dashboard/hooks/use-user";
 import { clearSessionTokens } from "#dashboard/utils/auth/client";
@@ -25,13 +25,14 @@ import { getInitials } from "#dashboard/utils/utils";
 export function AppSidebarUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
+  const navigate = useNavigate();
   const { user, setUser } = useUser();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     clearSessionTokens();
     setUser(null);
-    router.push(`/login`);
-    router.refresh();
+    await navigate({ search: {}, to: "/login" });
+    await router.invalidate();
   };
 
   return (

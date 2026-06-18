@@ -1,0 +1,18 @@
+[Unit]
+Description=Basango crawler worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/basango-crawler
+EnvironmentFile=/opt/basango-crawler/.env
+ExecStart=/opt/basango-crawler/basango-crawler worker --queue listing --queue details
+Restart=always
+RestartSec=10
+User=basango
+Group=basango
+StateDirectory=basango-crawler
+
+[Install]
+WantedBy=multi-user.target

@@ -15,8 +15,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@basango/ui/components/sidebar";
+import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronRight, type LucideIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
 
 type ParentItem = {
   title: string;
@@ -37,7 +37,9 @@ type Props = {
 };
 
 export function AppSidebarContent({ items }: Props) {
-  const pathname = usePathname();
+  const pathname = useLocation({
+    select: (location) => location.pathname,
+  });
 
   return (
     <SidebarGroup>
@@ -66,9 +68,9 @@ export function AppSidebarContent({ items }: Props) {
                         asChild
                         isActive={subItem.url === pathname || pathname.includes(subItem.url)}
                       >
-                        <a href={subItem.url}>
+                        <Link to={subItem.url}>
                           <span>{subItem.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

@@ -10,7 +10,7 @@ services:
       - "3306:3306"
     volumes:
       - ./var/volumes/mariadb:/var/lib/mysql:rw
-      - ./var/volumes/api-legacy-var:/var/www/var
+      - ./var/volumes/backups:/var/www/var
     networks:
       - basango_network
   

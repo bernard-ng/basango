@@ -3,9 +3,9 @@ import { DEFAULT_OPEN_GRAPH_USER_AGENT } from "@basango/domain/constants";
 import { ArticleMetadata } from "@basango/domain/models";
 import { parse } from "node-html-parser";
 
+import { createAbsoluteUrl } from "#crawler/config/ranges";
 import { SyncHttpClient } from "#crawler/http/http-client";
 import { UserAgents } from "#crawler/http/user-agent";
-import { createAbsoluteUrl } from "#crawler/utils";
 
 /**
  * Picks the first non-empty value from the provided array.

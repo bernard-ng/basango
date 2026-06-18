@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 
 import { SOURCE_KINDS } from "../constants";
 import { PageRangeSchema, TimestampRangeSchema, UpdateDirectionSchema } from "../models";
@@ -35,6 +35,7 @@ export const HtmlSourceOptionsSchema = SourceOptionsSchema.extend({
 });
 
 export const WordPressSourceOptionsSchema = SourceOptionsSchema.extend({
+  metadataStrategy: z.enum(["auto", "yoast", "rest", "fetch", "none"]).default("auto"),
   sourceDate: SourceDateSchema.default(SourceDateSchema.parse({ format: "yyyy-LL-dd'T'HH:mm:ss" })),
   sourceKind: z.literal("wordpress"),
 });
@@ -86,6 +87,7 @@ export const CrawlerConfigurationSchema = z.object({
   paths: z.object({
     data: z.string(),
     root: z.string(),
+    sqlite: z.string().optional().default(""),
   }),
   sources: z.object({
     html: z.array(HtmlSourceOptionsSchema).default([]),

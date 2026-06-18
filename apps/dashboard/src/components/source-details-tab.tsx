@@ -1,5 +1,6 @@
 "use client";
 
+import { RouterOutputs } from "@basango/api/trpc/routers/_app";
 import {
   Card,
   CardContent,
@@ -7,10 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@basango/ui/components/card";
-import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { RouterOutputs } from "#api/trpc/routers/_app";
 import { SourceEditForm } from "#dashboard/components/forms/source-edit-form";
 
 type Props = {
@@ -34,13 +33,14 @@ export function SourceDetailsTab({ source }: Props) {
             <DetailItem
               label="Website"
               value={
-                <Link
+                <a
                   className="text-primary underline underline-offset-4"
                   href={source.url}
+                  rel="noreferrer"
                   target="_blank"
                 >
                   {source.url}
-                </Link>
+                </a>
               }
             />
             <DetailItem label="Description" value={source.description ?? "Not provided"} />

@@ -12,7 +12,6 @@ import {
 } from "@basango/ui/components/dropdown-menu";
 import { Skeleton } from "@basango/ui/components/skeleton";
 import { ExternalLink, Link2, MoreHorizontal } from "lucide-react";
-import Link from "next/link";
 import * as React from "react";
 
 import { formatDate, formatRelativeTime } from "#dashboard/utils/utils";
@@ -68,10 +67,10 @@ export function ArticleCard({ article }: ArticleCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={article.link} rel="noreferrer" target="_blank">
+                  <a href={article.link} rel="noreferrer" target="_blank">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Open original
-                  </Link>
+                  </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={copyLink}>
                   <Link2 className="mr-2 h-4 w-4" />
@@ -84,14 +83,14 @@ export function ArticleCard({ article }: ArticleCardProps) {
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-3 p-4">
         <CardTitle className="text-base leading-tight">
-          <Link
+          <a
             className="transition hover:text-primary hover:underline"
             href={article.link}
             rel="noreferrer"
             target="_blank"
           >
             {article.title}
-          </Link>
+          </a>
         </CardTitle>
         <p className="text-sm text-muted-foreground line-clamp-3">
           {article.metadata?.description ??

@@ -11,7 +11,7 @@ The Basango Crawler is designed to systematically crawl news websites and extrac
 - **Configurable Sources**: JSON-based configuration for different website sources
 - **HTML & WordPress Support**: Built-in parsers for HTML websites and WordPress APIs
 - **Rate Limiting**: Respects website rate limits and implements backoff strategies
-- **Data Persistence**: JSONL output format for processed articles
+- **Data Persistence**: SQLite outbox for processed articles and retryable forwarding
 - **Worker Management**: Distributed worker system for parallel processing
 - **Type Safety**: Full TypeScript implementation with Zod schema validation
 
@@ -51,6 +51,7 @@ BASANGO_CRAWLER_FETCH_USER_AGENT=Basango/0.1 (+https://github.com/bernard-ng/bas
 
 # Crawler behavior
 BASANGO_CRAWLER_UPDATE_DIRECTION=forward
+BASANGO_CRAWLER_SQLITE_PATH=/var/lib/basango-crawler/crawler.db
 
 # TTL settings (in seconds)
 BASANGO_CRAWLER_ASYNC_TTL_FAILURE=3600
@@ -105,8 +106,8 @@ bun run crawler:sync -- --sourceId radiookapi.net --dateRange 2024-01-01:2024-01
 bun run crawler:sync -- --sourceId example.com --category politics
 ```
 
-Crawled data will be saved in the `data/` directory as JSONL files.
-and can be push to the database using the `bun run crawler:push -- --sourceId radiookapi.net`.
+Crawled articles are saved in the local SQLite outbox and forwarded to the backend. Pending
+or failed articles can be retried with `bun run crawler:push -- --sourceId radiookapi.net`.
 
 
 ### Asynchronous Crawling

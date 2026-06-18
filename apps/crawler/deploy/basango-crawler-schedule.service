@@ -1,0 +1,13 @@
+[Unit]
+Description=Schedule Basango crawler jobs for this node
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/basango-crawler
+EnvironmentFile=/opt/basango-crawler/.env
+ExecStart=/opt/basango-crawler/basango-crawler schedule
+User=basango
+Group=basango
+StateDirectory=basango-crawler

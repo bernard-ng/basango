@@ -1,8 +1,15 @@
+import fs from "node:fs";
 import path from "node:path";
 
 import { defineConfig } from "@devscast/config";
 import z from "zod";
 
+import apiConfig from "../../config/api.json";
+import crawlerConfig from "../../config/crawler.json";
+import databaseConfig from "../../config/database.json";
+import encryptionConfig from "../../config/encryption.json";
+import loggerConfig from "../../config/logger.json";
+import sharedConfig from "../../config/shared.json";
 import { ApiConfigurationSchema } from "./api";
 import { CrawlerConfigurationSchema } from "./crawler";
 import { DatabaseConfigurationSchema } from "./database";
@@ -17,8 +24,26 @@ export * from "./encryption";
 export * from "./logger";
 export * from "./shared";
 
-const root = path.resolve(__dirname, "../../../../");
-const domain = path.join(root, "packages", "domain", "config");
+const findEnvPath = (): string => {
+  const configured = process.env.BASANGO_ENV_PATH?.trim();
+  if (configured) {
+    return path.resolve(configured);
+  }
+
+  let current = process.cwd();
+  while (true) {
+    const candidate = path.join(current, ".env");
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return path.join(process.cwd(), ".env");
+    }
+    current = parent;
+  }
+};
 
 export const { env, config } = defineConfig({
   env: {
@@ -28,8 +53,10 @@ export const { env, config } = defineConfig({
       "BASANGO_API_PORT",
       "BASANGO_API_ALLOWED_ORIGINS",
       "BASANGO_API_KEY",
+      "BASANGO_API_CRAWLER_ENDPOINT",
       "BASANGO_API_CRAWLER_TOKEN",
       "BASANGO_API_JWT_SECRET",
+      "BASANGO_ENV_PATH",
       "BASANGO_DATABASE_URL",
       "BASANGO_DATABASE_LEGACY_HOST",
       "BASANGO_DATABASE_LEGACY_PASSWORD",
@@ -37,8 +64,10 @@ export const { env, config } = defineConfig({
       "BASANGO_DATABASE_LEGACY_USER",
       "BASANGO_CRAWLER_ROOT_PATH",
       "BASANGO_CRAWLER_DATA_PATH",
+      "BASANGO_CRAWLER_SQLITE_PATH",
       "BASANGO_CRAWLER_LOGS_PATH",
       "BASANGO_CRAWLER_CONFIG_PATH",
+      "BASANGO_CRAWLER_SOURCE_IDS",
       "BASANGO_CRAWLER_UPDATE_DIRECTION",
       "BASANGO_CRAWLER_FETCH_USER_AGENT",
       "BASANGO_CRAWLER_FETCH_MAX_RETRIES",
@@ -50,8 +79,10 @@ export const { env, config } = defineConfig({
       "BASANGO_CRAWLER_ASYNC_QUEUE_DETAILS",
       "BASANGO_CRAWLER_ASYNC_QUEUE_PROCESSING",
       "BASANGO_ENCRYPTION_KEY",
+      "BASANGO_LOGGER_LEVEL",
+      "BASANGO_LOGGER_PRETTY",
     ] as const,
-    path: path.join(root, ".env"),
+    path: findEnvPath(),
   },
   schema: z.object({
     api: ApiConfigurationSchema,
@@ -61,12 +92,5 @@ export const { env, config } = defineConfig({
     logger: LoggerConfigurationSchema,
     shared: SharedConfigurationSchema,
   }),
-  sources: [
-    path.join(domain, "api.json"),
-    path.join(domain, "crawler.json"),
-    path.join(domain, "database.json"),
-    path.join(domain, "encryption.json"),
-    path.join(domain, "logger.json"),
-    path.join(domain, "shared.json"),
-  ],
+  sources: [apiConfig, crawlerConfig, databaseConfig, encryptionConfig, loggerConfig, sharedConfig],
 });

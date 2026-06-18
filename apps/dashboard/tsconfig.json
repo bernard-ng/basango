@@ -1,19 +1,16 @@
 {
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "noEmit": true,
     "paths": {
       "@basango/ui/*": ["../../packages/ui/src/*"],
       "#api/*": ["../api/src/*"],
       "#dashboard/*": ["./src/*"],
       "#db/*": ["../../packages/db/src/*"],
       "#domain/*": ["../../packages/domain/src/*"]
-    },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    }
   },
   "exclude": ["node_modules"],
-  "extends": "@basango/tsconfig/nextjs.json",
-  "include": ["next-env.d.ts", "next.config.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+  "extends": "@basango/tsconfig/base.json",
+  "include": ["vite.config.ts", "**/*.ts", "**/*.tsx"]
 }
