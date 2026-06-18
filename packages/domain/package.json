@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@devscast/config": "catalog:",
     "@hono/zod-openapi": "^1.1.4",
     "zod": "catalog:"
   },

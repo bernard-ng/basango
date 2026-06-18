@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "@basango/domain": "workspace:*",
-    "@devscast/config": "catalog:",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {

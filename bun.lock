@@ -44,7 +44,6 @@
         "@basango/domain": "workspace:*",
         "@basango/encryption": "workspace:*",
         "@basango/logger": "workspace:*",
-        "@devscast/config": "catalog:",
         "bullmq": "^4.18.3",
         "date-fns": "catalog:",
         "ioredis": "^5.8.2",
@@ -170,6 +169,7 @@
     "packages/domain": {
       "name": "@basango/domain",
       "dependencies": {
+        "@devscast/config": "catalog:",
         "@hono/zod-openapi": "^1.1.4",
         "zod": "catalog:",
       },
@@ -181,7 +181,6 @@
       "name": "@basango/encryption",
       "dependencies": {
         "@basango/domain": "workspace:*",
-        "@devscast/config": "catalog:",
         "bcrypt": "^6.0.0",
       },
       "devDependencies": {
