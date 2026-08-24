@@ -23,8 +23,8 @@ Better Auth owns password credentials, sessions, password-reset verifications, a
 Configure:
 
 - `BETTER_AUTH_SECRET`: random secret with at least 32 characters; required in production.
-- `BETTER_AUTH_URL`: public API origin, for example `https://api.basango.io`.
-- `BETTER_AUTH_COOKIE_DOMAIN`: optional shared production domain, for example `.basango.io`, when API and clients use subdomains.
+- `BETTER_AUTH_URL`: public API origin, for example `https://api.basango.ngandu.dev`.
+- `BETTER_AUTH_COOKIE_DOMAIN`: optional shared production domain, for example `.basango.ngandu.dev`, when API and clients use subdomains.
 
 The dashboard supplies its own origin as the password-reset destination; Better Auth validates it against the configured trusted CORS origins.
 

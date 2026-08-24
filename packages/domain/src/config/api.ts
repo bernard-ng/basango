@@ -9,7 +9,11 @@ export const ApiConfigurationSchema = z.object({
     origin: z
       .array(z.string())
       .optional()
-      .default(["http://localhost:3000", "http://127.0.0.1:3000", "https://dashboard.basango.io"]),
+      .default([
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://dashboard.basango.ngandu.dev",
+      ]),
   }),
   security: z.object({
     ingestionToken: z.string(),

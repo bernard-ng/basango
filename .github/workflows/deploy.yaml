@@ -21,7 +21,7 @@ jobs:
             key: ${{ secrets.SSH_KEY }}
             port: ${{ secrets.SSH_PORT }}
             script: |
-              cd /var/www/html/basango.io
+              cd /var/www/html/basango.ngandu.dev
               git pull origin main --rebase
               bun install --frozen-lockfile
               make deploy
@@ -29,6 +29,6 @@ jobs:
                   -H "Content-Type: application/json" \
                   -d '{
                     "chat_id": "${{ secrets.DEVY_CHAT_ID }}",
-                    "text": "basango.io : `'"$(git rev-parse --short HEAD)"'` has been deployed! 🎉",
+                    "text": "basango.ngandu.dev : `'"$(git rev-parse --short HEAD)"'` has been deployed! 🎉",
                     "parse_mode": "Markdown"
                   }'
