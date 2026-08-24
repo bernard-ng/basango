@@ -12,12 +12,7 @@ export const ApiConfigurationSchema = z.object({
       .default(["http://localhost:3000", "http://127.0.0.1:3000", "https://dashboard.basango.io"]),
   }),
   security: z.object({
-    accessTokenTtl: z.string(),
-    audience: z.string(),
-    crawlerToken: z.string(),
-    issuer: z.string(),
-    jwtSecret: z.string(),
-    refreshTokenTtl: z.string(),
+    ingestionToken: z.string(),
   }),
   server: z.object({
     host: z.string().default("localhost"),

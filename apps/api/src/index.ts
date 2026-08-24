@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
+import { auth } from "#api/auth";
 import { routers } from "#api/rest/routers";
 import { createTRPCContext } from "#api/trpc/init";
 import { appRouter } from "#api/trpc/routers/_app";
@@ -17,13 +18,16 @@ app.use(secureHeaders());
 app.use(
   "*",
   cors({
-    allowHeaders: config.api.cors.allowedHeaders,
-    allowMethods: config.api.cors.allowMethods,
-    exposeHeaders: config.api.cors.exposeHeaders,
+    allowHeaders: [...config.api.cors.allowedHeaders],
+    allowMethods: [...config.api.cors.allowMethods],
+    credentials: true,
+    exposeHeaders: [...config.api.cors.exposeHeaders],
     maxAge: config.api.cors.maxAge,
-    origin: config.api.cors.origin,
+    origin: [...config.api.cors.origin],
   }),
 );
+
+app.all("/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.use(
   "/trpc/*",

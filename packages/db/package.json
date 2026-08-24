@@ -8,8 +8,7 @@
     "@date-fns/utc": "^2.1.1",
     "ai": "^5.0.105",
     "date-fns": "catalog:",
-    "drizzle-orm": "^0.44.7",
-    "mysql2": "^3.15.3",
+    "drizzle-orm": "0.45.2",
     "pg": "^8.16.3",
     "snakecase-keys": "^9.0.2",
     "tiktoken": "^1.0.22",
@@ -35,7 +34,6 @@
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "sync:categories": "bun ./src/synchronizers/categories.ts",
-    "sync:data": "bun ./src/synchronizers/data.ts",
     "sync:tokens": "bun ./src/synchronizers/tokens.ts",
     "typecheck": "tsc --noEmit"
   }

@@ -1,9 +1,9 @@
 import { createRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 
-import { TRPCReactProvider } from "#dashboard/trpc/client";
-import { createTRPCOptions } from "#dashboard/trpc/options";
-import { makeQueryClient } from "#dashboard/trpc/query-client";
+import { TRPCReactProvider } from "#dashboard/app/trpc/client";
+import { createTRPCOptions } from "#dashboard/app/trpc/options";
+import { makeQueryClient } from "#dashboard/app/trpc/query-client";
 
 import { routeTree } from "./routeTree.gen";
 

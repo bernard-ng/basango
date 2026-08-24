@@ -8,139 +8,160 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './app/__root'
-import { Route as LoginRouteImport } from './app/login'
-import { Route as AuthenticatedRouteImport } from './app/_authenticated'
-import { Route as IndexRouteImport } from './app/index'
-import { Route as AuthenticatedSourcesRouteImport } from './app/_authenticated.sources'
-import { Route as AuthenticatedDashboardRouteImport } from './app/_authenticated.dashboard'
-import { Route as AuthenticatedArticlesRouteImport } from './app/_authenticated.articles'
-import { Route as ApiSessionRefreshRouteImport } from './app/api.session.refresh'
-import { Route as AuthenticatedSourcesIdRouteImport } from './app/_authenticated.sources.$id'
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as IngestionRouteImport } from './routes/ingestion'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
+import { Route as ArticlesIdRouteImport } from './routes/articles/$id'
+import { Route as SourcesIndexRouteImport } from './routes/sources/index'
+import { Route as SourcesIdRouteImport } from './routes/sources/$id'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSourcesRoute = AuthenticatedSourcesRouteImport.update({
-  id: '/sources',
-  path: '/sources',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedArticlesRoute = AuthenticatedArticlesRouteImport.update({
-  id: '/articles',
-  path: '/articles',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const ApiSessionRefreshRoute = ApiSessionRefreshRouteImport.update({
-  id: '/api/session/refresh',
-  path: '/api/session/refresh',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSourcesIdRoute = AuthenticatedSourcesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedSourcesRoute,
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IngestionRoute = IngestionRouteImport.update({
+  id: '/ingestion',
+  path: '/ingestion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
+  id: '/articles/',
+  path: '/articles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesIdRoute = ArticlesIdRouteImport.update({
+  id: '/articles/$id',
+  path: '/articles/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SourcesIndexRoute = SourcesIndexRouteImport.update({
+  id: '/sources/',
+  path: '/sources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SourcesIdRoute = SourcesIdRouteImport.update({
+  id: '/sources/$id',
+  path: '/sources/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
-  '/articles': typeof AuthenticatedArticlesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/sources': typeof AuthenticatedSourcesRouteWithChildren
-  '/sources/$id': typeof AuthenticatedSourcesIdRoute
-  '/api/session/refresh': typeof ApiSessionRefreshRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/articles/$id': typeof ArticlesIdRoute
+  '/sources/$id': typeof SourcesIdRoute
+  '/articles/': typeof ArticlesIndexRoute
+  '/sources/': typeof SourcesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
-  '/articles': typeof AuthenticatedArticlesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/sources': typeof AuthenticatedSourcesRouteWithChildren
-  '/sources/$id': typeof AuthenticatedSourcesIdRoute
-  '/api/session/refresh': typeof ApiSessionRefreshRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/articles/$id': typeof ArticlesIdRoute
+  '/sources/$id': typeof SourcesIdRoute
+  '/articles': typeof ArticlesIndexRoute
+  '/sources': typeof SourcesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
-  '/_authenticated/articles': typeof AuthenticatedArticlesRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/sources': typeof AuthenticatedSourcesRouteWithChildren
-  '/_authenticated/sources/$id': typeof AuthenticatedSourcesIdRoute
-  '/api/session/refresh': typeof ApiSessionRefreshRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/articles/$id': typeof ArticlesIdRoute
+  '/sources/$id': typeof SourcesIdRoute
+  '/articles/': typeof ArticlesIndexRoute
+  '/sources/': typeof SourcesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
-    | '/articles'
     | '/dashboard'
-    | '/sources'
+    | '/forgot-password'
+    | '/ingestion'
+    | '/login'
+    | '/reset-password'
+    | '/articles/$id'
     | '/sources/$id'
-    | '/api/session/refresh'
+    | '/articles/'
+    | '/sources/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
-    | '/articles'
     | '/dashboard'
-    | '/sources'
+    | '/forgot-password'
+    | '/ingestion'
+    | '/login'
+    | '/reset-password'
+    | '/articles/$id'
     | '/sources/$id'
-    | '/api/session/refresh'
+    | '/articles'
+    | '/sources'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/ingestion'
     | '/login'
-    | '/_authenticated/articles'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/sources'
-    | '/_authenticated/sources/$id'
-    | '/api/session/refresh'
+    | '/reset-password'
+    | '/articles/$id'
+    | '/sources/$id'
+    | '/articles/'
+    | '/sources/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  IngestionRoute: typeof IngestionRoute
   LoginRoute: typeof LoginRoute
-  ApiSessionRefreshRoute: typeof ApiSessionRefreshRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  ArticlesIdRoute: typeof ArticlesIdRoute
+  SourcesIdRoute: typeof SourcesIdRoute
+  ArticlesIndexRoute: typeof ArticlesIndexRoute
+  SourcesIndexRoute: typeof SourcesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -148,76 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/sources': {
-      id: '/_authenticated/sources'
-      path: '/sources'
-      fullPath: '/sources'
-      preLoaderRoute: typeof AuthenticatedSourcesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
+    '/dashboard': {
+      id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/articles': {
-      id: '/_authenticated/articles'
-      path: '/articles'
-      fullPath: '/articles'
-      preLoaderRoute: typeof AuthenticatedArticlesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/api/session/refresh': {
-      id: '/api/session/refresh'
-      path: '/api/session/refresh'
-      fullPath: '/api/session/refresh'
-      preLoaderRoute: typeof ApiSessionRefreshRouteImport
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/sources/$id': {
-      id: '/_authenticated/sources/$id'
-      path: '/$id'
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ingestion': {
+      id: '/ingestion'
+      path: '/ingestion'
+      fullPath: '/ingestion'
+      preLoaderRoute: typeof IngestionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/': {
+      id: '/articles/'
+      path: '/articles'
+      fullPath: '/articles/'
+      preLoaderRoute: typeof ArticlesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/$id': {
+      id: '/articles/$id'
+      path: '/articles/$id'
+      fullPath: '/articles/$id'
+      preLoaderRoute: typeof ArticlesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sources/': {
+      id: '/sources/'
+      path: '/sources'
+      fullPath: '/sources/'
+      preLoaderRoute: typeof SourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sources/$id': {
+      id: '/sources/$id'
+      path: '/sources/$id'
       fullPath: '/sources/$id'
-      preLoaderRoute: typeof AuthenticatedSourcesIdRouteImport
-      parentRoute: typeof AuthenticatedSourcesRoute
+      preLoaderRoute: typeof SourcesIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AuthenticatedSourcesRouteChildren {
-  AuthenticatedSourcesIdRoute: typeof AuthenticatedSourcesIdRoute
-}
-
-const AuthenticatedSourcesRouteChildren: AuthenticatedSourcesRouteChildren = {
-  AuthenticatedSourcesIdRoute: AuthenticatedSourcesIdRoute,
-}
-
-const AuthenticatedSourcesRouteWithChildren =
-  AuthenticatedSourcesRoute._addFileChildren(AuthenticatedSourcesRouteChildren)
-
-interface AuthenticatedRouteChildren {
-  AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRouteWithChildren
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedArticlesRoute: AuthenticatedArticlesRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedSourcesRoute: AuthenticatedSourcesRouteWithChildren,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DashboardRoute: DashboardRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  IngestionRoute: IngestionRoute,
   LoginRoute: LoginRoute,
-  ApiSessionRefreshRoute: ApiSessionRefreshRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  ArticlesIdRoute: ArticlesIdRoute,
+  SourcesIdRoute: SourcesIdRoute,
+  ArticlesIndexRoute: ArticlesIndexRoute,
+  SourcesIndexRoute: SourcesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,15 +1,15 @@
 import { type Database, db } from "@basango/db/client";
 
-import type { Session } from "#api/utils/auth";
+import type { AuthSession } from "#api/auth";
 
 export const withDatabase = async <TReturn>(opts: {
   ctx: {
-    session?: Session | null;
+    session?: AuthSession | null;
     db: Database;
   };
   next: (opts: {
     ctx: {
-      session?: Session | null;
+      session?: AuthSession | null;
       db: Database;
     };
   }) => Promise<TReturn>;

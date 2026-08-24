@@ -7,6 +7,7 @@ import { DEFAULT_CATEGORY } from "#domain/constants";
 import { Categories } from "#domain/models";
 
 type CategoryRow = typeof categories.$inferSelect;
+type CanonicalCategory = (typeof Categories)[number];
 type ArticleCategories = Pick<typeof articles.$inferSelect, "categories" | "id">;
 
 type CategoryScore = {
@@ -122,6 +123,32 @@ export class CategoryClassifier {
 
     return map;
   }
+}
+
+export async function ensureCanonicalCategory(
+  db: Database,
+  category: CanonicalCategory,
+): Promise<CategoryRow> {
+  const payload = {
+    candidates: category.candidates,
+    description: category.description ?? null,
+    embeddings: null,
+    id: category.id,
+    name: category.name,
+    slug: category.slug,
+    weight: category.weight,
+  } satisfies typeof categories.$inferInsert;
+
+  const [created] = await db.insert(categories).values(payload).onConflictDoNothing().returning();
+  if (created) return created;
+
+  const existing = await db.query.categories.findFirst({
+    where: eq(categories.slug, category.slug),
+  });
+  if (!existing) {
+    throw new Error(`Could not initialize canonical category '${category.slug}'`);
+  }
+  return existing;
 }
 
 export function classifyCategory(article: ArticleCategories): CategoryScore {

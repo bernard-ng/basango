@@ -1,2 +1,2 @@
-export type Role = "ROLE_USER" | "ROLE_ADMIN";
+export type Role = "admin" | "user";
 export type Roles = Role[];

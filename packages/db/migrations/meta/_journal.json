@@ -4,30 +4,9 @@
     {
       "breakpoints": true,
       "idx": 0,
-      "tag": "0000_setup",
+      "tag": "0000_init",
       "version": "7",
-      "when": 1762775141000
-    },
-    {
-      "breakpoints": true,
-      "idx": 1,
-      "tag": "0001_init",
-      "version": "7",
-      "when": 1762775267679
-    },
-    {
-      "breakpoints": true,
-      "idx": 2,
-      "tag": "0002_modern_joseph",
-      "version": "7",
-      "when": 1763920009482
-    },
-    {
-      "breakpoints": true,
-      "idx": 3,
-      "tag": "0003_categories",
-      "version": "7",
-      "when": 1764767993880
+      "when": 1787508668274
     }
   ],
   "version": "7"

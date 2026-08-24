@@ -1,14 +1,7 @@
 import { createMiddleware, createStart } from "@tanstack/react-start";
-import { getCookie, setCookie } from "@tanstack/react-start/server";
 
-import {
-  DEFAULT_ACCESS_TOKEN_COOKIE,
-  DEFAULT_REFRESH_TOKEN_COOKIE,
-  getSessionCookieOptions,
-  refreshSession,
-} from "#dashboard/utils/auth/session";
-
-const PUBLIC_PATHS = new Set(["/login", "/api/session/refresh"]);
+import { isPublicAuthPath } from "#dashboard/app/auth/public-paths";
+import { getPublicApiUrl } from "#dashboard/app/environment";
 
 const authMiddleware = createMiddleware({ type: "request" }).server(
   async ({ next, request, pathname, handlerType }) => {
@@ -26,23 +19,14 @@ const authMiddleware = createMiddleware({ type: "request" }).server(
       return next();
     }
 
-    let accessToken = getCookie(DEFAULT_ACCESS_TOKEN_COOKIE);
-    const refreshToken = getCookie(DEFAULT_REFRESH_TOKEN_COOKIE);
+    const session = await getSession(request);
+    const isDashboardAdmin = session?.user.role?.split(",").includes("admin") ?? false;
 
-    if (!accessToken && refreshToken) {
-      const tokens = await refreshSession(refreshToken);
-
-      if (tokens) {
-        accessToken = tokens.accessToken;
-        setSessionCookies(tokens, request.url);
-      }
-    }
-
-    if (pathname === "/login" && accessToken) {
+    if (pathname === "/login" && isDashboardAdmin) {
       return Response.redirect(new URL("/dashboard", request.url));
     }
 
-    if (!PUBLIC_PATHS.has(pathname) && !accessToken) {
+    if (!isPublicAuthPath(pathname) && !isDashboardAdmin) {
       const loginUrl = new URL("/login", request.url);
       const returnTo = `${pathname}${new URL(request.url).search}`;
 
@@ -86,18 +70,19 @@ function isStaticAsset(pathname: string) {
   );
 }
 
-function setSessionCookies(
-  tokens: NonNullable<Awaited<ReturnType<typeof refreshSession>>>,
-  requestUrl: string,
-) {
-  setCookie(
-    DEFAULT_ACCESS_TOKEN_COOKIE,
-    tokens.accessToken,
-    getSessionCookieOptions(tokens.accessTokenExpiresAt, requestUrl),
-  );
-  setCookie(
-    DEFAULT_REFRESH_TOKEN_COOKIE,
-    tokens.refreshToken,
-    getSessionCookieOptions(tokens.refreshTokenExpiresAt, requestUrl),
-  );
+async function getSession(request: Request) {
+  try {
+    const cookie = request.headers.get("cookie");
+    const response = await fetch(`${getPublicApiUrl()}/api/auth/get-session`, {
+      headers: cookie ? { cookie } : undefined,
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as { user: { role?: string | null } } | null;
+  } catch {
+    return null;
+  }
 }

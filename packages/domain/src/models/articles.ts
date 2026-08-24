@@ -59,6 +59,10 @@ export const createArticleSchema = z.object({
 
 export const createArticleResponseSchema = z.object({ id: idSchema, sourceId: idSchema });
 
+export const getArticleSchema = z.object({
+  id: idSchema,
+});
+
 export const getArticlesSchema = z.object({
   category: z.string().min(1).max(255).optional(),
   cursor: z.string().nullable().optional(),

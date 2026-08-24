@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@devscast/config": "catalog:",
     "@hono/zod-openapi": "^1.1.4",
+    "@ngandu-dev/config": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -9,8 +9,8 @@
   },
   "exports": {
     "./config": "./src/config/index.ts",
+    "./config/environment": "./src/config/environment.ts",
     "./constants": "./src/constants.ts",
-    "./crawler": "./src/crawler/index.ts",
     "./models": "./src/models/index.ts"
   },
   "imports": {
@@ -20,6 +20,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
+    "test": "bun test src",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"

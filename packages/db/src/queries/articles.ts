@@ -15,9 +15,10 @@ import { count, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import * as uuid from "uuid";
 
 import { Database } from "#db/client";
-import { getSourceIdByName } from "#db/queries/sources";
+import { NotFoundError } from "#db/errors";
+import { getOrCreateSourceIdByName } from "#db/queries/sources";
 import { articles, categories, sources } from "#db/schema";
-import { classifyCategory } from "#db/services/category-classifier";
+import { classifyCategory, ensureCanonicalCategory } from "#db/services/category-classifier";
 import { CreateArticleParams, GetArticlesParams } from "#db/types/articles";
 import { GetDistributionsParams, GetPublicationsParams } from "#db/types/shared";
 import {
@@ -49,7 +50,7 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
     id: uuid.v7(),
     readingTime: computeReadingTime(params.body),
     sentiment: (params.sentiment ?? "neutral") as Sentiment,
-    sourceId: await getSourceIdByName(db, params.sourceId),
+    sourceId: await getOrCreateSourceIdByName(db, params.sourceId, new URL(params.link).origin),
     tokenStatistics: computeTokenStatistics({
       body: params.body,
       categories: params.categories ?? [],
@@ -57,7 +58,8 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
     }),
   };
 
-  data.categoryId = classifyCategory(data).category.id;
+  const category = await ensureCanonicalCategory(db, classifyCategory(data).category);
+  data.categoryId = category.id;
 
   const [result] = await db
     .insert(articles)
@@ -81,9 +83,27 @@ export async function getArticleByHash(db: Database, hash: string) {
 }
 
 export async function getArticleById(db: Database, id: ID) {
-  return await db.query.articles.findFirst({
-    where: eq(articles.id, id),
-  });
+  const [item] = await db
+    .select({
+      ...getTableColumns(articles),
+      category: {
+        ...getTableColumns(categories),
+      },
+      source: {
+        ...getTableColumns(sources),
+      },
+    })
+    .from(articles)
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .innerJoin(sources, eq(articles.sourceId, sources.id))
+    .where(eq(articles.id, id))
+    .limit(1);
+
+  if (item === undefined) {
+    throw new NotFoundError("Article not found");
+  }
+
+  return item;
 }
 
 export async function countArticlesBySourceId(db: Database, sourceId: ID) {

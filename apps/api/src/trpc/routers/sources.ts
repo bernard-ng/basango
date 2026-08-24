@@ -14,30 +14,28 @@ import {
   updateSourceSchema,
 } from "@basango/domain/models";
 
-import { createTRPCRouter, protectedProcedure } from "#api/trpc/init";
+import { adminProcedure, createTRPCRouter } from "#api/trpc/init";
 
 export const sourcesRouter = createTRPCRouter({
-  create: protectedProcedure.input(createSourceSchema).mutation(async ({ ctx, input }) => {
+  create: adminProcedure.input(createSourceSchema).mutation(async ({ ctx, input }) => {
     return createSource(ctx.db, input);
   }),
 
-  getById: protectedProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
+  getById: adminProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
     return getSourceById(ctx.db, input.id);
   }),
 
-  getCategoryShares: protectedProcedure
-    .input(getCategorySharesSchema)
-    .query(async ({ ctx, input }) => {
-      return getSourceCategoryShares(ctx.db, input);
-    }),
+  getCategoryShares: adminProcedure.input(getCategorySharesSchema).query(async ({ ctx, input }) => {
+    return getSourceCategoryShares(ctx.db, input);
+  }),
 
-  getPublications: protectedProcedure.input(getPublicationsSchema).query(async ({ ctx, input }) => {
+  getPublications: adminProcedure.input(getPublicationsSchema).query(async ({ ctx, input }) => {
     return getSourcePublicationGraph(ctx.db, input);
   }),
 
-  list: protectedProcedure.query(async ({ ctx }) => getSources(ctx.db)),
+  list: adminProcedure.query(async ({ ctx }) => getSources(ctx.db)),
 
-  update: protectedProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
+  update: adminProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
     return updateSource(ctx.db, input);
   }),
 });

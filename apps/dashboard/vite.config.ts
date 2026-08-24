@@ -9,7 +9,7 @@ export default defineConfig({
     tanstackStart({
       router: {
         generatedRouteTree: "./routeTree.gen.ts",
-        routesDirectory: "./app",
+        routesDirectory: "./routes",
       },
     }),
     nitro(),

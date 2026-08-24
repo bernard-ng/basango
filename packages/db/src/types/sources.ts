@@ -1,4 +1,4 @@
-import { Credibility, ID } from "@basango/domain/models";
+import type { Credibility, ID } from "@basango/domain/models";
 
 export type UpdateSourceParams = {
   id: ID;
@@ -6,6 +6,7 @@ export type UpdateSourceParams = {
   displayName?: string;
   description?: string;
   credibility?: Credibility;
+  url?: string;
 };
 
 export type CreateSourceParams = {

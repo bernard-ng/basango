@@ -39,15 +39,15 @@ export const updateSourceSchema = sourceSchema.pick({
   url: true,
 });
 
-export const getSourceUpdateDatesSchema = z.object({
+export const getSourcePublicationBoundsSchema = z.object({
   name: z.string().min(1).max(255),
 });
 
-export const getSourceUpdateDatesResponseSchema = z.object({
-  earliest: z.coerce.date(),
-  latest: z.coerce.date(),
+export const getSourcePublicationBoundsResponseSchema = z.object({
+  earliest: z.coerce.date().nullable(),
+  latest: z.coerce.date().nullable(),
 });
 
 // types
 export type Source = z.infer<typeof sourceSchema>;
-export type SourceUpdateDates = z.infer<typeof getSourceUpdateDatesResponseSchema>;
+export type SourcePublicationBounds = z.infer<typeof getSourcePublicationBoundsResponseSchema>;

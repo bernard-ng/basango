@@ -1,19 +1,4 @@
 services:
-  mariadb:
-    image: mariadb:10.11.11
-    environment:
-      MARIADB_USER: root
-      MARIADB_ROOT_PASSWORD: root
-      MARIADB_DATABASE: app
-      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'no'
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./var/volumes/mariadb:/var/lib/mysql:rw
-      - ./var/volumes/backups:/var/www/var
-    networks:
-      - basango_network
-  
   postgres:
     image: pgvector/pgvector:pg16
     environment:
@@ -51,11 +36,11 @@ services:
   adminer:
     image: adminer:latest
     depends_on:
-      - mariadb
+      - postgres
     environment:
       APP_ENV: dev
       ADMINER_DESIGN: pepa-linha
-      ADMINER_DEFAULT_SERVER: mariadb
+      ADMINER_DEFAULT_SERVER: postgres
     ports:
       - "8082:8080"
     networks:
@@ -76,18 +61,6 @@ networks:
   basango_network:
 
 volumes:
-  database_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./var/volumes/mariadb
-  backend_var:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./var/volumes/api-legacy-var
   redis_data:
     driver: local
     driver_opts:

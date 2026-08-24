@@ -1,10 +1,10 @@
-import { config } from "@basango/domain/config";
+import { config, env } from "@basango/domain/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 import * as schema from "#db/schema";
 
-const isDevelopment = process.env.NODE_ENV === "development";
+const isDevelopment = env.NODE_ENV === "development";
 
 const pool = new Pool({
   allowExitOnIdle: true,

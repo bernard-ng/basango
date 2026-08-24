@@ -1,22 +1,20 @@
-import { Database, db } from "@basango/db/client";
+import { type Database, db } from "@basango/db/client";
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { Context } from "hono";
 import superjson from "superjson";
 
-import { withAuthentication } from "#api/trpc/middlewares/auth";
+import { type AuthSession, auth, isAdmin } from "#api/auth";
 import { withDatabase } from "#api/trpc/middlewares/db";
-import { Session, getSession } from "#api/utils/auth";
 import { getGeoContext } from "#api/utils/geo";
 
 type TRPCContext = {
-  session: Session | null;
+  session: AuthSession | null;
   db: Database;
   geo: ReturnType<typeof getGeoContext>;
 };
 
 export const createTRPCContext = async (_: unknown, c: Context): Promise<TRPCContext> => {
-  const accessToken = c.req.header("Authorization")?.split(" ")[1];
-  const session = await getSession(db, accessToken);
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
   const geo = getGeoContext(c.req);
 
   return {
@@ -40,28 +38,26 @@ const withDatabaseMiddleware = t.middleware(async (opts) => {
   });
 });
 
-const withAutenticationMiddleware = t.middleware(async (opts) => {
-  return withAuthentication({
-    ctx: opts.ctx,
-    next: opts.next,
+export const publicProcedure = t.procedure.use(withDatabaseMiddleware);
+
+export const protectedProcedure = t.procedure.use(withDatabaseMiddleware).use(async (opts) => {
+  const { session } = opts.ctx;
+
+  if (!session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return opts.next({
+    ctx: {
+      session,
+    },
   });
 });
 
-export const publicProcedure = t.procedure.use(withDatabaseMiddleware);
+export const adminProcedure = protectedProcedure.use(async (opts) => {
+  if (!isAdmin(opts.ctx.session)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Administrator access is required." });
+  }
 
-export const protectedProcedure = t.procedure
-  .use(withDatabaseMiddleware)
-  .use(withAutenticationMiddleware)
-  .use(async (opts) => {
-    const { session } = opts.ctx;
-
-    if (!session) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-
-    return opts.next({
-      ctx: {
-        session,
-      },
-    });
-  });
+  return opts.next();
+});

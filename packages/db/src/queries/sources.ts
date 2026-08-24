@@ -46,6 +46,8 @@ export async function updateSource(db: Database, params: UpdateSourceParams) {
       description: params.description,
       displayName: params.displayName,
       name: params.name,
+      updatedAt: new Date(),
+      url: params.url,
     })
     .where(eq(sources.id, params.id))
     .returning();
@@ -94,6 +96,35 @@ export async function getSourceIdByName(db: Database, name: string): Promise<str
   }
 
   return result.id;
+}
+
+export async function getOrCreateSourceIdByName(
+  db: Database,
+  name: string,
+  url: string,
+): Promise<string> {
+  const existing = await db.query.sources.findFirst({
+    columns: { id: true },
+    where: eq(sources.name, name),
+  });
+  if (existing) return existing.id;
+
+  const [created] = await db
+    .insert(sources)
+    .values({ id: uuid.v7(), name, url })
+    .onConflictDoNothing()
+    .returning({ id: sources.id });
+  if (created) return created.id;
+
+  // Another ingestion request may have inserted the source concurrently.
+  const raced = await db.query.sources.findFirst({
+    columns: { id: true },
+    where: eq(sources.name, name),
+  });
+  if (!raced) {
+    throw new Error(`Could not create crawler source '${name}' with URL '${url}'`);
+  }
+  return raced.id;
 }
 
 export async function getSourcePublicationGraph(
@@ -163,7 +194,7 @@ export async function getSourceCategoryShares(
   return { items: data.rows, total: data.rowCount ?? 0 };
 }
 
-export async function getLatestPublished(db: Database, source: string): Promise<Date> {
+export async function getLatestPublished(db: Database, source: string): Promise<Date | null> {
   const result = await db
     .select({
       publishedAt: max(articles.publishedAt),
@@ -172,10 +203,10 @@ export async function getLatestPublished(db: Database, source: string): Promise<
     .innerJoin(sources, eq(articles.sourceId, sources.id))
     .where(eq(sources.name, source));
 
-  return result[0]?.publishedAt ?? new Date();
+  return result[0]?.publishedAt ?? null;
 }
 
-export async function getEarliestPublished(db: Database, source: string): Promise<Date> {
+export async function getEarliestPublished(db: Database, source: string): Promise<Date | null> {
   const result = await db
     .select({
       publishedAt: min(articles.publishedAt),
@@ -184,5 +215,5 @@ export async function getEarliestPublished(db: Database, source: string): Promis
     .innerJoin(sources, eq(articles.sourceId, sources.id))
     .where(eq(sources.name, source));
 
-  return result[0]?.publishedAt ?? new Date();
+  return result[0]?.publishedAt ?? null;
 }

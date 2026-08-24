@@ -1,0 +1,107 @@
+{
+  "skills": {
+    "better-auth-best-practices": {
+      "computedHash": "61ba0ef64ed2e7c424401cc848ca33dd6d790a720c44727717dc0c5cba5fc122",
+      "skillPath": "better-auth/best-practices/SKILL.md",
+      "source": "better-auth/skills",
+      "sourceType": "github"
+    },
+    "better-auth-security-best-practices": {
+      "computedHash": "7a230edf3a24ce18162cb4379f59b6a19b8d24ca04db530609d0f15cede556dc",
+      "skillPath": "security/SKILL.md",
+      "source": "better-auth/skills",
+      "sourceType": "github"
+    },
+    "code-review": {
+      "computedHash": "caa9a086baaf9e0f7cd71f64edfa83da6821c05e826b083221f3d02e3d6a1905",
+      "skillPath": "skills/engineering/code-review/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "codebase-design": {
+      "computedHash": "5a17552cc1482f1a40124bf4e6c9dbd90ac0dbb47e71c07d47369f9e5f2ae3b5",
+      "skillPath": "skills/engineering/codebase-design/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "create-auth": {
+      "computedHash": "4e261efac2ae9a2321c4495c846ef97cf239818fc8bd2ab7e92ed1f9d25470f7",
+      "skillPath": "better-auth/create-auth/SKILL.md",
+      "source": "better-auth/skills",
+      "sourceType": "github"
+    },
+    "diagnosing-bugs": {
+      "computedHash": "37b5e9c624513551da790b52864dc8c84bff996a6d03a380cc6facdcc0a88354",
+      "skillPath": "skills/engineering/diagnosing-bugs/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "domain-modeling": {
+      "computedHash": "a11713c0ff7870efa3c331b2e273f09116158485246edc89ae5088eefd1b0b48",
+      "skillPath": "skills/engineering/domain-modeling/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "email-and-password-best-practices": {
+      "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d",
+      "skillPath": "better-auth/emailAndPassword/SKILL.md",
+      "source": "better-auth/skills",
+      "sourceType": "github"
+    },
+    "grill-me": {
+      "computedHash": "9cdbb4b8f7a3aeaef82e6230c9e823500d4a8a1214c726cf342cf9829d34fc7d",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "grill-with-docs": {
+      "computedHash": "35e62aa423aaeab6a414bcac273f56dfb17802ef2334b41b6a3b00f28196c8cf",
+      "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "handoff": {
+      "computedHash": "20e5f4afdef502637510bc5c64d27645d3c85c88df9cb006824bbb0980166319",
+      "skillPath": "skills/productivity/handoff/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "improve-codebase-architecture": {
+      "computedHash": "2449db6ab1ded9581f69fcc56c1f64818112d05e271fd4c5da23c6523f9d3d9d",
+      "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "organization-best-practices": {
+      "computedHash": "27627eb3a13bd44eff3a5d890f96e7db052b623db90e01684f759abe3e7fe56b",
+      "skillPath": "better-auth/organization/SKILL.md",
+      "source": "better-auth/skills",
+      "sourceType": "github"
+    },
+    "tdd": {
+      "computedHash": "e753a5da75292bbe59d302d89566bc2c53d0e73944da2f0e944a7578883c07d0",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "source": "mattpocock/skills",
+      "sourceType": "github"
+    },
+    "two-factor-authentication-best-practices": {
+      "computedHash": "a6f720042e5a090909e0d519a6a50a7eb8179553cd5315f0bbad852a6d20dac8",
+      "skillPath": "better-auth/twoFactor/SKILL.md",
+      "source": "better-auth/skills",
+      "sourceType": "github"
+    },
+    "web-design-guidelines": {
+      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github"
+    },
+    "writing-guidelines": {
+      "computedHash": "25aa3a33a97bddbcb1847ce4a6169106ec25e5b19b15b99c66e75ab383866ef2",
+      "skillPath": "skills/writing-guidelines/SKILL.md",
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github"
+    }
+  },
+  "version": 1
+}

@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 
-import { config } from "@basango/domain/config";
+import { config, env } from "@basango/domain/config";
 import type pino from "pino";
 
 declare const BASANGO_CRAWLER_BINARY: boolean | undefined;
@@ -98,8 +98,8 @@ const createPinoLogger = (): LoggerLike => {
 
   return createLogger({
     level: config.logger.level,
-    ...(process.env.NODE_ENV !== "production" &&
-      process.env.BASANGO_LOGGER_PRETTY === "true" && {
+    ...(env.NODE_ENV !== "production" &&
+      env.BASANGO_LOGGER_PRETTY === "true" && {
         transport: {
           options: {
             colorize: true,

@@ -7,16 +7,6 @@ const sharedEnv = {
 module.exports = {
   apps: [
     {
-      args: "run crawler:worker",
-      autorestart: true,
-      cwd: path.join(__dirname, "apps", "crawler"),
-      env: sharedEnv,
-      max_restarts: 5,
-      name: "worker.basango.io",
-      script: "bun",
-      watch: false,
-    },
-    {
       args: "run start",
       autorestart: true,
       cwd: path.join(__dirname, "apps", "api"),

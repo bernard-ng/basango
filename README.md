@@ -11,7 +11,7 @@
 | Scope             | Link                                      |
 |-------------------|-------------------------------------------|
 | API               | [README.md](./apps/api/README.md)         |
-| Crawler           | [README.md](./apps/crawler/README.md)     |
+| Crawler (Rust)    | [bernard-ng/basango-rs](https://github.com/bernard-ng/basango-rs) |
 | Dashboard         | [README.md](./apps/dashboard/README.md)   |
 | Mobile            | [README.md](./apps/mobile/README.md)      |
 
@@ -30,6 +30,8 @@
 | Scope             | Link                                          |
 |-------------------|-----------------------------------------------|
 | Architecture      | [ARCHITECTURE.md](./docs/architecture.md)     |
+| TypeScript apps   | [README.md](./docs/web/README.md)             |
+| TypeScript style  | [CODE-STYLE.md](./docs/web/code-style.md)     |
 | Contributing      | [CONTRIBUTING.md](./CONTRIBUTING.md)          |
 | Code of Conduct   | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)    |
 | Security          | [SECURITY.md](./SECURITY.md)                  |

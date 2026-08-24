@@ -1,96 +1,84 @@
-import fs from "node:fs";
-import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { defineConfig } from "@devscast/config";
+import { defineConfig, jsonFile } from "@ngandu-dev/config";
 import z from "zod";
 
-import apiConfig from "../../config/api.json";
-import crawlerConfig from "../../config/crawler.json";
-import databaseConfig from "../../config/database.json";
-import encryptionConfig from "../../config/encryption.json";
-import loggerConfig from "../../config/logger.json";
-import sharedConfig from "../../config/shared.json";
 import { ApiConfigurationSchema } from "./api";
-import { CrawlerConfigurationSchema } from "./crawler";
 import { DatabaseConfigurationSchema } from "./database";
 import { EncryptionConfigurationSchema } from "./encryption";
+import { findEnvPath } from "./environment";
 import { LoggerConfigurationSchema } from "./logger";
 import { SharedConfigurationSchema } from "./shared";
 
 export * from "./api";
-export * from "./crawler";
 export * from "./database";
 export * from "./encryption";
 export * from "./logger";
 export * from "./shared";
 
-const findEnvPath = (): string => {
-  const configured = process.env.BASANGO_ENV_PATH?.trim();
-  if (configured) {
-    return path.resolve(configured);
-  }
-
-  let current = process.cwd();
-  while (true) {
-    const candidate = path.join(current, ".env");
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-
-    const parent = path.dirname(current);
-    if (parent === current) {
-      return path.join(process.cwd(), ".env");
-    }
-    current = parent;
-  }
-};
-
-export const { env, config } = defineConfig({
-  env: {
-    knownKeys: [
-      "NODE_ENV",
-      "BASANGO_API_HOST",
-      "BASANGO_API_PORT",
-      "BASANGO_API_ALLOWED_ORIGINS",
-      "BASANGO_API_KEY",
-      "BASANGO_API_CRAWLER_ENDPOINT",
+export const { env, config } = await defineConfig({
+  cwd: fileURLToPath(new URL("../..", import.meta.url)),
+  environment: {
+    files: [{ optional: true, path: findEnvPath() }],
+    redact: [
+      "BASANGO_ADMIN_PASSWORD",
       "BASANGO_API_CRAWLER_TOKEN",
-      "BASANGO_API_JWT_SECRET",
-      "BASANGO_ENV_PATH",
+      "BASANGO_API_KEY",
       "BASANGO_DATABASE_URL",
-      "BASANGO_DATABASE_LEGACY_HOST",
-      "BASANGO_DATABASE_LEGACY_PASSWORD",
-      "BASANGO_DATABASE_LEGACY_NAME",
-      "BASANGO_DATABASE_LEGACY_USER",
-      "BASANGO_CRAWLER_ROOT_PATH",
-      "BASANGO_CRAWLER_DATA_PATH",
-      "BASANGO_CRAWLER_SQLITE_PATH",
-      "BASANGO_CRAWLER_LOGS_PATH",
-      "BASANGO_CRAWLER_CONFIG_PATH",
-      "BASANGO_CRAWLER_SOURCE_IDS",
-      "BASANGO_CRAWLER_UPDATE_DIRECTION",
-      "BASANGO_CRAWLER_FETCH_USER_AGENT",
-      "BASANGO_CRAWLER_FETCH_MAX_RETRIES",
-      "BASANGO_CRAWLER_FETCH_RESPECT_RETRY_AFTER",
-      "BASANGO_CRAWLER_ASYNC_REDIS_URL",
-      "BASANGO_CRAWLER_ASYNC_TTL_RESULT",
-      "BASANGO_CRAWLER_ASYNC_TTL_FAILURE",
-      "BASANGO_CRAWLER_ASYNC_QUEUE_LISTING",
-      "BASANGO_CRAWLER_ASYNC_QUEUE_DETAILS",
-      "BASANGO_CRAWLER_ASYNC_QUEUE_PROCESSING",
       "BASANGO_ENCRYPTION_KEY",
-      "BASANGO_LOGGER_LEVEL",
-      "BASANGO_LOGGER_PRETTY",
-    ] as const,
-    path: findEnvPath(),
+      "BASANGO_RESEND_API_KEY",
+      "BETTER_AUTH_SECRET",
+    ],
+    schema: z.object({
+      BASANGO_ADMIN_EMAIL: z.string().optional(),
+      BASANGO_ADMIN_NAME: z.string().optional(),
+      BASANGO_ADMIN_PASSWORD: z.string().optional(),
+      BASANGO_API_ALLOWED_ORIGINS: z.string().optional(),
+      BASANGO_API_CRAWLER_ENDPOINT: z.string().optional(),
+      BASANGO_API_CRAWLER_TOKEN: z.string().min(1),
+      BASANGO_API_HOST: z.string().default("localhost"),
+      BASANGO_API_KEY: z.string().optional(),
+      BASANGO_API_PORT: z.coerce.number().int().min(1).max(65535).default(3080),
+      BASANGO_CRAWLER_AGENT_ID: z.string().optional(),
+      BASANGO_CRAWLER_CONFIG_PATH: z.string().optional(),
+      BASANGO_CRAWLER_DATA_PATH: z.string().optional(),
+      BASANGO_CRAWLER_FETCH_MAX_RETRIES: z.string().optional(),
+      BASANGO_CRAWLER_FETCH_RESPECT_RETRY_AFTER: z.string().optional(),
+      BASANGO_CRAWLER_FETCH_USER_AGENT: z.string().optional(),
+      BASANGO_CRAWLER_NODE_ID: z.string().optional(),
+      BASANGO_CRAWLER_QUEUE_ARTICLES: z.string().optional(),
+      BASANGO_CRAWLER_QUEUE_DISCOVERY: z.string().optional(),
+      BASANGO_CRAWLER_REDIS_URL: z.string().optional(),
+      BASANGO_CRAWLER_RETAIN_COMPLETED: z.string().optional(),
+      BASANGO_CRAWLER_RETAIN_FAILED: z.string().optional(),
+      BASANGO_CRAWLER_SOURCE_IDS: z.string().optional(),
+      BASANGO_CRAWLER_SQLITE_PATH: z.string().optional(),
+      BASANGO_CRAWLER_UPDATE_DIRECTION: z.string().optional(),
+      BASANGO_DATABASE_URL: z.string().min(1),
+      BASANGO_ENCRYPTION_KEY: z.string().min(1),
+      BASANGO_ENV_PATH: z.string().optional(),
+      BASANGO_LOGGER_LEVEL: z.string().default("info"),
+      BASANGO_LOGGER_PRETTY: z.string().optional(),
+      BASANGO_RESEND_API_KEY: z.string().optional(),
+      BASANGO_RESEND_FROM_EMAIL: z.string().optional(),
+      BETTER_AUTH_COOKIE_DOMAIN: z.string().optional(),
+      BETTER_AUTH_SECRET: z.string().optional(),
+      BETTER_AUTH_URL: z.string().optional(),
+      NODE_ENV: z.enum(["development", "test", "production"]).optional(),
+    }),
   },
   schema: z.object({
     api: ApiConfigurationSchema,
-    crawler: CrawlerConfigurationSchema,
     database: DatabaseConfigurationSchema,
     encryption: EncryptionConfigurationSchema,
     logger: LoggerConfigurationSchema,
     shared: SharedConfigurationSchema,
   }),
-  sources: [apiConfig, crawlerConfig, databaseConfig, encryptionConfig, loggerConfig, sharedConfig],
+  sources: [
+    jsonFile("config/api.json", { name: "api" }),
+    jsonFile("config/database.json", { name: "database" }),
+    jsonFile("config/encryption.json", { name: "encryption" }),
+    jsonFile("config/logger.json", { name: "logger" }),
+    jsonFile("config/shared.json", { name: "shared" }),
+  ],
 });

@@ -2,19 +2,17 @@ import { BIAS, RELIABILITY, SENTIMENT, TRANSPARENCY } from "@basango/domain/cons
 import {
   ArticleMetadata,
   Credibility,
-  Device,
-  GeoLocation,
-  Roles,
+  INGESTION_RUN_STATES,
   TokenStatistics,
 } from "@basango/domain/models";
 import { relations, sql } from "drizzle-orm";
-import { check } from "drizzle-orm/gel-core";
 import {
+  bigint,
   boolean,
+  check,
   customType,
   foreignKey,
   index,
-  inet,
   integer,
   jsonb,
   pgEnum,
@@ -37,18 +35,22 @@ const tsvector = customType<{ data: string; driverData: string }>({
   },
 });
 
-pgEnum("bias", BIAS);
-pgEnum("reliability", RELIABILITY);
-pgEnum("transparency", TRANSPARENCY);
+export const biasEnum = pgEnum("bias", BIAS);
+export const reliabilityEnum = pgEnum("reliability", RELIABILITY);
+export const transparencyEnum = pgEnum("transparency", TRANSPARENCY);
 
-const sentimentEnum = pgEnum("sentiment", SENTIMENT);
-const tokenPurposeEnum = pgEnum("token_purpose", [
-  "confirm_account",
-  "password_reset",
-  "unlock_account",
-  "delete_account",
+export const sentimentEnum = pgEnum("sentiment", SENTIMENT);
+export const ingestionAgentStateEnum = pgEnum("ingestion_agent_state", ["idle", "busy"]);
+export const ingestionRunStateEnum = pgEnum("ingestion_run_state", INGESTION_RUN_STATES);
+export const ingestionSignalTypeEnum = pgEnum("ingestion_signal_type", [
+  "agent.heartbeat",
+  "agent.reset",
+  "run.preparing",
+  "run.started",
+  "run.progress",
+  "run.completed",
+  "run.failed",
 ]);
-
 /* -------------------------------------------------------------------------- */
 /*                                   Tables                                   */
 /* -------------------------------------------------------------------------- */
@@ -56,25 +58,88 @@ const tokenPurposeEnum = pgEnum("token_purpose", [
 export const users = pgTable(
   "user",
   {
+    banExpires: timestamp("ban_expires"),
+    banned: boolean().default(false).notNull(),
+    banReason: text("ban_reason"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    email: varchar({ length: 255 }).notNull(),
+    email: text().notNull(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
     id: uuid().primaryKey().notNull(),
-    isConfirmed: boolean("is_confirmed").default(false).notNull(),
-    isLocked: boolean("is_locked").default(false).notNull(),
-    name: varchar({ length: 255 }).notNull(),
-    password: varchar({ length: 512 }).notNull(),
-    roles: varchar("roles", { length: 255 })
-      .$type<Roles>()
-      .array()
-      .notNull()
-      .default(["ROLE_USER"]),
-    updatedAt: timestamp("updated_at"),
+    image: text(),
+    name: text().notNull(),
+    role: text().default("user").notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (_table) => [
     uniqueIndex("unq_user_email").using("btree", sql`lower((email)::text)`),
     index("idx_user_created_at").using("btree", sql`created_at`),
-    sql`CONSTRAINT "chk_user_roles_json" CHECK (jsonb_typeof(roles) = 'array')`,
   ],
+);
+
+export const sessions = pgTable(
+  "session",
+  {
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    id: uuid().primaryKey().notNull(),
+    impersonatedBy: text("impersonated_by"),
+    ipAddress: text("ip_address"),
+    token: text().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    uniqueIndex("unq_session_token").on(table.token),
+    index("idx_session_user_id").on(table.userId),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "fk_session_user_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const accounts = pgTable(
+  "account",
+  {
+    accessToken: text("access_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    accountId: text("account_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    id: uuid().primaryKey().notNull(),
+    idToken: text("id_token"),
+    issuer: text().notNull(),
+    password: text(),
+    providerId: text("provider_id").notNull(),
+    refreshToken: text("refresh_token"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    uniqueIndex("unq_account_issuer_account_id").on(table.issuer, table.accountId),
+    index("idx_account_user_id").on(table.userId),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: "fk_account_user_id",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const verifications = pgTable(
+  "verification",
+  {
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    id: uuid().primaryKey().notNull(),
+    identifier: text().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    value: text().notNull(),
+  },
+  (table) => [index("idx_verification_identifier").on(table.identifier)],
 );
 
 export const sources = pgTable(
@@ -179,6 +244,68 @@ export const articles = pgTable(
   ],
 );
 
+export const ingestionAgents = pgTable(
+  "ingestion_agent",
+  {
+    activeRunId: uuid("active_run_id"),
+    id: varchar({ length: 255 }).primaryKey().notNull(),
+    lastSeenAt: timestamp("last_seen_at").notNull(),
+    registeredAt: timestamp("registered_at").defaultNow().notNull(),
+    state: ingestionAgentStateEnum().notNull().default("idle"),
+    version: varchar({ length: 64 }),
+  },
+  (table) => [index("idx_ingestion_agent_last_seen").on(table.lastSeenAt)],
+);
+
+export const ingestionRuns = pgTable(
+  "ingestion_run",
+  {
+    agentId: varchar("agent_id", { length: 255 }).notNull(),
+    articlesDelivered: integer("articles_delivered").default(0).notNull(),
+    articlesDiscovered: integer("articles_discovered").default(0).notNull(),
+    articlesFailed: integer("articles_failed").default(0).notNull(),
+    articlesPersisted: integer("articles_persisted").default(0).notNull(),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").notNull(),
+    durationMs: bigint("duration_ms", { mode: "number" }),
+    error: text(),
+    id: uuid().primaryKey().notNull(),
+    lastSignalAt: timestamp("last_signal_at").notNull(),
+    sourceId: varchar("source_id", { length: 255 }).notNull(),
+    startedAt: timestamp("started_at"),
+    state: ingestionRunStateEnum().notNull(),
+  },
+  (table) => [
+    index("idx_ingestion_run_last_signal").on(table.lastSignalAt),
+    index("idx_ingestion_run_agent_state").on(table.agentId, table.state),
+    check(
+      "chk_ingestion_run_metrics_nonnegative",
+      sql`${table.articlesDelivered} >= 0 AND ${table.articlesDiscovered} >= 0 AND ${table.articlesFailed} >= 0 AND ${table.articlesPersisted} >= 0`,
+    ),
+    check(
+      "chk_ingestion_run_duration_nonnegative",
+      sql`${table.durationMs} IS NULL OR ${table.durationMs} >= 0`,
+    ),
+  ],
+);
+
+export const ingestionActivities = pgTable(
+  "ingestion_activity",
+  {
+    agentId: varchar("agent_id", { length: 255 }).notNull(),
+    data: jsonb().$type<Record<string, unknown>>().notNull(),
+    id: uuid().primaryKey().notNull(),
+    occurredAt: timestamp("occurred_at").notNull(),
+    runId: uuid("run_id"),
+    sourceId: varchar("source_id", { length: 255 }),
+    type: ingestionSignalTypeEnum().notNull(),
+  },
+  (table) => [
+    index("idx_ingestion_activity_occurred").on(table.occurredAt),
+    index("idx_ingestion_activity_run_occurred").on(table.runId, table.occurredAt),
+  ],
+);
+
 export const bookmarks = pgTable(
   "bookmark",
   {
@@ -227,77 +354,6 @@ export const bookmarkArticles = pgTable(
       columns: [table.articleId],
       foreignColumns: [articles.id],
       name: "fk_bookmark_article_article_id",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const loginAttempts = pgTable(
-  "login_attempt",
-  {
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    id: uuid().primaryKey().notNull(),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("idx_login_attempt_user_created").using(
-      "btree",
-      table.userId.asc().nullsLast(),
-      table.createdAt.desc().nullsFirst(),
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [users.id],
-      name: "fk_login_attempt_user_id",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const loginHistory = pgTable(
-  "login_history",
-  {
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    device: jsonb("device").$type<Device>(),
-    id: uuid().primaryKey().notNull(),
-    ipAddress: inet("ip_address"),
-    location: jsonb("location").$type<GeoLocation>(),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("idx_login_history_user_created").using(
-      "btree",
-      table.userId.asc().nullsLast(),
-      table.createdAt.desc().nullsFirst(),
-    ),
-    index("idx_login_history_ip_address").using("btree", table.ipAddress.asc().nullsLast()),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [users.id],
-      name: "fk_login_history_user_id",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const verificationTokens = pgTable(
-  "verification_token",
-  {
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    id: uuid().primaryKey().notNull(),
-    purpose: tokenPurposeEnum("purpose").notNull(),
-    token: varchar({ length: 60 }), // nullable if you support "reservations" before issue
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("idx_verif_token_created_at").using("btree", table.createdAt.desc().nullsFirst()),
-    uniqueIndex("unq_verif_user_purpose_token")
-      .using("btree", table.userId, table.purpose, table.token)
-      .where(sql`${table.token} IS NOT NULL`),
-    uniqueIndex("unq_verif_token_token")
-      .using("btree", table.token)
-      .where(sql`${table.token} IS NOT NULL`),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [users.id],
-      name: "fk_verification_token_user_id",
     }).onDelete("cascade"),
   ],
 );
@@ -368,21 +424,6 @@ export const comments = pgTable(
   ],
 );
 
-export const refreshTokens = pgTable(
-  "refresh_token",
-  {
-    id: uuid().primaryKey().notNull(),
-    token: varchar("token", { length: 128 }).notNull(),
-    username: varchar({ length: 255 }).notNull(),
-    valid: timestamp().notNull(),
-  },
-  (table) => [
-    uniqueIndex("uniq_refresh_token_token").using("btree", table.token.asc().nullsLast()),
-    index("idx_refresh_token_valid").using("btree", table.valid.asc().nullsLast()),
-    index("idx_refresh_token_username").using("btree", sql`lower(${table.username})`),
-  ],
-);
-
 /* -------------------------------------------------------------------------- */
 /*                                 Relations                                  */
 /* -------------------------------------------------------------------------- */
@@ -396,31 +437,23 @@ export const bookmarkRelations = relations(bookmarks, ({ one, many }) => ({
 }));
 
 export const userRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts),
   bookmarks: many(bookmarks),
   comments: many(comments),
   followedSources: many(followedSources),
-  loginAttempts: many(loginAttempts),
-  loginHistories: many(loginHistory),
-  verificationTokens: many(verificationTokens),
+  sessions: many(sessions),
 }));
 
-export const loginAttemptRelations = relations(loginAttempts, ({ one }) => ({
+export const accountRelations = relations(accounts, ({ one }) => ({
   user: one(users, {
-    fields: [loginAttempts.userId],
+    fields: [accounts.userId],
     references: [users.id],
   }),
 }));
 
-export const loginHistoryRelations = relations(loginHistory, ({ one }) => ({
+export const sessionRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
-    fields: [loginHistory.userId],
-    references: [users.id],
-  }),
-}));
-
-export const verificationTokenRelations = relations(verificationTokens, ({ one }) => ({
-  user: one(users, {
-    fields: [verificationTokens.userId],
+    fields: [sessions.userId],
     references: [users.id],
   }),
 }));
