@@ -40,7 +40,7 @@ export async function sendPasswordResetEmail(input: PasswordResetEmail): Promise
   const safeResetUrl = escapeHtml(input.url);
   const response = await fetch("https://api.resend.com/emails", {
     body: JSON.stringify({
-      from: env.BASANGO_RESEND_FROM_EMAIL ?? "Basango <noreply@basango.gandu.dev>",
+      from: env.BASANGO_RESEND_FROM_EMAIL ?? "Basango <noreply@basango.ngandu.dev>",
       html: `<p>Hello ${safeName},</p><p>Use the link below to reset your Basango password. This link expires in 30 minutes and can only be used once.</p><p><a href="${safeResetUrl}">Reset your password</a></p><p>If you did not request this, you can safely ignore this email.</p>`,
       subject: "Reset your Basango password",
       text: `Hello ${input.name},\n\nReset your Basango password using this link:\n${input.url}\n\nThis link expires in 30 minutes and can only be used once. If you did not request this, you can safely ignore this email.`,

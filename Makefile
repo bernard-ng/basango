@@ -2,6 +2,8 @@
 default: help
 
 COMPOSE ?= docker compose
+BUN ?= $(HOME)/.bun/bin/bun
+PM2 ?= pm2
 POSTGRES_DATABASE ?= app
 POSTGRES_SERVICE ?= postgres
 POSTGRES_USER ?= postgres
@@ -28,31 +30,32 @@ db-rebuild: ## Rebuild the local PostgreSQL database and run migrations
 # Deployment
 # -----------------------------------
 .PHONY: deploy
-deploy:
-	~/.bun/bin/bun install --frozen-lockfile.
-	~/.bun/bin/bun run build:database
-	~/.bun/bin/bun run migrate
-	pm2 reload ecosystem.config.js --env production
+deploy: ## Install, build, migrate, and reload the production applications
+	$(BUN) install --frozen-lockfile
+	$(BUN) run build:dashboard
+	$(BUN) run migrate
+	$(PM2) startOrReload ecosystem.config.js --env production
+	$(PM2) save
 
 # -----------------------------------                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 # PM2 Commands
 # -----------------------------------
 .PHONY: start
 start:
-	pm2 start ecosystem.config.js --env production
+	$(PM2) start ecosystem.config.js --env production
 
 .PHONY: restart
 restart:
-	pm2 reload ecosystem.config.js --env production
+	$(PM2) reload ecosystem.config.js --env production
 
 .PHONY: stop
 stop:
-	pm2 stop ecosystem.config.js --env production
+	$(PM2) stop ecosystem.config.js --env production
 
 .PHONY: logs
 logs:
-	pm2 logs --lines 100 --env production
+	$(PM2) logs --lines 100
 
 .PHONY: monit
 monit:
-	pm2 monit --env production
+	$(PM2) monit
