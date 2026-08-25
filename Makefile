@@ -2,11 +2,15 @@
 default: help
 
 COMPOSE ?= docker compose
-BUN ?= $(HOME)/.bun/bin/bun
+BUN_INSTALL ?= $(HOME)/.bun
+BUN ?= $(BUN_INSTALL)/bin/bun
 PM2 ?= pm2
 POSTGRES_DATABASE ?= app
 POSTGRES_SERVICE ?= postgres
 POSTGRES_USER ?= postgres
+
+export BUN_INSTALL
+export PATH := $(BUN_INSTALL)/bin:$(PATH)
 
 .PHONY: help
 help:
