@@ -1,6 +1,8 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "globalDependencies": ["**/.env"],
+  "globalDependencies": [".env", ".env.*"],
+  "globalEnv": ["NODE_ENV", "VITE_*", "EXPO_PUBLIC_*", "VERCEL_TARGET_ENV", "VERCEL_URL"],
+  "globalPassThroughEnv": ["BASANGO_*", "BETTER_AUTH_*"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -14,7 +16,7 @@
     },
     "dev": {
       "cache": false,
-      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "persistent": true
     },
     "start": {

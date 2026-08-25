@@ -28,8 +28,8 @@
   "private": true,
   "scripts": {
     "auth:create-admin": "bun run src/scripts/create-admin.ts",
-    "dev": "bun run --hot src/index.ts",
-    "start": "NODE_ENV=production bun run src/index.ts",
+    "dev": "NODE_ENV=dev bun run --hot src/index.ts",
+    "start": "NODE_ENV=prod bun run src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"

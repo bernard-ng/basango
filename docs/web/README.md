@@ -19,6 +19,10 @@ substantive Basango-owned behavior.
 Keep route composition, navigation, environment access, and platform-specific behavior in the owning application.
 Start new product behavior there. Extract it only after a stable package responsibility is visible.
 
+Environment files are an exception to application ownership: all TypeScript applications use the repository-root
+precedence documented in the [environment configuration guide](../environment.md). Application-specific `.env` files
+must not be added under `apps/` or `packages/`.
+
 ## Shared packages
 
 - `@basango/domain` owns runtime schemas and inferred TypeScript contracts shared across process boundaries. It must

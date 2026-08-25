@@ -49,10 +49,10 @@
   "name": "@basango/dashboard",
   "private": true,
   "scripts": {
-    "build": "vite build",
+    "build": "vite build --mode prod",
     "clean": "rm -rf .output .tanstack node_modules",
-    "dev": "vite dev",
-    "start": "NODE_ENV=production node .output/server/index.mjs",
+    "dev": "vite dev --mode dev",
+    "start": "NODE_ENV=prod node .output/server/index.mjs",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"

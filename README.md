@@ -30,6 +30,8 @@
 | Scope             | Link                                          |
 |-------------------|-----------------------------------------------|
 | Architecture      | [ARCHITECTURE.md](./docs/architecture.md)     |
+| Environment       | [ENVIRONMENT.md](./docs/environment.md)       |
+| Deployment        | [DEPLOYMENT.md](./docs/deployment.md)         |
 | TypeScript apps   | [README.md](./docs/web/README.md)             |
 | TypeScript style  | [CODE-STYLE.md](./docs/web/code-style.md)     |
 | Contributing      | [CONTRIBUTING.md](./CONTRIBUTING.md)          |

@@ -6,7 +6,7 @@ import z from "zod";
 import { ApiConfigurationSchema } from "./api";
 import { DatabaseConfigurationSchema } from "./database";
 import { EncryptionConfigurationSchema } from "./encryption";
-import { findEnvPath } from "./environment";
+import { resolveEnvFiles } from "./environment";
 import { LoggerConfigurationSchema } from "./logger";
 import { SharedConfigurationSchema } from "./shared";
 
@@ -16,10 +16,12 @@ export * from "./encryption";
 export * from "./logger";
 export * from "./shared";
 
+const nodeEnvironmentSchema = z.enum(["dev", "test", "prod"]).default("dev");
+
 export const { env, config } = await defineConfig({
   cwd: fileURLToPath(new URL("../..", import.meta.url)),
   environment: {
-    files: [{ optional: true, path: findEnvPath() }],
+    files: resolveEnvFiles(),
     redact: [
       "BASANGO_ADMIN_PASSWORD",
       "BASANGO_API_CRAWLER_TOKEN",
@@ -64,7 +66,7 @@ export const { env, config } = await defineConfig({
       BETTER_AUTH_COOKIE_DOMAIN: z.string().optional(),
       BETTER_AUTH_SECRET: z.string().optional(),
       BETTER_AUTH_URL: z.string().optional(),
-      NODE_ENV: z.enum(["development", "test", "production"]).optional(),
+      NODE_ENV: nodeEnvironmentSchema,
     }),
   },
   schema: z.object({

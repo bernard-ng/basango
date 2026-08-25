@@ -1,8 +1,8 @@
-import { readEnvFile } from "@basango/domain/config/environment";
+import { readEnvFiles } from "@basango/domain/config/environment";
 import { defineConfig } from "drizzle-kit";
 
 const databaseUrl = (
-  process.env.BASANGO_DATABASE_URL ?? readEnvFile().BASANGO_DATABASE_URL
+  process.env.BASANGO_DATABASE_URL ?? readEnvFiles().BASANGO_DATABASE_URL
 )?.trim();
 
 if (!databaseUrl) {

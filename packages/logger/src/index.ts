@@ -98,7 +98,7 @@ const createPinoLogger = (): LoggerLike => {
 
   return createLogger({
     level: config.logger.level,
-    ...(env.NODE_ENV !== "production" &&
+    ...(env.NODE_ENV !== "prod" &&
       env.BASANGO_LOGGER_PRETTY === "true" && {
         transport: {
           options: {

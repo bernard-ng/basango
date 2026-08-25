@@ -25,7 +25,7 @@ export async function sendPasswordResetEmail(input: PasswordResetEmail): Promise
   const apiKey = env.BASANGO_RESEND_API_KEY?.trim();
 
   if (!apiKey) {
-    if (env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "prod") {
       throw new Error("BASANGO_RESEND_API_KEY is required to send password reset emails.");
     }
 

@@ -4,7 +4,7 @@ import { Pool } from "pg";
 
 import * as schema from "#db/schema";
 
-const isDevelopment = env.NODE_ENV === "development";
+const isDevelopment = env.NODE_ENV === "dev";
 
 const pool = new Pool({
   allowExitOnIdle: true,

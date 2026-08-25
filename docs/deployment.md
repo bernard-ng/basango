@@ -37,7 +37,7 @@ BASANGO_API_CRAWLER_TOKEN=replace-with-the-same-secret-as-the-api
 
 The endpoint is the API origin without `/ingest`; the crawler appends `/ingest/articles` and the
 other ingestion paths itself. The token must exactly match `BASANGO_API_CRAWLER_TOKEN` in the
-TypeScript API's root `.env`. Keep both values secret. Before Certbot enables HTTPS, use
+TypeScript API's root `.env.local`. Keep both values secret. Before Certbot enables HTTPS, use
 `http://api.basango.ngandu.dev` only for an initial connectivity check, then switch the crawler to
 the HTTPS endpoint.
 
@@ -59,10 +59,17 @@ pm2 startup
 pm2 save
 ```
 
-The root `.env` must provide the API database, encryption, crawler token, and Better Auth secrets.
-Use these public authentication values:
+The committed root `.env` only contains safe development examples. On the server, create an ignored
+root `.env.prod` for production-wide values:
 
 ```dotenv
+VITE_PUBLIC_API_URL=https://api.basango.ngandu.dev
+VITE_PUBLIC_URL=https://dashboard.basango.ngandu.dev
 BETTER_AUTH_URL=https://api.basango.ngandu.dev
 BETTER_AUTH_COOKIE_DOMAIN=.basango.ngandu.dev
 ```
+
+Put the API database, encryption key, crawler token, and Better Auth secret in root `.env.local`.
+That file is loaded after `.env.prod`, so it is the final file-based override and stays outside Git.
+Variables injected directly by PM2 or the host still take precedence. See the
+[environment configuration guide](environment.md) for the complete convention.
