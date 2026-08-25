@@ -10,8 +10,8 @@ export const ApiConfigurationSchema = z.object({
       .array(z.string())
       .optional()
       .default([
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
         "https://dashboard.basango.ngandu.dev",
       ]),
   }),

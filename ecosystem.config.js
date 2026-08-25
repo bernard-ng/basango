@@ -23,7 +23,7 @@ module.exports = {
       env: {
         HOST: "127.0.0.1",
         NODE_ENV: "prod",
-        PORT: "3000",
+        PORT: "3001",
         VITE_PUBLIC_API_URL: "https://api.basango.ngandu.dev",
         VITE_PUBLIC_URL: "https://dashboard.basango.ngandu.dev",
       },

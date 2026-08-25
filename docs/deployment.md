@@ -1,7 +1,7 @@
 # Deployment
 
 The production checkout lives at `/var/www/html/basango.ngandu.dev`. PM2 runs the API on
-`127.0.0.1:3080` and the dashboard on `127.0.0.1:3000`; Nginx is the only public entrypoint.
+`127.0.0.1:3080` and the dashboard on `127.0.0.1:3001`; Nginx is the only public entrypoint.
 
 ## Nginx
 

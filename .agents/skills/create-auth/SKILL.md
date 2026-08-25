@@ -167,7 +167,7 @@ At the end of implementation, guide users thoroughly on remaining next steps (e.
 
 ```env
 BETTER_AUTH_SECRET=<32+ chars, generate with: openssl rand -base64 32>
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3001
 DATABASE_URL=<your database connection string>
 ```
 
