@@ -51,7 +51,7 @@
   "scripts": {
     "build": "vite build --mode production",
     "clean": "rm -rf .output .tanstack node_modules",
-    "dev": "vite dev --mode development",
+    "dev": "vite dev --mode development --port 3001",
     "start": "NODE_ENV=production node .output/server/index.mjs",
     "typecheck": "tsc --noEmit"
   },

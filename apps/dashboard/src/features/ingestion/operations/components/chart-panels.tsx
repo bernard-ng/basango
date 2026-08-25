@@ -37,7 +37,7 @@ const latencyConfig = {
 export function ThroughputPanel({ data }: { data: ThroughputPoint[] }) {
   return (
     <DashboardPanel
-      description="Article volume accepted from live ingestion signals"
+      description="Articles processed per 3-minute interval over the last 30 minutes"
       title="Throughput"
       trailing={<ThroughputLegend />}
     >

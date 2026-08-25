@@ -1,9 +1,9 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
 
 import type {
-  IngestionActivity,
   IngestionMetrics,
   IngestionOverview,
+  IngestionThroughput,
   ThroughputPoint,
 } from "./types";
 
@@ -13,9 +13,6 @@ const EMPTY_METRICS: IngestionMetrics = {
   failed: 0,
   persisted: 0,
 };
-const THROUGHPUT_BUCKETS = 10;
-const THROUGHPUT_WINDOW_MS = 30 * 60 * 1000;
-
 export const relativeTime = (date: Date) =>
   formatDistanceToNowStrict(new Date(date), { addSuffix: true });
 
@@ -32,68 +29,15 @@ export const formatDuration = (durationMs: number | null) => {
   return `${(durationMs / 60_000).toFixed(1)} min`;
 };
 
-const getActivityMetrics = (activity: IngestionActivity): IngestionMetrics | null => {
-  if (!activity.data || typeof activity.data !== "object") return null;
-  const metrics = activity.data.metrics;
-  if (!metrics || typeof metrics !== "object") return null;
-
-  const record = metrics as Record<string, unknown>;
-  const readNumber = (key: string) => (typeof record[key] === "number" ? record[key] : 0);
-
-  return {
-    delivered: readNumber("articlesDelivered"),
-    discovered: readNumber("articlesDiscovered"),
-    failed: readNumber("articlesFailed"),
-    persisted: readNumber("articlesPersisted"),
-  };
-};
-
-const buildThroughputSeries = (
-  activities: IngestionActivity[],
-  generatedAt: Date,
-): ThroughputPoint[] => {
-  const end = new Date(generatedAt).getTime();
-  const start = end - THROUGHPUT_WINDOW_MS;
-  const bucketSize = THROUGHPUT_WINDOW_MS / THROUGHPUT_BUCKETS;
-  const points = Array.from({ length: THROUGHPUT_BUCKETS }, (_, index) => ({
-    delivered: 0,
-    discovered: 0,
-    label: format(new Date(start + index * bucketSize), "HH:mm"),
-    persisted: 0,
+const buildThroughputSeries = (throughput: IngestionThroughput[]): ThroughputPoint[] =>
+  throughput.map((point) => ({
+    delivered: point.articlesDelivered,
+    discovered: point.articlesDiscovered,
+    label: format(new Date(point.occurredAt), "HH:mm"),
+    persisted: point.articlesPersisted,
   }));
-  const previousByRun = new Map<string, IngestionMetrics>();
 
-  for (const activity of [...activities].reverse()) {
-    const occurredAt = new Date(activity.occurredAt).getTime();
-    if (occurredAt < start || occurredAt > end) continue;
-
-    const metrics = getActivityMetrics(activity);
-    if (!metrics) continue;
-
-    const runKey = activity.runId ?? activity.id;
-    const previous = previousByRun.get(runKey) ?? EMPTY_METRICS;
-    const bucketIndex = Math.min(
-      THROUGHPUT_BUCKETS - 1,
-      Math.max(0, Math.floor((occurredAt - start) / bucketSize)),
-    );
-    const point = points[bucketIndex];
-    if (!point) continue;
-
-    point.delivered += Math.max(0, metrics.delivered - previous.delivered);
-    point.discovered += Math.max(0, metrics.discovered - previous.discovered);
-    point.persisted += Math.max(0, metrics.persisted - previous.persisted);
-    previousByRun.set(runKey, metrics);
-  }
-
-  return points;
-};
-
-export const createDashboardModel = ({
-  activities,
-  agents,
-  generatedAt,
-  runs,
-}: IngestionOverview) => {
+export const createDashboardModel = ({ agents, runs, throughput }: IngestionOverview) => {
   const activeRuns = runs.filter((run) => run.state === "preparing" || run.state === "running");
   const onlineAgents = agents.filter((agent) => agent.online);
   const failedRuns = runs.filter((run) => run.state === "failed");
@@ -130,7 +74,7 @@ export const createDashboardModel = ({
       { color: "var(--destructive)", stage: "Failed", value: totals.failed },
     ],
     successRate: terminalRuns === 0 ? 100 : Math.round((completedRuns.length / terminalRuns) * 100),
-    throughputSeries: buildThroughputSeries(activities, generatedAt),
+    throughputSeries: buildThroughputSeries(throughput),
     totals,
   };
 };
