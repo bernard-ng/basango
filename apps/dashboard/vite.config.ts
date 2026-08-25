@@ -22,6 +22,14 @@ export default defineConfig(({ mode }) => {
       viteReact(),
     ],
     resolve: {
+      alias: [
+        {
+          // React 19 provides this API natively. Avoid Nitro loading the CommonJS
+          // shim through createRequire(), which would create a second SSR runtime.
+          find: /^use-sync-external-store\/shim$/,
+          replacement: "react",
+        },
+      ],
       tsconfigPaths: true,
     },
   };
