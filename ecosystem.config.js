@@ -9,7 +9,7 @@ module.exports = {
       env: {
         BASANGO_API_HOST: "127.0.0.1",
         BASANGO_API_PORT: "3080",
-        NODE_ENV: "prod",
+        NODE_ENV: "production",
       },
       max_restarts: 5,
       name: "api.basango.ngandu.dev",
@@ -22,7 +22,7 @@ module.exports = {
       cwd: path.join(__dirname, "apps", "dashboard"),
       env: {
         HOST: "127.0.0.1",
-        NODE_ENV: "prod",
+        NODE_ENV: "production",
         PORT: "3001",
         VITE_PUBLIC_API_URL: "https://api.basango.ngandu.dev",
         VITE_PUBLIC_URL: "https://dashboard.basango.ngandu.dev",

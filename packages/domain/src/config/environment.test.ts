@@ -15,14 +15,14 @@ afterEach(() => {
 
 describe("normalizeNodeEnvironment", () => {
   test.each([
-    ["dev", "dev"],
+    ["development", "development"],
     ["test", "test"],
-    ["prod", "prod"],
+    ["production", "production"],
   ] as const)("normalizes %s to %s", (value, expected) => {
     expect(normalizeNodeEnvironment(value)).toBe(expected);
   });
 
-  test.each(["development", "production"])("rejects unsupported value %s", (value) => {
+  test.each(["dev", "prod"])("rejects unsupported value %s", (value) => {
     expect(() => normalizeNodeEnvironment(value)).toThrow(`Unsupported NODE_ENV: ${value}`);
   });
 });
@@ -35,7 +35,7 @@ describe("environment files", () => {
       ".env.prod": "VALUE=production\nMODE_ONLY=yes\n",
     });
 
-    expect(readEnvFiles({ cwd: directory, nodeEnvironment: "prod" })).toEqual({
+    expect(readEnvFiles({ cwd: directory, nodeEnvironment: "production" })).toEqual({
       BASE_ONLY: "yes",
       LOCAL_ONLY: "yes",
       MODE_ONLY: "yes",
@@ -44,9 +44,9 @@ describe("environment files", () => {
   });
 
   test.each([
-    ["dev", ".env.dev"],
+    ["development", ".env.dev"],
     ["test", ".env.test"],
-    ["prod", ".env.prod"],
+    ["production", ".env.prod"],
   ] as const)("selects %s mode file", (mode, expectedFile) => {
     const directory = createEnvironmentDirectory({ ".env": "VALUE=base\n" });
     const files = resolveEnvFiles({ cwd: directory, nodeEnvironment: mode });
@@ -60,7 +60,7 @@ describe("environment files", () => {
 
   test("uses NODE_ENV from the base file when no mode is provided", () => {
     const directory = createEnvironmentDirectory({
-      ".env": "NODE_ENV=prod\nVALUE=base\n",
+      ".env": "NODE_ENV=production\nVALUE=base\n",
       ".env.prod": "VALUE=production\n",
     });
     const previousNodeEnvironment = process.env.NODE_ENV;

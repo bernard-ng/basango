@@ -9,7 +9,7 @@ import { v7 as uuidv7 } from "uuid";
 
 import { sendPasswordResetEmail } from "#api/utils/password-reset-email";
 
-const isProduction = env.NODE_ENV === "prod";
+const isProduction = env.NODE_ENV === "production";
 const baseURL = env.BETTER_AUTH_URL?.trim() ?? `http://localhost:${config.api.server.port}`;
 const cookieDomain = env.BETTER_AUTH_COOKIE_DOMAIN?.trim();
 const secret =

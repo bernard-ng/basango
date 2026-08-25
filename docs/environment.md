@@ -16,9 +16,9 @@ Environment files are loaded from lowest to highest priority:
 Only `.env` is committed. Every `.env.*` file is ignored by Git. Never put production credentials
 or personal secrets in `.env`.
 
-`NODE_ENV` accepts exactly `dev`, `test`, or `prod`, selecting `.env.dev`, `.env.test`, or
-`.env.prod` respectively. The longer `development` and `production` values are intentionally
-rejected so every TypeScript application uses the same vocabulary.
+`NODE_ENV` accepts exactly `development`, `test`, or `production`. These select `.env.dev`,
+`.env.test`, or `.env.prod` respectively. The file suffixes stay concise while `NODE_ENV` follows
+the values expected by Node.js and React tooling.
 
 The API, Drizzle commands, and dashboard build share this ordering. The dashboard exposes only
 variables prefixed with `VITE_` to browser code. If the mobile application gains public runtime
@@ -38,7 +38,7 @@ superseded by `.env.local`.
 
 ## Production
 
-On the server, set `NODE_ENV=prod` and create `.env.prod` for production-wide values. Put
+On the server, set `NODE_ENV=production` and create `.env.prod` for production-wide values. Put
 host-specific credentials in `.env.local`. For example:
 
 ```dotenv

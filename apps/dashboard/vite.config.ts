@@ -1,4 +1,4 @@
-import { normalizeNodeEnvironment, readEnvFiles } from "@basango/domain/config/environment";
+import { readEnvFiles } from "@basango/domain/config/environment";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -6,13 +6,9 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
-  const nodeEnvironment = normalizeNodeEnvironment(mode);
-  applyPublicEnvironment(nodeEnvironment);
+  applyPublicEnvironment(mode);
 
   return {
-    define: {
-      "process.env.NODE_ENV": JSON.stringify(nodeEnvironment),
-    },
     envDir: false,
     plugins: [
       tanstackStart({

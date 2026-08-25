@@ -16,7 +16,7 @@ export * from "./encryption";
 export * from "./logger";
 export * from "./shared";
 
-const nodeEnvironmentSchema = z.enum(["dev", "test", "prod"]).default("dev");
+const nodeEnvironmentSchema = z.enum(["development", "test", "production"]).default("development");
 
 export const { env, config } = await defineConfig({
   cwd: fileURLToPath(new URL("../..", import.meta.url)),

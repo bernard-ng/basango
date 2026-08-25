@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { parseEnv } from "node:util";
 
-export type NodeEnvironment = "dev" | "test" | "prod";
+export type NodeEnvironment = "development" | "test" | "production";
 
 export interface EnvironmentFileOptions {
   cwd?: string;
@@ -15,16 +15,22 @@ interface EnvironmentFile {
   path: string;
 }
 
+const environmentFileSuffixes: Record<NodeEnvironment, string> = {
+  development: "dev",
+  production: "prod",
+  test: "test",
+};
+
 export function normalizeNodeEnvironment(value?: string): NodeEnvironment {
   switch (value?.trim().toLowerCase()) {
     case undefined:
     case "":
-    case "dev":
-      return "dev";
+    case "development":
+      return "development";
     case "test":
       return "test";
-    case "prod":
-      return "prod";
+    case "production":
+      return "production";
     default:
       throw new Error(`Unsupported NODE_ENV: ${value}`);
   }
@@ -60,7 +66,7 @@ export function resolveEnvFiles(options: EnvironmentFileOptions = {}): Environme
   const directory = path.dirname(envPath);
   const paths = [
     envPath,
-    path.join(directory, `.env.${nodeEnvironment}`),
+    path.join(directory, `.env.${environmentFileSuffixes[nodeEnvironment]}`),
     path.join(directory, ".env.local"),
   ];
 

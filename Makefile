@@ -33,7 +33,7 @@ db-rebuild: ## Rebuild the local PostgreSQL database and run migrations
 deploy: ## Install, build, migrate, and reload the production applications
 	$(BUN) install --frozen-lockfile
 	$(BUN) run build:dashboard
-	NODE_ENV=prod $(BUN) run migrate
+	NODE_ENV=production $(BUN) run migrate
 	$(PM2) startOrReload ecosystem.config.js
 	$(PM2) save
 
