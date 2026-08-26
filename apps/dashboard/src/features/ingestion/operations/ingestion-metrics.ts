@@ -1,11 +1,6 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
 
-import type {
-  IngestionMetrics,
-  IngestionOverview,
-  IngestionThroughput,
-  ThroughputPoint,
-} from "./types";
+import type { IngestionDashboardData, IngestionMetrics, ThroughputPoint } from "./types";
 
 const EMPTY_METRICS: IngestionMetrics = {
   delivered: 0,
@@ -26,10 +21,17 @@ export const formatDuration = (durationMs: number | null) => {
   if (durationMs === null) return "—";
   if (durationMs < 1_000) return `${durationMs} ms`;
   if (durationMs < 60_000) return `${(durationMs / 1_000).toFixed(1)} s`;
-  return `${(durationMs / 60_000).toFixed(1)} min`;
+  if (durationMs < 3_600_000) return `${(durationMs / 60_000).toFixed(1)} min`;
+
+  const hours = Math.floor(durationMs / 3_600_000);
+  const minutes = Math.round((durationMs % 3_600_000) / 60_000);
+
+  return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
 };
 
-const buildThroughputSeries = (throughput: IngestionThroughput[]): ThroughputPoint[] =>
+const buildThroughputSeries = (
+  throughput: IngestionDashboardData["throughput"],
+): ThroughputPoint[] =>
   throughput.map((point) => ({
     delivered: point.articlesDelivered,
     discovered: point.articlesDiscovered,
@@ -37,32 +39,19 @@ const buildThroughputSeries = (throughput: IngestionThroughput[]): ThroughputPoi
     persisted: point.articlesPersisted,
   }));
 
-export const createDashboardModel = ({ agents, runs, throughput }: IngestionOverview) => {
-  const activeRuns = runs.filter((run) => run.state === "preparing" || run.state === "running");
+export const createDashboardModel = ({ agents, summary, throughput }: IngestionDashboardData) => {
   const onlineAgents = agents.filter((agent) => agent.online);
-  const failedRuns = runs.filter((run) => run.state === "failed");
-  const completedRuns = runs.filter((run) => run.state === "completed");
-  const totals = runs.reduce(
-    (current, run) => ({
-      delivered: current.delivered + run.articlesDelivered,
-      discovered: current.discovered + run.articlesDiscovered,
-      failed: current.failed + run.articlesFailed,
-      persisted: current.persisted + run.articlesPersisted,
-    }),
-    { ...EMPTY_METRICS },
-  );
-  const terminalRuns = completedRuns.length + failedRuns.length;
+  const totals = { ...EMPTY_METRICS, ...summary.totals };
 
   return {
-    activeRunsCount: activeRuns.length,
-    completedRunsCount: completedRuns.length,
-    failedRunsCount: failedRuns.length,
-    latencySeries: runs
-      .filter((run) => run.durationMs !== null)
-      .slice(0, 12)
+    activeRunsCount: summary.activeRunsCount,
+    completedRunsCount: summary.completedRunsCount,
+    failedRunsCount: summary.failedRunsCount,
+    latencySeries: summary.runDurations
+      .slice()
       .reverse()
       .map((run) => ({
-        duration: Math.round(((run.durationMs ?? 0) / 1_000) * 10) / 10,
+        duration: Math.round((run.durationMs / 60_000) * 100) / 100,
         label: format(new Date(run.lastSignalAt), "HH:mm"),
         source: run.sourceId,
       })),
@@ -73,7 +62,7 @@ export const createDashboardModel = ({ agents, runs, throughput }: IngestionOver
       { color: "var(--chart-3)", stage: "Delivered", value: totals.delivered },
       { color: "var(--destructive)", stage: "Failed", value: totals.failed },
     ],
-    successRate: terminalRuns === 0 ? 100 : Math.round((completedRuns.length / terminalRuns) * 100),
+    successRate: summary.successRate,
     throughputSeries: buildThroughputSeries(throughput),
     totals,
   };

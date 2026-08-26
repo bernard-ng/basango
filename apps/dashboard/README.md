@@ -2,7 +2,7 @@
 
 The dashboard manages the Basango dataset and provides an ingestion operations view for the Rust crawler fleet.
 
-The **Ingestion** page shows online agents, active and recent runs, discovered/processed/persisted/skipped/delivered/failed totals, failures, and lifecycle activity. It treats the tRPC operations snapshot as authoritative; the authenticated SSE stream only triggers immediate refreshes, with periodic polling as a reconnect safety net. Legacy runs show unknown processed/skipped values instead of guessing how their discovery-to-persistence gap was produced.
+The **Ingestion** page shows online agents, active and recent runs, discovered/processed/persisted/skipped/delivered/failed totals, failures, and lifecycle activity. Focused tRPC operations reads are authoritative; the authenticated SSE stream sends coalesced topic invalidations that selectively refresh those reads. There is no polling fallback: when SSE disconnects, the page keeps its last data and visibly reports that realtime updates are unavailable. Legacy runs show unknown processed/skipped values instead of guessing how their discovery-to-persistence gap was produced.
 
 Authentication is provided by Better Auth through HttpOnly session cookies. The dashboard accepts only users with the `admin` role and includes Better Auth-backed sign-in, sign-out, forgot-password, and reset-password flows. General web and mobile users can share the same API identity and session tables without receiving dashboard access.
 

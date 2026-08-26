@@ -51,11 +51,13 @@ app.openapi(
   async (c) => {
     const payload = c.req.valid("json");
     const idempotencyKey = c.req.valid("header")["idempotency-key"];
+
     if (idempotencyKey !== payload.hash) {
       throw new HTTPException(400, {
         message: "Idempotency-Key must match the article hash",
       });
     }
+
     if (payload.hash !== md5(payload.link)) {
       throw new HTTPException(400, {
         message: "Article hash must be the MD5 identity of its link",

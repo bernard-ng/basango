@@ -12,10 +12,12 @@ import {
 } from "@basango/ui/components/select";
 import { ToggleGroup, ToggleGroupItem } from "@basango/ui/components/toggle-group";
 import { differenceInCalendarDays, format, subDays } from "date-fns";
-import { CalendarIcon, ChevronDown } from "lucide-react";
+import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { parseAsInteger, parseAsIsoDate, useQueryStates } from "nuqs";
 import { useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
+
+import { useHydrated } from "#dashboard/app/hooks/use-hydrated";
 
 const DEFAULT_PERIOD_OPTIONS = [
   { label: "Last 7 days", value: 7 },
@@ -124,6 +126,12 @@ export function ChartPeriodPicker({
     paramKey,
   });
   const [open, setOpen] = useState(false);
+  const isHydrated = useHydrated();
+
+  const calendarDisabled = useMemo(
+    () => (isHydrated ? { after: new Date() } : undefined),
+    [isHydrated],
+  );
 
   const selectValue = useMemo(() => {
     if (!calendarRange?.from || !calendarRange?.to) {
@@ -188,7 +196,7 @@ export function ChartPeriodPicker({
       >
         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
         <span className="flex-1 truncate">{displayLabel}</span>
-        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-0" sideOffset={8}>
         <div className="flex flex-col gap-0 sm:flex-row">
@@ -231,7 +239,7 @@ export function ChartPeriodPicker({
           </div>
           <div className="p-4">
             <Calendar
-              disabled={{ after: new Date() }}
+              disabled={calendarDisabled}
               mode="range"
               numberOfMonths={1}
               onSelect={handleCalendarSelect}

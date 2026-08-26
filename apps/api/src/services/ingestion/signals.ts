@@ -1,20 +1,86 @@
 import type { Database } from "@basango/db/client";
 import { applyIngestionSignal } from "@basango/db/queries";
-import type { IngestionSignal } from "@basango/domain/models";
+import type {
+  IngestionChange,
+  IngestionChangeTopic,
+  IngestionSignal,
+  IngestionSignalType,
+} from "@basango/domain/models";
 
-type ChangeListener = (signalId: string) => void;
+import { invalidateIngestionThroughput } from "./throughput";
+
+type ChangeListener = (change: IngestionChange) => void;
+
+const CHANGE_COALESCE_MS = 250;
+
+const topicsBySignalType = {
+  "agent.heartbeat": ["agents"],
+  "agent.reset": ["agents", "runs", "summary", "throughput"],
+  "run.completed": ["agents", "runs", "summary", "throughput"],
+  "run.failed": ["agents", "runs", "summary", "throughput"],
+  "run.preparing": ["agents", "runs", "summary"],
+  "run.progress": ["agents", "runs", "summary", "throughput"],
+  "run.started": ["agents", "runs", "summary"],
+} satisfies Record<IngestionSignalType, readonly IngestionChangeTopic[]>;
 
 const listeners = new Set<ChangeListener>();
+const pendingTopics = new Set<IngestionChangeTopic>();
+let pendingSignalId: string | undefined;
+let flushTimer: ReturnType<typeof setTimeout> | undefined;
 
 export async function acceptIngestionSignal(db: Database, signal: IngestionSignal) {
   const result = await applyIngestionSignal(db, signal);
+
   if (!result.duplicate) {
-    for (const listener of listeners) listener(signal.signalId);
+    if (getIngestionChangeTopics(signal.type).some((topic) => topic === "throughput")) {
+      invalidateIngestionThroughput();
+    }
+
+    queueIngestionChange(signal);
   }
+
   return result;
 }
 
 export function subscribeToIngestionChanges(listener: ChangeListener) {
   listeners.add(listener);
+
   return () => listeners.delete(listener);
+}
+
+export function getIngestionChangeTopics(type: IngestionSignalType) {
+  return topicsBySignalType[type];
+}
+
+function queueIngestionChange(signal: IngestionSignal) {
+  for (const topic of getIngestionChangeTopics(signal.type)) {
+    pendingTopics.add(topic);
+  }
+
+  if (!pendingSignalId || signal.signalId > pendingSignalId) {
+    pendingSignalId = signal.signalId;
+  }
+
+  if (!flushTimer) {
+    flushTimer = setTimeout(flushIngestionChanges, CHANGE_COALESCE_MS);
+  }
+}
+
+function flushIngestionChanges() {
+  flushTimer = undefined;
+
+  if (!pendingSignalId || pendingTopics.size === 0) {
+    return;
+  }
+
+  const change: IngestionChange = {
+    latestSignalId: pendingSignalId,
+    topics: [...pendingTopics],
+  };
+  pendingSignalId = undefined;
+  pendingTopics.clear();
+
+  for (const listener of listeners) {
+    listener(change);
+  }
 }

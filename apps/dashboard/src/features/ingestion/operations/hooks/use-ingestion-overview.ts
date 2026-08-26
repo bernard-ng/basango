@@ -1,64 +1,198 @@
 "use client";
 
+import {
+  type IngestionChange,
+  type IngestionChangeTopic,
+  ingestionChangeSchema,
+} from "@basango/domain/models";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 import { getPublicApiUrl } from "#dashboard/app/environment";
 import { useTRPC } from "#dashboard/app/trpc/client";
 
+const REFRESH_COALESCE_MS = 750;
+const AGENT_ONLINE_WINDOW_MS = 45_000;
+const ALL_CHANGE_TOPICS: readonly IngestionChangeTopic[] = [
+  "agents",
+  "runs",
+  "summary",
+  "throughput",
+];
+const realtimeQueryOptions = {
+  refetchOnReconnect: false,
+  refetchOnWindowFocus: false,
+  retry: false,
+  trpc: { context: { realtime: true } },
+} as const;
+
+type ConnectionStatus = "connecting" | "disconnected" | "live";
+
 export function useIngestionOverview() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const [streamConnected, setStreamConnected] = useState(false);
-  const query = useQuery({
-    ...trpc.operations.getIngestionOverview.queryOptions(),
-    refetchInterval: 15_000,
-  });
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
+  const [livenessNow, setLivenessNow] = useState(() => Date.now());
+  const agents = useQuery(
+    trpc.operations.getIngestionAgents.queryOptions(undefined, realtimeQueryOptions),
+  );
+  const summary = useQuery(
+    trpc.operations.getIngestionSummary.queryOptions(undefined, realtimeQueryOptions),
+  );
+  const throughput = useQuery(
+    trpc.operations.getIngestionThroughput.queryOptions(undefined, realtimeQueryOptions),
+  );
 
   useEffect(() => {
-    const controller = new AbortController();
+    const dirtyTopics = new Set<IngestionChangeTopic>();
+    let connected = false;
+    let active = true;
+    let refreshInFlight = false;
+    let needsReconciliation = false;
+    let refreshTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const connect = async () => {
-      while (!controller.signal.aborted) {
-        try {
-          const response = await fetch(`${getPublicApiUrl()}/operations/ingestion/stream`, {
-            credentials: "include",
-            signal: controller.signal,
-          });
-          if (!response.ok || !response.body) throw new Error("Ingestion stream unavailable");
+    function scheduleRefresh(topics: readonly IngestionChangeTopic[]) {
+      if (!connected || !active) {
+        return;
+      }
 
-          setStreamConnected(true);
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          let buffer = "";
-          while (!controller.signal.aborted) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
-            const messages = buffer.split("\n\n");
-            buffer = messages.pop() ?? "";
-            if (messages.some((message) => message.includes("event: ingestion-update"))) {
-              void query.refetch();
-              void queryClient.invalidateQueries(trpc.operations.listIngestionRuns.queryFilter());
-            }
-          }
-          setStreamConnected(false);
-        } catch {
-          if (controller.signal.aborted) break;
-          setStreamConnected(false);
-        }
+      for (const topic of topics) {
+        dirtyTopics.add(topic);
+      }
 
-        await new Promise((resolve) => setTimeout(resolve, 3_000));
+      refreshTimer ??= setTimeout(flushRefresh, REFRESH_COALESCE_MS);
+    }
+
+    async function flushRefresh() {
+      refreshTimer = undefined;
+
+      if (!connected || !active || refreshInFlight || dirtyTopics.size === 0) {
+        return;
+      }
+
+      const topics = [...dirtyTopics];
+      dirtyTopics.clear();
+      refreshInFlight = true;
+
+      await Promise.allSettled(topics.map(refreshTopic));
+      refreshInFlight = false;
+
+      if (connected && dirtyTopics.size > 0) {
+        scheduleRefresh([]);
+      }
+    }
+
+    function refreshTopic(topic: IngestionChangeTopic) {
+      const options = { cancelRefetch: false };
+
+      if (topic === "agents") {
+        return queryClient.refetchQueries(
+          trpc.operations.getIngestionAgents.queryFilter(),
+          options,
+        );
+      }
+
+      if (topic === "runs") {
+        return queryClient.refetchQueries(trpc.operations.listIngestionRuns.queryFilter(), options);
+      }
+
+      if (topic === "summary") {
+        return queryClient.refetchQueries(
+          trpc.operations.getIngestionSummary.queryFilter(),
+          options,
+        );
+      }
+
+      return queryClient.refetchQueries(
+        trpc.operations.getIngestionThroughput.queryFilter(),
+        options,
+      );
+    }
+
+    const eventSource = new EventSource(`${getPublicApiUrl()}/operations/ingestion/stream`, {
+      withCredentials: true,
+    });
+
+    eventSource.onopen = () => {
+      connected = true;
+      setLivenessNow(Date.now());
+      setConnectionStatus("live");
+
+      if (needsReconciliation) {
+        needsReconciliation = false;
+        scheduleRefresh(ALL_CHANGE_TOPICS);
       }
     };
+    eventSource.onerror = () => {
+      connected = false;
+      needsReconciliation = true;
+      dirtyTopics.clear();
 
-    void connect();
-    return () => controller.abort();
-  }, [query.refetch, queryClient, trpc.operations.listIngestionRuns]);
+      if (refreshTimer) {
+        clearTimeout(refreshTimer);
+        refreshTimer = undefined;
+      }
+
+      setConnectionStatus("disconnected");
+    };
+
+    function handleIngestionUpdate(event: MessageEvent<string>) {
+      const change = parseIngestionChange(event.data);
+
+      if (change) {
+        scheduleRefresh(change.topics);
+      }
+    }
+
+    function handleHeartbeat() {
+      setLivenessNow(Date.now());
+    }
+
+    eventSource.addEventListener("heartbeat", handleHeartbeat);
+    eventSource.addEventListener("ingestion-update", handleIngestionUpdate);
+
+    return () => {
+      active = false;
+      connected = false;
+
+      if (refreshTimer) {
+        clearTimeout(refreshTimer);
+      }
+
+      eventSource.removeEventListener("heartbeat", handleHeartbeat);
+      eventSource.removeEventListener("ingestion-update", handleIngestionUpdate);
+      eventSource.close();
+    };
+  }, [queryClient, trpc]);
+
+  const data =
+    agents.data && summary.data && throughput.data
+      ? {
+          agents: agents.data.agents.map((agent) => {
+            const online = livenessNow - agent.lastSeenAt.getTime() <= AGENT_ONLINE_WINDOW_MS;
+
+            return {
+              ...agent,
+              online,
+              state: online ? agent.state : ("offline" as const),
+            };
+          }),
+          summary: summary.data,
+          throughput: throughput.data,
+        }
+      : undefined;
 
   return {
-    data: query.data,
-    isPending: query.isPending,
-    streamConnected,
+    connectionStatus,
+    data,
+    isPending: agents.isPending || summary.isPending || throughput.isPending,
   };
+}
+
+function parseIngestionChange(data: string): IngestionChange | undefined {
+  try {
+    return ingestionChangeSchema.parse(JSON.parse(data));
+  } catch {
+    return undefined;
+  }
 }

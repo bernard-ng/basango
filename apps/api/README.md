@@ -14,7 +14,7 @@ The domain package owns request validation. The ingestion service applies signal
 
 ## Operations reads
 
-Authenticated administrators receive the durable snapshot through `operations.getIngestionOverview` over tRPC. `GET /operations/ingestion/stream` sends lightweight realtime invalidations and uses the same Better Auth session cookie as tRPC. The stream never serves as the source of truth.
+Authenticated administrators receive focused durable reads through `operations.getIngestionAgents`, `operations.getIngestionSummary`, `operations.getIngestionThroughput`, and `operations.listIngestionRuns` over tRPC. `GET /operations/ingestion/stream` sends coalesced, topic-based realtime invalidations and uses the same Better Auth session cookie as tRPC. The stream never serves as the source of truth or transmits dashboard data.
 
 ## Authentication
 

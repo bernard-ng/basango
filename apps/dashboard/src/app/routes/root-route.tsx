@@ -1,6 +1,6 @@
 import { SidebarInset, SidebarProvider } from "@basango/ui/components/sidebar";
 import { Toaster } from "@basango/ui/components/sonner";
-import { HeadContent, Outlet, Scripts, useRouterState } from "@tanstack/react-router";
+import { HeadContent, Link, Outlet, Scripts, useRouterState } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import type { ReactNode } from "react";
@@ -66,9 +66,9 @@ export function RootNotFound() {
     <div className="flex h-screen flex-col items-center justify-center text-center text-sm text-muted-foreground">
       <h2 className="mb-2 font-semibold text-xl text-foreground">Not Found</h2>
       <p className="mb-4">Could not find requested resource</p>
-      <a className="underline" href="/dashboard">
+      <Link className="underline" to="/dashboard">
         Return home
-      </a>
+      </Link>
     </div>
   );
 }

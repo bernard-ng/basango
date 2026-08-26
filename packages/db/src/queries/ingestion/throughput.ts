@@ -1,48 +1,20 @@
-import { desc, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import type { Database } from "#db/client";
-import { ingestionAgents, ingestionRuns } from "#db/schema";
 
-const AGENT_ONLINE_WINDOW_MS = 45_000;
 const THROUGHPUT_BUCKETS = 10;
 const THROUGHPUT_WINDOW_MS = 30 * 60 * 1000;
 
-interface ThroughputBucket {
+type ThroughputBucket = {
   [key: string]: unknown;
   articlesDelivered: number;
   articlesDiscovered: number;
   articlesPersisted: number;
   bucket: number;
-}
+};
 
-export async function getIngestionOverview(db: Database) {
-  const generatedAt = new Date();
-  const [agents, runs, throughput] = await Promise.all([
-    db.query.ingestionAgents.findMany({ orderBy: [desc(ingestionAgents.lastSeenAt)] }),
-    db.query.ingestionRuns.findMany({
-      limit: 24,
-      orderBy: [desc(ingestionRuns.lastSignalAt)],
-    }),
-    getIngestionThroughput(db, generatedAt),
-  ]);
-  const now = generatedAt.getTime();
-
-  return {
-    agents: agents.map((agent) => {
-      const online = now - agent.lastSeenAt.getTime() <= AGENT_ONLINE_WINDOW_MS;
-      return {
-        ...agent,
-        online,
-        state: online ? agent.state : "offline",
-      };
-    }),
-    generatedAt,
-    runs,
-    throughput,
-  };
-}
-
-async function getIngestionThroughput(db: Database, end: Date) {
+export async function getIngestionThroughput(db: Database) {
+  const end = new Date();
   const start = new Date(end.getTime() - THROUGHPUT_WINDOW_MS);
   const bucketSizeMs = THROUGHPUT_WINDOW_MS / THROUGHPUT_BUCKETS;
   const result = await db.execute<ThroughputBucket>(sql`

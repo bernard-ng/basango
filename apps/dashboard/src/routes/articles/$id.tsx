@@ -5,14 +5,14 @@ import { ArticleDetailsPage } from "#dashboard/features/content/articles/pages/a
 
 export const Route = createFileRoute("/articles/$id")({
   beforeLoad: ({ location }) => requireAdminSession(location.href),
-  component: ArticleDetailsRoute,
-  head: () => ({
-    meta: [{ title: "Article Details | Basango Dashboard" }],
-  }),
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(
       context.trpc.articles.getById.queryOptions({ id: params.id }),
     ),
+  head: () => ({
+    meta: [{ title: "Article Details | Basango Dashboard" }],
+  }),
+  component: ArticleDetailsRoute,
 });
 
 function ArticleDetailsRoute() {

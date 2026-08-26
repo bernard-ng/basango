@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 
-import { ingestionRunsQuerySchema, ingestionSignalSchema } from "./ingestion";
+import {
+  ingestionChangeSchema,
+  ingestionRunsQuerySchema,
+  ingestionSignalSchema,
+} from "./ingestion";
 
 const envelope = {
   agentId: "crawler-lubumbashi-01",
@@ -101,6 +105,29 @@ describe("ingestion runs query", () => {
       ingestionRunsQuerySchema.safeParse({
         filters: { states: ["offline"] },
         page: { current: 1, limit: 100 },
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("ingestion realtime changes", () => {
+  test("parses a selective change notification", () => {
+    const change = ingestionChangeSchema.parse({
+      latestSignalId: envelope.signalId,
+      topics: ["agents", "runs"],
+    });
+
+    expect(change.topics).toEqual(["agents", "runs"]);
+  });
+
+  test("rejects unknown or empty change topics", () => {
+    expect(
+      ingestionChangeSchema.safeParse({ latestSignalId: envelope.signalId, topics: [] }).success,
+    ).toBe(false);
+    expect(
+      ingestionChangeSchema.safeParse({
+        latestSignalId: envelope.signalId,
+        topics: ["articles"],
       }).success,
     ).toBe(false);
   });

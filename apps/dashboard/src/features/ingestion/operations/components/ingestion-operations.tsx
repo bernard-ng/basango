@@ -3,7 +3,7 @@
 import { Activity, ArrowDownToLine, CircleCheck, Radio } from "lucide-react";
 
 import { createDashboardModel } from "../ingestion-metrics";
-import type { IngestionOverview } from "../types";
+import type { IngestionDashboardData } from "../types";
 import { PipelineStagesPanel, RunDurationPanel, ThroughputPanel } from "./chart-panels";
 import { IngestionOperationsSkeleton, MetricCard } from "./dashboard-primitives";
 import { RecentRunsPanel } from "./recent-runs-panel";
@@ -13,7 +13,7 @@ export function IngestionOperations({
   data,
   isPending,
 }: {
-  data: IngestionOverview | undefined;
+  data: IngestionDashboardData | undefined;
   isPending: boolean;
 }) {
   if (isPending || !data) {

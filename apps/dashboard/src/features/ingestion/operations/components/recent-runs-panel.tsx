@@ -46,20 +46,15 @@ export function RecentRunsPanel() {
     pagination: { pageIndex: 0, pageSize: 10 },
     sorting: [{ desc: true, id: "lastSignalAt" }],
   });
-  const queryInput = useMemo(
-    () => buildRunsQuery(store),
-    [
-      store.columnFilters,
-      store.globalFilter,
-      store.pagination.pageIndex,
-      store.pagination.pageSize,
-      store.sorting,
-    ],
-  );
+  const queryInput = buildRunsQuery(store);
   const listRuns = useQuery({
-    ...trpc.operations.listIngestionRuns.queryOptions(queryInput),
+    ...trpc.operations.listIngestionRuns.queryOptions(queryInput, {
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+      retry: false,
+      trpc: { context: { realtime: true } },
+    }),
     placeholderData: keepPreviousData,
-    refetchInterval: 15_000,
   });
   const columns = useMemo<ColumnDef<IngestionRun>[]>(() => createRunColumns(), []);
 

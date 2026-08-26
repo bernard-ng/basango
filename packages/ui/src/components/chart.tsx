@@ -2,14 +2,31 @@
 
 import { cn } from "@basango/ui/lib/utils";
 import * as React from "react";
-import type { TooltipValueType } from "recharts";
-import * as RechartsPrimitive from "recharts";
+import type {
+  DefaultLegendContentProps,
+  DefaultTooltipContentProps,
+  ResponsiveContainerProps,
+  TooltipProps,
+  TooltipValueType,
+} from "recharts";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { dark: ".dark", light: "" } as const;
 
 const INITIAL_DIMENSION = { height: 200, width: 320 } as const;
 type TooltipNameType = number | string;
+
+const RechartsResponsiveContainer = React.lazy(() =>
+  import("recharts").then((module) => ({ default: module.ResponsiveContainer })),
+);
+
+const ChartTooltip = React.lazy(() =>
+  import("recharts").then((module) => ({ default: module.Tooltip })),
+);
+
+const ChartLegend = React.lazy(() =>
+  import("recharts").then((module) => ({ default: module.Legend })),
+);
 
 export type ChartConfig = Record<
   string,
@@ -47,7 +64,7 @@ function ChartContainer({
   ...props
 }: React.ComponentProps<"div"> & {
   config: ChartConfig;
-  children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"];
+  children: ResponsiveContainerProps["children"];
   initialDimension?: {
     width: number;
     height: number;
@@ -68,9 +85,13 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle config={config} id={chartId} />
-        <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        <React.Suspense
+          fallback={<div aria-hidden className="h-full w-full animate-pulse rounded-md bg-muted" />}
+        >
+          <RechartsResponsiveContainer initialDimension={initialDimension}>
+            {children}
+          </RechartsResponsiveContainer>
+        </React.Suspense>
       </div>
     </ChartContext.Provider>
   );
@@ -105,8 +126,6 @@ ${colorConfig
   );
 };
 
-const ChartTooltip = RechartsPrimitive.Tooltip;
-
 function ChartTooltipContent({
   active,
   payload,
@@ -121,17 +140,14 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+}: TooltipProps<TooltipValueType, TooltipNameType> &
   React.ComponentProps<"div"> & {
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
     nameKey?: string;
     labelKey?: string;
-  } & Omit<
-    RechartsPrimitive.DefaultTooltipContentProps<TooltipValueType, TooltipNameType>,
-    "accessibilityLayer"
-  >) {
+  } & Omit<DefaultTooltipContentProps<TooltipValueType, TooltipNameType>, "accessibilityLayer">) {
   const { config } = useChart();
 
   const tooltipLabel = React.useMemo(() => {
@@ -246,8 +262,6 @@ function ChartTooltipContent({
   );
 }
 
-const ChartLegend = RechartsPrimitive.Legend;
-
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -257,7 +271,7 @@ function ChartLegendContent({
 }: React.ComponentProps<"div"> & {
   hideIcon?: boolean;
   nameKey?: string;
-} & RechartsPrimitive.DefaultLegendContentProps) {
+} & DefaultLegendContentProps) {
   const { config } = useChart();
 
   if (!payload?.length) {

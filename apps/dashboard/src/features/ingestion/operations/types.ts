@@ -1,10 +1,17 @@
 import type { RouterOutputs } from "@basango/api/trpc/routers/_app";
 
-export type IngestionOverview = RouterOutputs["operations"]["getIngestionOverview"];
-export type IngestionAgent = IngestionOverview["agents"][number];
-export type IngestionThroughput = IngestionOverview["throughput"][number];
+export type IngestionAgents = RouterOutputs["operations"]["getIngestionAgents"];
+export type IngestionSummary = RouterOutputs["operations"]["getIngestionSummary"];
+export type IngestionThroughput = RouterOutputs["operations"]["getIngestionThroughput"];
 export type IngestionRunsPage = RouterOutputs["operations"]["listIngestionRuns"];
+export type IngestionAgent = IngestionAgents["agents"][number];
 export type IngestionRun = IngestionRunsPage["items"][number];
+
+export type IngestionDashboardData = {
+  agents: IngestionAgents["agents"];
+  summary: IngestionSummary;
+  throughput: IngestionThroughput;
+};
 
 export type IngestionMetrics = {
   delivered: number;

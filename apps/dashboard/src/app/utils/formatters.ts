@@ -1,38 +1,4 @@
-import type { TZDate } from "@date-fns/tz";
 import { format, isSameYear } from "date-fns";
-
-export function formatSize(bytes: number): string {
-  const units = ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte"];
-
-  const unitIndex = Math.max(
-    0,
-    Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1),
-  );
-
-  return Intl.NumberFormat("en-US", {
-    style: "unit",
-    unit: units[unitIndex],
-  }).format(+Math.round(bytes / 1024 ** unitIndex));
-}
-
-export function formatHoursMinutes(seconds: number) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  if (hours && minutes) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  if (hours) {
-    return `${hours}h`;
-  }
-
-  if (minutes) {
-    return `${minutes}m`;
-  }
-
-  return "0m";
-}
 
 export function formatDate(date: string, dateFormat?: string | null, checkYear = true) {
   if (checkYear && isSameYear(new Date(), new Date(date))) {
@@ -58,29 +24,6 @@ export function getInitials(value: string) {
   }
 
   return formatted.charAt(0);
-}
-
-export function formatDateRange(dates: TZDate[]): string {
-  if (!dates.length) return "";
-
-  const formatFullDate = (date: TZDate) => format(date, "MMM d");
-  const formatDay = (date: TZDate) => format(date, "d");
-
-  const startDate = dates[0];
-  const endDate = dates[1];
-
-  if (!startDate) return "";
-
-  if (dates.length === 1 || !endDate || startDate.getTime() === endDate.getTime()) {
-    return formatFullDate(startDate);
-  }
-
-  if (startDate.getMonth() === endDate.getMonth()) {
-    // Same month
-    return `${format(startDate, "MMM")} ${formatDay(startDate)} - ${formatDay(endDate)}`;
-  }
-  // Different months
-  return `${formatFullDate(startDate)} - ${formatFullDate(endDate)}`;
 }
 
 export function formatRelativeTime(date: Date): string {

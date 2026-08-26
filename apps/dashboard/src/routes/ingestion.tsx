@@ -5,13 +5,15 @@ import { IngestionOperationsPage } from "#dashboard/features/ingestion/operation
 
 export const Route = createFileRoute("/ingestion")({
   beforeLoad: ({ location }) => requireAdminSession(location.href),
-  component: IngestionOperationsPage,
-  head: () => ({
-    meta: [{ title: "Ingestion | Basango" }],
-  }),
   loader: ({ context }) => {
     void context.queryClient.prefetchQuery(
-      context.trpc.operations.getIngestionOverview.queryOptions(),
+      context.trpc.operations.getIngestionAgents.queryOptions(),
+    );
+    void context.queryClient.prefetchQuery(
+      context.trpc.operations.getIngestionSummary.queryOptions(),
+    );
+    void context.queryClient.prefetchQuery(
+      context.trpc.operations.getIngestionThroughput.queryOptions(),
     );
     void context.queryClient.prefetchQuery(
       context.trpc.operations.listIngestionRuns.queryOptions({
@@ -20,4 +22,8 @@ export const Route = createFileRoute("/ingestion")({
       }),
     );
   },
+  head: () => ({
+    meta: [{ title: "Ingestion | Basango" }],
+  }),
+  component: IngestionOperationsPage,
 });

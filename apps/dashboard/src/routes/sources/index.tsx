@@ -4,13 +4,13 @@ import { requireAdminSession } from "#dashboard/app/auth/route-guards";
 import { SourcesPage } from "#dashboard/features/content/sources/pages/sources-page";
 
 export const Route = createFileRoute("/sources/")({
+  validateSearch: (search): { createSource?: boolean } =>
+    search.createSource === true || search.createSource === "true" ? { createSource: true } : {},
   beforeLoad: ({ location }) => requireAdminSession(location.href),
-  component: SourcesPage,
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(context.trpc.sources.list.queryOptions()),
   head: () => ({
     meta: [{ title: "Sources | Basango Dashboard" }],
   }),
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(context.trpc.sources.list.queryOptions()),
-  validateSearch: (search): { createSource?: boolean } =>
-    search.createSource === true || search.createSource === "true" ? { createSource: true } : {},
+  component: SourcesPage,
 });

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CrawlHistoryRouteImport } from './routes/crawl-history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IngestionRouteImport } from './routes/ingestion'
@@ -23,6 +24,11 @@ import { Route as SourcesIdRouteImport } from './routes/sources/$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrawlHistoryRoute = CrawlHistoryRouteImport.update({
+  id: '/crawl-history',
+  path: '/crawl-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -73,6 +79,7 @@ const SourcesIdRoute = SourcesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/crawl-history': typeof CrawlHistoryRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/crawl-history': typeof CrawlHistoryRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/crawl-history': typeof CrawlHistoryRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/crawl-history'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/crawl-history'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/crawl-history'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CrawlHistoryRoute: typeof CrawlHistoryRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IngestionRoute: typeof IngestionRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crawl-history': {
+      id: '/crawl-history'
+      path: '/crawl-history'
+      fullPath: '/crawl-history'
+      preLoaderRoute: typeof CrawlHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -237,6 +257,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CrawlHistoryRoute: CrawlHistoryRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IngestionRoute: IngestionRoute,

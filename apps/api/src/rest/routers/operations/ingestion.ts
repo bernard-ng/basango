@@ -1,3 +1,4 @@
+import type { IngestionChange, IngestionChangeTopic } from "@basango/domain/models";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { streamSSE } from "hono/streaming";
 
@@ -9,14 +10,19 @@ const app = new OpenAPIHono<Context>();
 
 app.get("/stream", withAdminSession, (c) =>
   streamSSE(c, async (stream) => {
-    const pending: string[] = [];
+    const pendingTopics = new Set<IngestionChangeTopic>();
+    let latestSignalId: string | undefined;
     let closed = false;
     let wake: () => void = () => undefined;
     let signal = new Promise<void>((resolve) => {
       wake = resolve;
     });
-    const unsubscribe = subscribeToIngestionChanges((signalId) => {
-      pending.push(signalId);
+    const unsubscribe = subscribeToIngestionChanges((change) => {
+      for (const topic of change.topics) {
+        pendingTopics.add(topic);
+      }
+
+      latestSignalId = change.latestSignalId;
       wake();
     });
 
@@ -27,7 +33,7 @@ app.get("/stream", withAdminSession, (c) =>
     });
 
     try {
-      await stream.writeSSE({ data: "connected", event: "ready" });
+      await stream.writeSSE({ data: "connected", event: "ready", retry: 3_000 });
 
       while (!closed) {
         await Promise.race([signal, stream.sleep(15_000)]);
@@ -35,18 +41,23 @@ app.get("/stream", withAdminSession, (c) =>
           wake = resolve;
         });
 
-        if (pending.length === 0) {
+        if (!latestSignalId || pendingTopics.size === 0) {
           await stream.writeSSE({ data: new Date().toISOString(), event: "heartbeat" });
           continue;
         }
 
-        for (const signalId of pending.splice(0)) {
-          await stream.writeSSE({
-            data: signalId,
-            event: "ingestion-update",
-            id: signalId,
-          });
-        }
+        const change: IngestionChange = {
+          latestSignalId,
+          topics: [...pendingTopics],
+        };
+        latestSignalId = undefined;
+        pendingTopics.clear();
+
+        await stream.writeSSE({
+          data: JSON.stringify(change),
+          event: "ingestion-update",
+          id: change.latestSignalId,
+        });
       }
     } finally {
       unsubscribe();

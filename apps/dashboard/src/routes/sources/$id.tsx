@@ -5,10 +5,6 @@ import { SourceDetailsPage } from "#dashboard/features/content/sources/pages/sou
 
 export const Route = createFileRoute("/sources/$id")({
   beforeLoad: ({ location }) => requireAdminSession(location.href),
-  component: SourceDetailsRoute,
-  head: () => ({
-    meta: [{ title: "Source Details | Basango Dashboard" }],
-  }),
   loader: async ({ context, params }) => {
     const sourceQuery = context.trpc.sources.getById.queryOptions({ id: params.id });
 
@@ -28,6 +24,10 @@ export const Route = createFileRoute("/sources/$id")({
 
     return context.queryClient.ensureQueryData(sourceQuery);
   },
+  head: () => ({
+    meta: [{ title: "Source Details | Basango Dashboard" }],
+  }),
+  component: SourceDetailsRoute,
 });
 
 function SourceDetailsRoute() {

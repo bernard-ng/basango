@@ -5,10 +5,6 @@ import { DashboardOverviewPage } from "#dashboard/features/dashboard/overview/pa
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: ({ location }) => requireAdminSession(location.href),
-  component: DashboardOverviewPage,
-  head: () => ({
-    meta: [{ title: "Dashboard | Basango" }],
-  }),
   loader: ({ context }) => {
     void context.queryClient.prefetchQuery(
       context.trpc.reports.getDashboardOverview.queryOptions(),
@@ -18,4 +14,8 @@ export const Route = createFileRoute("/dashboard")({
       context.trpc.articles.getSourceDistribution.queryOptions({ limit: 8 }),
     );
   },
+  head: () => ({
+    meta: [{ title: "Dashboard | Basango" }],
+  }),
+  component: DashboardOverviewPage,
 });

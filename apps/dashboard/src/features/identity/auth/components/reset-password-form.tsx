@@ -6,7 +6,7 @@ import { buttonVariants } from "@basango/ui/components/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@basango/ui/components/field";
 import { Input } from "@basango/ui/components/input";
 import { SubmitButton } from "@basango/ui/components/submit-button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2Icon, CircleAlertIcon } from "lucide-react";
 import { Controller } from "react-hook-form";
@@ -33,6 +33,7 @@ type ResetPasswordFormProps = {
 };
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+  const queryClient = useQueryClient();
   const form = useZodForm(resetPasswordFormSchema, {
     defaultValues: { confirmPassword: "", password: "" },
   });
@@ -47,6 +48,9 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     },
     onError(error) {
       toast.error(error.message ?? "Unable to reset your password. Try again.");
+    },
+    onSuccess() {
+      return queryClient.invalidateQueries();
     },
   });
 

@@ -5,10 +5,6 @@ import { ArticlesPage } from "#dashboard/features/content/articles/pages/article
 
 export const Route = createFileRoute("/articles/")({
   beforeLoad: ({ location }) => requireAdminSession(location.href),
-  component: ArticlesPage,
-  head: () => ({
-    meta: [{ title: "Articles | Basango Dashboard" }],
-  }),
   loader: ({ context }) => {
     void context.queryClient.prefetchInfiniteQuery(
       context.trpc.articles.list.infiniteQueryOptions(
@@ -18,4 +14,8 @@ export const Route = createFileRoute("/articles/")({
     );
     void context.queryClient.prefetchQuery(context.trpc.categories.list.queryOptions());
   },
+  head: () => ({
+    meta: [{ title: "Articles | Basango Dashboard" }],
+  }),
+  component: ArticlesPage,
 });

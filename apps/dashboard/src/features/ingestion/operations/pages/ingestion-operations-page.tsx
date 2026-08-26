@@ -13,7 +13,7 @@ export function IngestionOperationsPage() {
       title={
         <span className="flex items-center gap-2">
           Ingestion monitor
-          <LiveBadge connected={ingestion.streamConnected} />
+          <LiveBadge status={ingestion.connectionStatus} />
         </span>
       }
     >

@@ -5,7 +5,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@basango/ui/component
 import { Input } from "@basango/ui/components/input";
 import { SubmitButton } from "@basango/ui/components/submit-button";
 import { cn } from "@basango/ui/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ type LoginFormProps = React.ComponentProps<"form"> & {
 export function LoginForm({ className, returnTo, ...props }: LoginFormProps) {
   const router = useRouter();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useZodForm(loginSchema, {
     defaultValues: {
@@ -51,6 +52,8 @@ export function LoginForm({ className, returnTo, ...props }: LoginFormProps) {
     async onSuccess() {
       toast.success("Successfully logged in.");
       form.reset();
+      await queryClient.invalidateQueries();
+
       const destination =
         returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/dashboard";
       await navigate({ to: destination });

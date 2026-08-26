@@ -73,7 +73,14 @@ export function MetricCard({
   );
 }
 
-export function LiveBadge({ connected }: { connected: boolean }) {
+type LiveBadgeProps = {
+  status: "connecting" | "disconnected" | "live";
+};
+
+export function LiveBadge({ status }: LiveBadgeProps) {
+  const connected = status === "live";
+  const label = status === "connecting" ? "Connecting" : connected ? "Live" : "Disconnected";
+
   return (
     <Badge
       className={
@@ -81,10 +88,15 @@ export function LiveBadge({ connected }: { connected: boolean }) {
           ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
           : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300"
       }
+      title={
+        connected
+          ? "Realtime updates are connected"
+          : "Realtime updates are unavailable; data will not refresh automatically"
+      }
       variant="outline"
     >
       {connected ? <Wifi className="size-3" /> : <WifiOff className="size-3" />}
-      {connected ? "Live" : "Polling"}
+      {label}
     </Badge>
   );
 }

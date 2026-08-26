@@ -2,6 +2,8 @@ import z from "zod";
 
 export const INGESTION_RUN_STATES = ["preparing", "running", "completed", "failed"] as const;
 
+export const INGESTION_CHANGE_TOPICS = ["agents", "runs", "summary", "throughput"] as const;
+
 export const INGESTION_RUN_SORT_FIELDS = [
   "agentId",
   "articlesDelivered",
@@ -95,6 +97,13 @@ export const ingestionSignalAcceptedSchema = z.object({
   duplicate: z.boolean(),
 });
 
+export const ingestionChangeSchema = z.object({
+  latestSignalId: z.uuid(),
+  topics: z.array(z.enum(INGESTION_CHANGE_TOPICS)).min(1),
+});
+
+export type IngestionChange = z.infer<typeof ingestionChangeSchema>;
+export type IngestionChangeTopic = (typeof INGESTION_CHANGE_TOPICS)[number];
 export type IngestionRunMetrics = z.infer<typeof ingestionRunMetricsSchema>;
 export type IngestionRunsQuery = z.infer<typeof ingestionRunsQuerySchema>;
 export type IngestionRunState = z.infer<typeof ingestionRunStateSchema>;

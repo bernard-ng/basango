@@ -78,7 +78,14 @@ export function ArticleCard({ article }: ArticleCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                  render={<a href={article.link} rel="noreferrer" target="_blank" />}
+                  render={
+                    <a
+                      aria-label={`Open original article: ${article.title}`}
+                      href={article.link}
+                      rel="noreferrer"
+                      target="_blank"
+                    />
+                  }
                 >
                   <ExternalLinkIcon className="mr-2 h-4 w-4" />
                   Open original
