@@ -5,6 +5,8 @@ import { idSchema, sentimentSchema } from "./shared";
 import { sourceSchema } from "./sources";
 
 // schemas
+export const articleHashSchema = z.string().regex(/^[a-f0-9]{32}$/, "Invalid article hash");
+
 export const articleMetadataSchema = z.object({
   author: z.string().optional(),
   description: z.string().optional(),
@@ -31,7 +33,7 @@ export const articleSchema = z.object({
   clustered: z.boolean().default(false),
   createdAt: z.coerce.date(),
   excerpt: z.string().optional(),
-  hash: z.string().min(1),
+  hash: articleHashSchema,
   id: idSchema,
   image: z.url().optional(),
   link: z.url(),
@@ -49,7 +51,7 @@ export const articleSchema = z.object({
 export const createArticleSchema = z.object({
   body: z.string().min(1),
   categories: z.array(z.string()).optional().default([]),
-  hash: z.string().min(1),
+  hash: articleHashSchema,
   link: z.url(),
   metadata: articleMetadataSchema.optional(),
   publishedAt: z.coerce.date(),
@@ -57,7 +59,11 @@ export const createArticleSchema = z.object({
   title: z.string().min(1),
 });
 
-export const createArticleResponseSchema = z.object({ id: idSchema, sourceId: idSchema });
+export const createArticleResponseSchema = z.object({
+  created: z.boolean(),
+  id: idSchema,
+  sourceId: idSchema,
+});
 
 export const getArticleSchema = z.object({
   id: idSchema,

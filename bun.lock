@@ -24,6 +24,7 @@
       "dependencies": {
         "@basango/db": "workspace:*",
         "@basango/domain": "workspace:*",
+        "@basango/encryption": "workspace:*",
         "@basango/logger": "workspace:*",
         "@better-auth/drizzle-adapter": "^1.7.1",
         "@hono/node-server": "^1.19.6",

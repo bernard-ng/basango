@@ -23,6 +23,8 @@ The crawler owns source adapters, Redis queues, workers, retries, its durable SQ
 
 Signals use stable `agent.*` and `run.*` names, UUID signal IDs, and absolute run metrics. This makes retries idempotent and keeps transport messages independent from the dashboard's read shape.
 
+Article ingestion uses an `Idempotency-Key` header equal to the MD5 identity of the article link. The API verifies that identity, then PostgreSQL's unique article-hash constraint and an atomic insert-on-conflict operation make retries return the canonical article instead of creating duplicates. The response states whether that request created the record.
+
 ## Packages
 
 - `@basango/domain`: shared API schemas and models, including the ingestion signal protocol.

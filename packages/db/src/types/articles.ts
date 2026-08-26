@@ -6,6 +6,7 @@ export type CreateArticleParams = {
   title: string;
   body: string;
   categories?: string[];
+  hash: string;
   link: string;
   sourceId: string;
   publishedAt: Date;

@@ -35,18 +35,11 @@ import {
 } from "#db/utils";
 
 export async function createArticle(db: Database, params: CreateArticleParams) {
-  const duplicated = await getArticleByHash(db, md5(params.link));
-  if (duplicated !== undefined) {
-    return {
-      id: duplicated.id,
-      sourceId: duplicated.sourceId,
-    };
-  }
-
+  const hash = md5(params.link);
   const data = {
     ...params,
     categories: params.categories ?? [],
-    hash: md5(params.link),
+    hash,
     id: uuid.v7(),
     readingTime: computeReadingTime(params.body),
     sentiment: (params.sentiment ?? "neutral") as Sentiment,
@@ -64,16 +57,26 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
   const [result] = await db
     .insert(articles)
     .values({ ...data })
+    .onConflictDoNothing({ target: articles.hash })
     .returning({
       id: articles.id,
       sourceId: articles.sourceId,
     });
 
-  if (result === undefined) {
-    throw new Error("Failed to create article");
+  if (result !== undefined) {
+    return { ...result, created: true };
   }
 
-  return result;
+  const duplicated = await getArticleByHash(db, hash);
+  if (duplicated === undefined) {
+    throw new Error("Failed to resolve article after an idempotent insert conflict");
+  }
+
+  return {
+    created: false,
+    id: duplicated.id,
+    sourceId: duplicated.sourceId,
+  };
 }
 
 export async function getArticleByHash(db: Database, hash: string) {

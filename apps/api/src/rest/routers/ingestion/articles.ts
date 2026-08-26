@@ -1,6 +1,13 @@
 import { createArticle } from "@basango/db/queries";
-import { createArticleResponseSchema, createArticleSchema } from "@basango/domain/models";
+import {
+  articleHashSchema,
+  createArticleResponseSchema,
+  createArticleSchema,
+} from "@basango/domain/models";
+import { md5 } from "@basango/encryption";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 
 import type { Context } from "#api/rest/init";
 import { withDatabase } from "#api/rest/middlewares/db";
@@ -24,6 +31,9 @@ app.openapi(
           },
         },
       },
+      headers: z.object({
+        "idempotency-key": articleHashSchema,
+      }),
     },
     responses: {
       201: {
@@ -39,7 +49,20 @@ app.openapi(
     tags: ["Ingestion"],
   }),
   async (c) => {
-    const result = await createArticle(c.get("db"), c.req.valid("json"));
+    const payload = c.req.valid("json");
+    const idempotencyKey = c.req.valid("header")["idempotency-key"];
+    if (idempotencyKey !== payload.hash) {
+      throw new HTTPException(400, {
+        message: "Idempotency-Key must match the article hash",
+      });
+    }
+    if (payload.hash !== md5(payload.link)) {
+      throw new HTTPException(400, {
+        message: "Article hash must be the MD5 identity of its link",
+      });
+    }
+
+    const result = await createArticle(c.get("db"), payload);
     return c.json(validateResponse(result, createArticleResponseSchema), 201);
   },
 );
