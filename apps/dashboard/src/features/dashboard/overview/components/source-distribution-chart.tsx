@@ -15,7 +15,7 @@ import {
 } from "@basango/ui/components/chart";
 import { useQuery } from "@tanstack/react-query";
 
-import { Cell, Pie, PieChart, RechartsSuspense } from "#dashboard/app/components/recharts";
+import { Cell, Pie, PieChart } from "#dashboard/app/components/recharts";
 import { useTRPC } from "#dashboard/app/trpc/client";
 import { formatNumber } from "#dashboard/app/utils/formatters";
 import { getColorFromName } from "#dashboard/features/content/shared/utils/category-colors";
@@ -41,24 +41,22 @@ export function SourceDistributionChart() {
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer className="mx-auto aspect-square max-h-80 w-full" config={chartConfig}>
-          <RechartsSuspense>
-            <PieChart>
-              <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-              <Pie
-                data={data?.items}
-                dataKey="count"
-                innerRadius={70}
-                nameKey="name"
-                outerRadius={110}
-                paddingAngle={2}
-                strokeWidth={0}
-              >
-                {data?.items.map((item) => (
-                  <Cell fill={getColorFromName(item.name)} key={item.id} />
-                ))}
-              </Pie>
-            </PieChart>
-          </RechartsSuspense>
+          <PieChart>
+            <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+            <Pie
+              data={data?.items}
+              dataKey="count"
+              innerRadius={70}
+              nameKey="name"
+              outerRadius={110}
+              paddingAngle={2}
+              strokeWidth={0}
+            >
+              {data?.items.map((item) => (
+                <Cell fill={getColorFromName(item.name)} key={item.id} />
+              ))}
+            </Pie>
+          </PieChart>
         </ChartContainer>
 
         <ul className="mt-4 space-y-2">

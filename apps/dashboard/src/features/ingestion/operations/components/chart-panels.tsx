@@ -14,7 +14,6 @@ import {
   Cell,
   Line,
   LineChart,
-  RechartsSuspense,
   XAxis,
   YAxis,
 } from "#dashboard/app/components/recharts";
@@ -44,44 +43,42 @@ export function ThroughputPanel({ data }: { data: ThroughputPoint[] }) {
       trailing={<ThroughputLegend />}
     >
       <ChartContainer className="h-[280px] w-full" config={throughputConfig}>
-        <RechartsSuspense>
-          <AreaChart accessibilityLayer data={data} margin={{ left: -16, right: 8 }}>
-            <defs>
-              <linearGradient id="discovered-fill" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-discovered)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="var(--color-discovered)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis axisLine={false} dataKey="label" tickLine={false} tickMargin={8} />
-            <YAxis allowDecimals={false} axisLine={false} tickLine={false} width={44} />
-            <ChartTooltip
-              content={<ChartTooltipContent indicator="line" />}
-              cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
-            />
-            <Area
-              dataKey="discovered"
-              fill="url(#discovered-fill)"
-              stroke="var(--color-discovered)"
-              strokeWidth={2}
-              type="monotone"
-            />
-            <Line
-              dataKey="persisted"
-              dot={false}
-              stroke="var(--color-persisted)"
-              strokeWidth={2}
-              type="monotone"
-            />
-            <Line
-              dataKey="delivered"
-              dot={false}
-              stroke="var(--color-delivered)"
-              strokeWidth={2}
-              type="monotone"
-            />
-          </AreaChart>
-        </RechartsSuspense>
+        <AreaChart accessibilityLayer data={data} margin={{ left: -16, right: 8 }}>
+          <defs>
+            <linearGradient id="discovered-fill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="5%" stopColor="var(--color-discovered)" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="var(--color-discovered)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis axisLine={false} dataKey="label" tickLine={false} tickMargin={8} />
+          <YAxis allowDecimals={false} axisLine={false} tickLine={false} width={44} />
+          <ChartTooltip
+            content={<ChartTooltipContent indicator="line" />}
+            cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
+          />
+          <Area
+            dataKey="discovered"
+            fill="url(#discovered-fill)"
+            stroke="var(--color-discovered)"
+            strokeWidth={2}
+            type="monotone"
+          />
+          <Line
+            dataKey="persisted"
+            dot={false}
+            stroke="var(--color-persisted)"
+            strokeWidth={2}
+            type="monotone"
+          />
+          <Line
+            dataKey="delivered"
+            dot={false}
+            stroke="var(--color-delivered)"
+            strokeWidth={2}
+            type="monotone"
+          />
+        </AreaChart>
       </ChartContainer>
     </DashboardPanel>
   );
@@ -91,19 +88,17 @@ export function PipelineStagesPanel({ data }: { data: PipelinePoint[] }) {
   return (
     <DashboardPanel description="Totals across the latest runs" title="Pipeline stages">
       <ChartContainer className="h-[280px] w-full" config={pipelineConfig}>
-        <RechartsSuspense>
-          <BarChart accessibilityLayer data={data} layout="vertical" margin={{ left: 8 }}>
-            <CartesianGrid horizontal={false} strokeDasharray="3 3" />
-            <XAxis allowDecimals={false} axisLine={false} tickLine={false} type="number" />
-            <YAxis axisLine={false} dataKey="stage" tickLine={false} type="category" width={74} />
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={false} />
-            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-              {data.map((entry) => (
-                <Cell fill={entry.color} key={entry.stage} />
-              ))}
-            </Bar>
-          </BarChart>
-        </RechartsSuspense>
+        <BarChart accessibilityLayer data={data} layout="vertical" margin={{ left: 8 }}>
+          <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+          <XAxis allowDecimals={false} axisLine={false} tickLine={false} type="number" />
+          <YAxis axisLine={false} dataKey="stage" tickLine={false} type="category" width={74} />
+          <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={false} />
+          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+            {data.map((entry) => (
+              <Cell fill={entry.color} key={entry.stage} />
+            ))}
+          </Bar>
+        </BarChart>
       </ChartContainer>
     </DashboardPanel>
   );
@@ -116,30 +111,28 @@ export function RunDurationPanel({ data }: { data: LatencyPoint[] }) {
         <EmptyState message="Duration telemetry will appear after a run completes." />
       ) : (
         <ChartContainer className="h-[280px] w-full" config={latencyConfig}>
-          <RechartsSuspense>
-            <LineChart accessibilityLayer data={data} margin={{ left: -12, right: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis axisLine={false} dataKey="label" tickLine={false} tickMargin={8} />
-              <YAxis
-                axisLine={false}
-                tickFormatter={(value) => `${value} min`}
-                tickLine={false}
-                width={48}
-              />
-              <ChartTooltip
-                content={<ChartTooltipContent indicator="line" />}
-                cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
-              />
-              <Line
-                activeDot={{ r: 4 }}
-                dataKey="duration"
-                dot={{ fill: "var(--color-duration)", r: 2 }}
-                stroke="var(--color-duration)"
-                strokeWidth={2}
-                type="monotone"
-              />
-            </LineChart>
-          </RechartsSuspense>
+          <LineChart accessibilityLayer data={data} margin={{ left: -12, right: 10 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis axisLine={false} dataKey="label" tickLine={false} tickMargin={8} />
+            <YAxis
+              axisLine={false}
+              tickFormatter={(value) => `${value} min`}
+              tickLine={false}
+              width={48}
+            />
+            <ChartTooltip
+              content={<ChartTooltipContent indicator="line" />}
+              cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
+            />
+            <Line
+              activeDot={{ r: 4 }}
+              dataKey="duration"
+              dot={{ fill: "var(--color-duration)", r: 2 }}
+              stroke="var(--color-duration)"
+              strokeWidth={2}
+              type="monotone"
+            />
+          </LineChart>
         </ChartContainer>
       )}
     </DashboardPanel>

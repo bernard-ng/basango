@@ -14,7 +14,6 @@ import {
   Bar,
   BarChart,
   Legend,
-  RechartsSuspense,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -62,43 +61,37 @@ export function CategorySharesChart({ sourceId }: Props) {
       </CardHeader>
       <CardContent>
         <div className="-ml-1 h-20">
-          <RechartsSuspense>
-            <ResponsiveContainer height="100%" width="100%">
-              <BarChart
-                data={chartData}
-                layout="vertical"
-                margin={{ bottom: 0, left: 0, right: 0, top: 0 }}
-              >
-                <YAxis
-                  axisLine={false}
-                  dataKey="name"
-                  fontSize={12}
-                  hide
-                  scale="band"
-                  type="category"
+          <ResponsiveContainer height="100%" width="100%">
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ bottom: 0, left: 0, right: 0, top: 0 }}
+            >
+              <YAxis
+                axisLine={false}
+                dataKey="name"
+                fontSize={12}
+                hide
+                scale="band"
+                type="category"
+              />
+              <XAxis axisLine={false} fontSize={12} hide tickLine={false} type="number" />
+              <Legend align="left" iconSize={8} iconType="circle" />
+              {data?.items.map((entry, index) => (
+                <Bar
+                  barSize={16}
+                  className="transition-all delay-75"
+                  dataKey={entry.category}
+                  fill={getColorFromName(entry.category)}
+                  key={entry.category}
+                  radius={
+                    index === 0 ? [4, 0, 0, 4] : index === data?.items.length - 1 ? [0, 4, 4, 0] : 0
+                  }
+                  stackId="category"
                 />
-                <XAxis axisLine={false} fontSize={12} hide tickLine={false} type="number" />
-                <Legend align="left" iconSize={8} iconType="circle" />
-                {data?.items.map((entry, index) => (
-                  <Bar
-                    barSize={16}
-                    className="transition-all delay-75"
-                    dataKey={entry.category}
-                    fill={getColorFromName(entry.category)}
-                    key={entry.category}
-                    radius={
-                      index === 0
-                        ? [4, 0, 0, 4]
-                        : index === data?.items.length - 1
-                          ? [0, 4, 4, 0]
-                          : 0
-                    }
-                    stackId="category"
-                  />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
-          </RechartsSuspense>
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>

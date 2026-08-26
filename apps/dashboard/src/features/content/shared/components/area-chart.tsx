@@ -6,7 +6,6 @@ import {
   Area,
   AreaChart as BaseAreaChart,
   CartesianGrid,
-  RechartsSuspense,
   XAxis,
   YAxis,
 } from "#dashboard/app/components/recharts";
@@ -18,42 +17,40 @@ type AreaChartProps<T> = {
 
 export function AreaChart<T>({ data }: AreaChartProps<T>) {
   return (
-    <RechartsSuspense>
-      <BaseAreaChart accessibilityLayer data={data}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis
-          axisLine={false}
-          dataKey="date"
-          minTickGap={32}
-          tickFormatter={(value) => formatDate(String(value))}
-          tickLine={false}
-          tickMargin={8}
-        />
-        <YAxis
-          allowDecimals={false}
-          axisLine={false}
-          tickFormatter={(value) => formatNumber(Number(value))}
-          tickLine={false}
-          width={48}
-        />
-        <ChartTooltip
-          content={
-            <ChartTooltipContent
-              labelFormatter={(value) => formatDate(String(value), "PP")}
-              nameKey="count"
-            />
-          }
-          cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
-        />
-        <Area
-          dataKey="count"
-          fill="var(--color-count)"
-          fillOpacity={0.15}
-          stroke="var(--color-count)"
-          strokeWidth={2}
-          type="monotone"
-        />
-      </BaseAreaChart>
-    </RechartsSuspense>
+    <BaseAreaChart accessibilityLayer data={data}>
+      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+      <XAxis
+        axisLine={false}
+        dataKey="date"
+        minTickGap={32}
+        tickFormatter={(value) => formatDate(String(value))}
+        tickLine={false}
+        tickMargin={8}
+      />
+      <YAxis
+        allowDecimals={false}
+        axisLine={false}
+        tickFormatter={(value) => formatNumber(Number(value))}
+        tickLine={false}
+        width={48}
+      />
+      <ChartTooltip
+        content={
+          <ChartTooltipContent
+            labelFormatter={(value) => formatDate(String(value), "PP")}
+            nameKey="count"
+          />
+        }
+        cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
+      />
+      <Area
+        dataKey="count"
+        fill="var(--color-count)"
+        fillOpacity={0.15}
+        stroke="var(--color-count)"
+        strokeWidth={2}
+        type="monotone"
+      />
+    </BaseAreaChart>
   );
 }

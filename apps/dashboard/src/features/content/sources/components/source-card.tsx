@@ -16,14 +16,7 @@ import {
   ChartTooltipContent,
 } from "@basango/ui/components/chart";
 
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  RechartsSuspense,
-  XAxis,
-  YAxis,
-} from "#dashboard/app/components/recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "#dashboard/app/components/recharts";
 import { formatDate, formatNumber } from "#dashboard/app/utils/formatters";
 
 const chartConfig = {
@@ -49,43 +42,41 @@ export function SourceCard({ source }: Props) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <RechartsSuspense>
-            <AreaChart accessibilityLayer data={source.publications?.items}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                axisLine={false}
-                dataKey="date"
-                minTickGap={32}
-                tickFormatter={(value) => formatDate(String(value))}
-                tickLine={false}
-                tickMargin={8}
-              />
-              <YAxis
-                allowDecimals={false}
-                axisLine={false}
-                tickFormatter={(value) => formatNumber(Number(value))}
-                tickLine={false}
-                width={48}
-              />
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => formatDate(String(value), "PP")}
-                    nameKey="count"
-                  />
-                }
-                cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
-              />
-              <Area
-                dataKey="count"
-                fill="var(--color-count)"
-                fillOpacity={0.15}
-                stroke="var(--color-count)"
-                strokeWidth={2}
-                type="monotone"
-              />
-            </AreaChart>
-          </RechartsSuspense>
+          <AreaChart accessibilityLayer data={source.publications?.items}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              axisLine={false}
+              dataKey="date"
+              minTickGap={32}
+              tickFormatter={(value) => formatDate(String(value))}
+              tickLine={false}
+              tickMargin={8}
+            />
+            <YAxis
+              allowDecimals={false}
+              axisLine={false}
+              tickFormatter={(value) => formatNumber(Number(value))}
+              tickLine={false}
+              width={48}
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(value) => formatDate(String(value), "PP")}
+                  nameKey="count"
+                />
+              }
+              cursor={{ stroke: "var(--border)", strokeDasharray: "4 4" }}
+            />
+            <Area
+              dataKey="count"
+              fill="var(--color-count)"
+              fillOpacity={0.15}
+              stroke="var(--color-count)"
+              strokeWidth={2}
+              type="monotone"
+            />
+          </AreaChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">

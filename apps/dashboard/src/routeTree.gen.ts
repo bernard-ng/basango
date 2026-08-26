@@ -10,12 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CrawlHistoryRouteImport } from './routes/crawl-history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IngestionRouteImport } from './routes/ingestion'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
 import { Route as ArticlesIdRouteImport } from './routes/articles/$id'
 import { Route as SourcesIndexRouteImport } from './routes/sources/index'
@@ -24,11 +24,6 @@ import { Route as SourcesIdRouteImport } from './routes/sources/$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CrawlHistoryRoute = CrawlHistoryRouteImport.update({
-  id: '/crawl-history',
-  path: '/crawl-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -56,6 +51,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
   id: '/articles/',
   path: '/articles/',
@@ -79,12 +79,12 @@ const SourcesIdRoute = SourcesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/crawl-history': typeof CrawlHistoryRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/timeline': typeof TimelineRoute
   '/articles/$id': typeof ArticlesIdRoute
   '/sources/$id': typeof SourcesIdRoute
   '/articles/': typeof ArticlesIndexRoute
@@ -92,12 +92,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/crawl-history': typeof CrawlHistoryRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/timeline': typeof TimelineRoute
   '/articles/$id': typeof ArticlesIdRoute
   '/sources/$id': typeof SourcesIdRoute
   '/articles': typeof ArticlesIndexRoute
@@ -106,12 +106,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/crawl-history': typeof CrawlHistoryRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/timeline': typeof TimelineRoute
   '/articles/$id': typeof ArticlesIdRoute
   '/sources/$id': typeof SourcesIdRoute
   '/articles/': typeof ArticlesIndexRoute
@@ -121,12 +121,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/crawl-history'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
     | '/login'
     | '/reset-password'
+    | '/timeline'
     | '/articles/$id'
     | '/sources/$id'
     | '/articles/'
@@ -134,12 +134,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/crawl-history'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
     | '/login'
     | '/reset-password'
+    | '/timeline'
     | '/articles/$id'
     | '/sources/$id'
     | '/articles'
@@ -147,12 +147,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/crawl-history'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
     | '/login'
     | '/reset-password'
+    | '/timeline'
     | '/articles/$id'
     | '/sources/$id'
     | '/articles/'
@@ -161,12 +161,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CrawlHistoryRoute: typeof CrawlHistoryRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IngestionRoute: typeof IngestionRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TimelineRoute: typeof TimelineRoute
   ArticlesIdRoute: typeof ArticlesIdRoute
   SourcesIdRoute: typeof SourcesIdRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
@@ -180,13 +180,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crawl-history': {
-      id: '/crawl-history'
-      path: '/crawl-history'
-      fullPath: '/crawl-history'
-      preLoaderRoute: typeof CrawlHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -224,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/articles/': {
       id: '/articles/'
       path: '/articles'
@@ -257,12 +257,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CrawlHistoryRoute: CrawlHistoryRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IngestionRoute: IngestionRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TimelineRoute: TimelineRoute,
   ArticlesIdRoute: ArticlesIdRoute,
   SourcesIdRoute: SourcesIdRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,

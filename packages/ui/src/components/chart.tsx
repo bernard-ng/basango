@@ -2,9 +2,12 @@
 
 import { cn } from "@basango/ui/lib/utils";
 import * as React from "react";
-import type {
+import {
   DefaultLegendContentProps,
   DefaultTooltipContentProps,
+  Legend as RechartsLegend,
+  ResponsiveContainer as RechartsResponsiveContainer,
+  Tooltip as RechartsTooltip,
   ResponsiveContainerProps,
   TooltipProps,
   TooltipValueType,
@@ -16,17 +19,9 @@ const THEMES = { dark: ".dark", light: "" } as const;
 const INITIAL_DIMENSION = { height: 200, width: 320 } as const;
 type TooltipNameType = number | string;
 
-const RechartsResponsiveContainer = React.lazy(() =>
-  import("recharts").then((module) => ({ default: module.ResponsiveContainer })),
-);
+const ChartTooltip = RechartsTooltip;
 
-const ChartTooltip = React.lazy(() =>
-  import("recharts").then((module) => ({ default: module.Tooltip })),
-);
-
-const ChartLegend = React.lazy(() =>
-  import("recharts").then((module) => ({ default: module.Legend })),
-);
+const ChartLegend = RechartsLegend;
 
 export type ChartConfig = Record<
   string,
@@ -85,13 +80,9 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle config={config} id={chartId} />
-        <React.Suspense
-          fallback={<div aria-hidden className="h-full w-full animate-pulse rounded-md bg-muted" />}
-        >
-          <RechartsResponsiveContainer initialDimension={initialDimension}>
-            {children}
-          </RechartsResponsiveContainer>
-        </React.Suspense>
+        <RechartsResponsiveContainer initialDimension={initialDimension}>
+          {children}
+        </RechartsResponsiveContainer>
       </div>
     </ChartContext.Provider>
   );

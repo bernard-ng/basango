@@ -17,7 +17,7 @@ const navigationGroups = [
     items: [
       { title: "Dashboard", url: "/dashboard" },
       { title: "Ingestion", url: "/ingestion" },
-      { title: "Timeline", url: "/crawl-history" },
+      { title: "Timeline", url: "/timeline" },
     ],
     title: "System",
   },

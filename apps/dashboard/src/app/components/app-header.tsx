@@ -15,7 +15,7 @@ import { ThemeToggle } from "#dashboard/app/components/theme-toggle";
 
 type AppBreadcrumbItem = {
   label: string;
-  to?: "/articles" | "/crawl-history" | "/dashboard" | "/sources";
+  to?: "/articles" | "/dashboard" | "/sources" | "/timeline";
 };
 
 export function AppHeader() {
@@ -77,10 +77,10 @@ function resolveBreadcrumbItems(pathname: string): AppBreadcrumbItem[] {
 
   const routeLabels: Record<string, string> = {
     "/articles": "Articles",
-    "/crawl-history": "Timeline",
     "/dashboard": "Dashboard",
     "/ingestion": "Ingestion",
     "/sources": "Sources",
+    "/timeline": "Timeline",
   };
 
   return [{ label: routeLabels[pathname] ?? "Dashboard" }];
