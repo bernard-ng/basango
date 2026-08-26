@@ -118,6 +118,8 @@ export async function applyIngestionSignal(db: Database, signal: IngestionSignal
             articlesDiscovered: sql`${ingestionRuns.articlesDiscovered}`,
             articlesFailed: sql`${ingestionRuns.articlesFailed}`,
             articlesPersisted: sql`${ingestionRuns.articlesPersisted}`,
+            articlesProcessed: sql`${ingestionRuns.articlesProcessed}`,
+            articlesSkipped: sql`${ingestionRuns.articlesSkipped}`,
           };
 
     await tx

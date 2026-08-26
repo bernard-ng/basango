@@ -8,6 +8,8 @@ export const INGESTION_RUN_SORT_FIELDS = [
   "articlesDiscovered",
   "articlesFailed",
   "articlesPersisted",
+  "articlesProcessed",
+  "articlesSkipped",
   "durationMs",
   "lastSignalAt",
   "sourceId",
@@ -42,6 +44,8 @@ export const ingestionRunMetricsSchema = z.object({
   articlesDiscovered: z.number().int().nonnegative(),
   articlesFailed: z.number().int().nonnegative(),
   articlesPersisted: z.number().int().nonnegative(),
+  articlesProcessed: z.number().int().nonnegative().optional(),
+  articlesSkipped: z.number().int().nonnegative().optional(),
 });
 
 const signalEnvelopeSchema = z.object({

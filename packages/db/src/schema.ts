@@ -265,6 +265,8 @@ export const ingestionRuns = pgTable(
     articlesDiscovered: integer("articles_discovered").default(0).notNull(),
     articlesFailed: integer("articles_failed").default(0).notNull(),
     articlesPersisted: integer("articles_persisted").default(0).notNull(),
+    articlesProcessed: integer("articles_processed"),
+    articlesSkipped: integer("articles_skipped"),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").notNull(),
     durationMs: bigint("duration_ms", { mode: "number" }),
@@ -281,6 +283,10 @@ export const ingestionRuns = pgTable(
     check(
       "chk_ingestion_run_metrics_nonnegative",
       sql`${table.articlesDelivered} >= 0 AND ${table.articlesDiscovered} >= 0 AND ${table.articlesFailed} >= 0 AND ${table.articlesPersisted} >= 0`,
+    ),
+    check(
+      "chk_ingestion_run_reconciliation_metrics_nonnegative",
+      sql`(${table.articlesProcessed} IS NULL OR ${table.articlesProcessed} >= 0) AND (${table.articlesSkipped} IS NULL OR ${table.articlesSkipped} >= 0)`,
     ),
     check(
       "chk_ingestion_run_duration_nonnegative",

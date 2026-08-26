@@ -17,6 +17,8 @@ describe("ingestion signal protocol", () => {
         articlesDiscovered: 5,
         articlesFailed: 1,
         articlesPersisted: 4,
+        articlesProcessed: 5,
+        articlesSkipped: 1,
       },
       runId: "0198d7e4-df8c-7000-8000-000000000002",
       sourceId: "radiookapi.net",
@@ -25,6 +27,31 @@ describe("ingestion signal protocol", () => {
 
     expect(signal.type).toBe("run.progress");
     expect(signal.emittedAt).toBeInstanceOf(Date);
+    if ("metrics" in signal) {
+      expect(signal.metrics.articlesProcessed).toBe(5);
+      expect(signal.metrics.articlesSkipped).toBe(1);
+    }
+  });
+
+  test("accepts legacy metrics without reconciliation counters", () => {
+    const signal = ingestionSignalSchema.parse({
+      ...envelope,
+      durationMs: 1_000,
+      metrics: {
+        articlesDelivered: 2,
+        articlesDiscovered: 5,
+        articlesFailed: 0,
+        articlesPersisted: 2,
+      },
+      runId: "0198d7e4-df8c-7000-8000-000000000002",
+      sourceId: "radiookapi.net",
+      type: "run.completed",
+    });
+
+    if ("metrics" in signal) {
+      expect(signal.metrics.articlesProcessed).toBeUndefined();
+      expect(signal.metrics.articlesSkipped).toBeUndefined();
+    }
   });
 
   test("rejects ambiguous progress payloads without metrics", () => {

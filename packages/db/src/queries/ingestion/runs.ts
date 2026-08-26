@@ -14,6 +14,8 @@ const sortColumns = {
   articlesDiscovered: ingestionRuns.articlesDiscovered,
   articlesFailed: ingestionRuns.articlesFailed,
   articlesPersisted: ingestionRuns.articlesPersisted,
+  articlesProcessed: ingestionRuns.articlesProcessed,
+  articlesSkipped: ingestionRuns.articlesSkipped,
   durationMs: ingestionRuns.durationMs,
   lastSignalAt: ingestionRuns.lastSignalAt,
   sourceId: ingestionRuns.sourceId,

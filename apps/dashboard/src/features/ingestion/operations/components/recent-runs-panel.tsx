@@ -165,9 +165,19 @@ function createRunColumns(): ColumnDef<IngestionRun>[] {
       header: "Discovered",
     },
     {
+      accessorKey: "articlesProcessed",
+      cell: ({ row }) => <MetricValue value={row.original.articlesProcessed} />,
+      header: "Processed",
+    },
+    {
       accessorKey: "articlesPersisted",
       cell: ({ row }) => <MetricValue value={row.original.articlesPersisted} />,
       header: "Persisted",
+    },
+    {
+      accessorKey: "articlesSkipped",
+      cell: ({ row }) => <MetricValue value={row.original.articlesSkipped} />,
+      header: "Skipped",
     },
     {
       accessorKey: "articlesDelivered",
@@ -198,8 +208,8 @@ function createRunColumns(): ColumnDef<IngestionRun>[] {
   ];
 }
 
-function MetricValue({ value }: { value: number }) {
-  return <span className="block text-right font-mono tabular-nums">{value}</span>;
+function MetricValue({ value }: { value: number | null }) {
+  return <span className="block text-right font-mono tabular-nums">{value ?? "—"}</span>;
 }
 
 function buildRunsQuery(store: ReturnType<typeof useTableStore>): IngestionRunsQuery {
