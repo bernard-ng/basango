@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { articleHashSchema, createArticleResponseSchema } from "./articles";
+import { articleHashSchema, createArticleResponseSchema, getArticlesSchema } from "./articles";
 
 describe("article ingestion contracts", () => {
   test("accepts the crawler's lowercase MD5 article identity", () => {
@@ -26,5 +26,18 @@ describe("article ingestion contracts", () => {
       id: "019c0000-0000-7000-8000-000000000001",
       sourceId: "019c0000-0000-7000-8000-000000000002",
     });
+  });
+});
+
+describe("article list contracts", () => {
+  test("accepts offset pagination", () => {
+    const query = getArticlesSchema.parse({ limit: 24, page: 3 });
+
+    expect(query).toMatchObject({ limit: 24, page: 3 });
+  });
+
+  test("rejects zero-based pages and cursor pagination", () => {
+    expect(getArticlesSchema.safeParse({ page: 0 }).success).toBeFalse();
+    expect(getArticlesSchema.safeParse({ cursor: "legacy-cursor" }).success).toBeFalse();
   });
 });

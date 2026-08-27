@@ -1,6 +1,12 @@
 import z from "zod";
 
-import { credibilitySchema, idSchema, limitSchema, publicationsSchema } from "./shared";
+import {
+  credibilitySchema,
+  idSchema,
+  limitSchema,
+  paginationRequestSchema,
+  publicationsSchema,
+} from "./shared";
 
 // schemas
 export const sourceSchema = z.object({
@@ -24,6 +30,8 @@ export const createSourceSchema = sourceSchema.pick({
 export const getSourceSchema = z.object({
   id: idSchema,
 });
+
+export const getSourcesSchema = paginationRequestSchema;
 
 export const getCategorySharesSchema = z.object({
   id: idSchema,

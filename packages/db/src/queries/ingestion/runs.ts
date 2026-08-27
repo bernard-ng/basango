@@ -1,6 +1,6 @@
 import type { IngestionRunsQuery } from "@basango/domain/models";
 import type { SQL } from "drizzle-orm";
-import { and, asc, count, desc, ilike, inArray, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
 import type { Database } from "#db/client";
 import { ingestionRuns } from "#db/schema";
@@ -58,7 +58,12 @@ export async function listIngestionRuns(db: Database, params: IngestionRunsQuery
 function buildRunsFilter(params: IngestionRunsQuery): SQL | undefined {
   const conditions: SQL[] = [];
   const query = params.filters?.query;
+  const sourceId = params.filters?.sourceId;
   const states = params.filters?.states;
+
+  if (sourceId) {
+    conditions.push(eq(ingestionRuns.sourceId, sourceId));
+  }
 
   if (query) {
     const pattern = `%${query}%`;

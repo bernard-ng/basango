@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
-import { getSourcePublicationBoundsResponseSchema } from "./sources";
+import { getSourcePublicationBoundsResponseSchema, getSourcesSchema } from "./sources";
+
+describe("source list contracts", () => {
+  test("accepts offset pagination", () => {
+    expect(getSourcesSchema.parse({ limit: 6, page: 2 })).toEqual({ limit: 6, page: 2 });
+  });
+});
 
 describe("source publication bounds", () => {
   test("accepts empty bounds for a source without articles", () => {

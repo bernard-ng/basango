@@ -13,6 +13,7 @@ import { ArticlesFeed } from "#dashboard/features/content/articles/components/ar
 import { CategorySharesChart } from "../components/category-shares-chart";
 import { PublicationGraphChart } from "../components/publication-graph-chart";
 import { SourceDetailsTab } from "../components/source-details-tab";
+import { SourceIngestionRuns } from "../components/source-ingestion-runs";
 import { SourceEditDialog } from "../dialogs/source-edit-dialog";
 
 type SourceDetailsPageProps = {
@@ -62,6 +63,7 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="articles">Articles</TabsTrigger>
+            <TabsTrigger value="ingestion">Ingestion</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
           </TabsList>
           <TabsContent className="space-y-4" value="overview">
@@ -70,6 +72,9 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
           </TabsContent>
           <TabsContent value="articles">
             <ArticlesFeed sourceId={source.id} />
+          </TabsContent>
+          <TabsContent value="ingestion">
+            <SourceIngestionRuns sourceId={source.id} sourceName={source.name} />
           </TabsContent>
           <TabsContent value="details">
             <SourceDetailsTab source={source} />

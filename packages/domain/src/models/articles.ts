@@ -1,7 +1,7 @@
 import z from "zod";
 
 import { categorySchema } from "./categories";
-import { idSchema, sentimentSchema } from "./shared";
+import { idSchema, paginationRequestSchema, sentimentSchema } from "./shared";
 import { sourceSchema } from "./sources";
 
 // schemas
@@ -69,10 +69,8 @@ export const getArticleSchema = z.object({
   id: idSchema,
 });
 
-export const getArticlesSchema = z.object({
+export const getArticlesSchema = paginationRequestSchema.extend({
   category: z.string().min(1).max(255).optional(),
-  cursor: z.string().nullable().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
   search: z.string().max(512).optional(),
   sentiment: sentimentSchema.optional(),
   sourceId: idSchema.optional(),

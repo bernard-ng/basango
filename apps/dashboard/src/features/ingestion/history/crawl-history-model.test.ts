@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import type { IngestionRun } from "../operations/types";
+import type { IngestionRun } from "../runs/types";
 import {
   createTimelineWindow,
   getRunDurationMs,

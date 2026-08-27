@@ -11,6 +11,7 @@ import {
   getCategorySharesSchema,
   getPublicationsSchema,
   getSourceSchema,
+  getSourcesSchema,
   updateSourceSchema,
 } from "@basango/domain/models";
 
@@ -33,7 +34,9 @@ export const sourcesRouter = createTRPCRouter({
     return getSourcePublicationGraph(ctx.db, input);
   }),
 
-  list: adminProcedure.query(async ({ ctx }) => getSources(ctx.db)),
+  list: adminProcedure.input(getSourcesSchema).query(async ({ ctx, input }) => {
+    return getSources(ctx.db, input);
+  }),
 
   update: adminProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
     return updateSource(ctx.db, input);

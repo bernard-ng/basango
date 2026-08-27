@@ -1,4 +1,4 @@
-import type { Credibility, ID } from "@basango/domain/models";
+import type { Credibility, ID, PaginationRequest } from "@basango/domain/models";
 
 export type UpdateSourceParams = {
   id: ID;
@@ -20,3 +20,5 @@ export type CreateSourceParams = {
 export type GetSourceByIdParams = {
   id: ID;
 };
+
+export type GetSourcesParams = PaginationRequest;

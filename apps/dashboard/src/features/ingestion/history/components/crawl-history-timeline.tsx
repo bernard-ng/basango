@@ -12,8 +12,8 @@ import { cn } from "@basango/ui/lib/utils";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { formatDuration, stateVariant } from "../../operations/ingestion-metrics";
-import type { IngestionRun } from "../../operations/types";
+import type { IngestionRun } from "../../runs/types";
+import { formatDuration, stateVariant } from "../../shared/ingestion-formatters";
 import {
   createTimelineWindow,
   formatRunDate,

@@ -21,8 +21,8 @@ export type GetArticleByIdParams = {
 };
 
 export type GetArticlesParams = {
-  cursor?: string | null;
   limit?: number;
+  page?: number;
   search?: string;
   sentiment?: Sentiment;
   sourceId?: string;

@@ -4,7 +4,6 @@ import {
   Distribution,
   Distributions,
   ID,
-  PaginationState,
   Publication,
   Publications,
   Sentiment,
@@ -24,7 +23,6 @@ import { GetDistributionsParams, GetPublicationsParams } from "#db/types/shared"
 import {
   applyFilters,
   buildDateRange,
-  buildKeysetFilter,
   buildPaginatedResult,
   buildPaginationState,
   buildPreviousRange,
@@ -109,17 +107,7 @@ export async function getArticleById(db: Database, id: ID) {
   return item;
 }
 
-export async function countArticlesBySourceId(db: Database, sourceId: ID) {
-  const result = await db
-    .select({ count: count(articles.id) })
-    .from(articles)
-    .where(eq(articles.sourceId, sourceId))
-    .then((res) => res[0]);
-
-  return result?.count ?? 0;
-}
-
-function buildFilters(params: GetArticlesParams, pagination: PaginationState) {
+function buildFilters(params: GetArticlesParams) {
   const filters: SQL<unknown>[] = [];
 
   if (params.sourceId) {
@@ -141,22 +129,12 @@ function buildFilters(params: GetArticlesParams, pagination: PaginationState) {
     }
   }
 
-  const cursorFilter = buildKeysetFilter({
-    cursor: pagination.payload,
-    date: articles.publishedAt,
-    id: articles.id,
-  });
-
-  if (cursorFilter !== undefined) {
-    filters.push(cursorFilter);
-  }
-
   return filters;
 }
 
 export async function getArticles(db: Database, params: GetArticlesParams) {
   const pagination = buildPaginationState(params);
-  const filters = buildFilters(params, pagination);
+  const filters = buildFilters(params);
 
   const query = db
     .select({
@@ -172,14 +150,17 @@ export async function getArticles(db: Database, params: GetArticlesParams) {
     .leftJoin(categories, eq(articles.categoryId, categories.id))
     .innerJoin(sources, eq(articles.sourceId, sources.id));
 
-  const rows = await applyFilters(query, filters)
-    .orderBy(desc(articles.publishedAt), desc(articles.id))
-    .limit(pagination.limit + 1);
+  const [rows, total] = await Promise.all([
+    applyFilters(query, filters)
+      .orderBy(desc(articles.publishedAt), desc(articles.id))
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    applyFilters(db.select({ value: count(articles.id) }).from(articles), filters).then(
+      (result: { value: number }[]) => result[0]?.value ?? 0,
+    ),
+  ]);
 
-  return buildPaginatedResult<Article>(rows, pagination, {
-    date: "publishedAt",
-    id: "id",
-  });
+  return buildPaginatedResult<Article>(rows, pagination, total);
 }
 
 export async function getArticlesPublicationGraph(

@@ -2,11 +2,12 @@
 
 import { Activity, ArrowDownToLine, CircleCheck, Radio } from "lucide-react";
 
+import { IngestionRunsTable } from "#dashboard/features/ingestion/runs/components/ingestion-runs-table";
+
 import { createDashboardModel } from "../ingestion-metrics";
 import type { IngestionDashboardData } from "../types";
 import { PipelineStagesPanel, RunDurationPanel, ThroughputPanel } from "./chart-panels";
 import { IngestionOperationsSkeleton, MetricCard } from "./dashboard-primitives";
-import { RecentRunsPanel } from "./recent-runs-panel";
 import { AgentHealthPanel } from "./status-panels";
 
 export function IngestionOperations({
@@ -67,7 +68,7 @@ export function IngestionOperations({
         <AgentHealthPanel agents={agents} />
       </div>
 
-      <RecentRunsPanel />
+      <IngestionRunsTable />
     </div>
   );
 }

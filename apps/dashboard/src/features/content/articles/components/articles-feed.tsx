@@ -1,44 +1,52 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@basango/ui/components/alert";
-import { Button } from "@basango/ui/components/button";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import * as React from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { useTRPC } from "#dashboard/app/trpc/client";
+import { OffsetPagination } from "#dashboard/features/content/shared/components/offset-pagination";
 
 import { useCategoryFilterParams } from "../hooks/use-category-filter-params";
 import { ArticleCard, ArticleCardSkeleton } from "./article-card";
 
-type ArticlesTableProps = {
+const ARTICLE_PAGE_SIZE = 12;
+
+type ArticlesFeedProps = {
   sourceId?: string;
 };
 
-export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
+type PaginatedArticlesFeedProps = {
+  category?: string;
+  sourceId?: string;
+};
+
+export function ArticlesFeed({ sourceId }: ArticlesFeedProps) {
   const { selectedCategory } = useCategoryFilterParams();
 
+  return (
+    <PaginatedArticlesFeed
+      category={selectedCategory ?? undefined}
+      key={`${sourceId ?? "all"}:${selectedCategory ?? "all"}`}
+      sourceId={sourceId}
+    />
+  );
+}
+
+function PaginatedArticlesFeed({ category, sourceId }: PaginatedArticlesFeedProps) {
   const trpc = useTRPC();
-  const query = useInfiniteQuery(
-    trpc.articles.list.infiniteQueryOptions(
-      {
-        category: selectedCategory ?? undefined,
-        limit: 12,
-        sourceId,
-      },
-      {
-        getNextPageParam: (lastPage) => (lastPage.meta.hasNext ? lastPage.meta.nextCursor : null),
-        initialCursor: null,
-      },
-    ),
-  );
-
-  const articles = React.useMemo(
-    () => query.data?.pages.flatMap((page) => page.items) ?? [],
-    [query.data],
-  );
-
-  const isInitialLoading = query.isLoading && !query.data;
+  const [page, setPage] = useState(1);
+  const query = useQuery({
+    ...trpc.articles.list.queryOptions({
+      category,
+      limit: ARTICLE_PAGE_SIZE,
+      page,
+      sourceId,
+    }),
+    placeholderData: keepPreviousData,
+  });
+  const articles = query.data?.items ?? [];
+  const pagination = query.data?.meta;
 
   return (
     <div className="space-y-4">
@@ -51,7 +59,7 @@ export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
         </Alert>
       )}
 
-      {isInitialLoading ? (
+      {query.isPending ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <ArticleCardSkeleton key={index} />
@@ -69,27 +77,16 @@ export function ArticlesFeed({ sourceId }: ArticlesTableProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-center">
-        {query.hasNextPage ? (
-          <Button
-            disabled={query.isFetchingNextPage}
-            onClick={() => query.fetchNextPage()}
-            type="button"
-            variant="outline"
-          >
-            {query.isFetchingNextPage ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading…
-              </>
-            ) : (
-              "Load more"
-            )}
-          </Button>
-        ) : articles.length > 0 ? (
-          <p className="text-xs text-muted-foreground">You&apos;re all caught up.</p>
-        ) : null}
-      </div>
+      {pagination ? (
+        <OffsetPagination
+          currentPage={pagination.current}
+          isFetching={query.isFetching}
+          itemLabel="article"
+          onPageChange={setPage}
+          pageCount={pagination.pages}
+          total={pagination.total}
+        />
+      ) : null}
     </div>
   );
 }

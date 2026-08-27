@@ -83,31 +83,27 @@ export const publicationsSchema = z.object({
   meta: publicationMetaSchema.optional(),
 });
 
-export const paginationCursorSchema = z.object({
-  date: z.string(),
-  id: z.string(),
-});
-
-export const paginationRequestSchema = z.object({
-  cursor: z.string().nullable().optional(),
-  limit: limitSchema.optional(),
-  page: z.number().nonnegative().default(1).optional(),
-});
+export const paginationRequestSchema = z
+  .object({
+    limit: limitSchema.optional(),
+    page: z.number().int().positive().default(1).optional(),
+  })
+  .strict();
 
 export const paginationStateSchema = z.object({
-  cursor: z.string().nullable(),
-  limit: z.number().int(),
-  offset: z.number().int(),
-  page: z.number().int(),
-  payload: paginationCursorSchema.nullable(),
+  limit: z.number().int().positive(),
+  offset: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
 });
 
 export const paginationMetaSchema = z.object({
-  current: z.number().int(),
-  cursor: z.string().nullable(),
+  current: z.number().int().positive(),
   hasNext: z.boolean(),
-  limit: z.number().int(),
-  nextCursor: z.string().nullable(),
+  hasPrevious: z.boolean(),
+  limit: z.number().int().positive(),
+  offset: z.number().int().nonnegative(),
+  pages: z.number().int().positive(),
+  total: z.number().int().nonnegative(),
 });
 
 // types
@@ -133,7 +129,6 @@ export type Publications = z.infer<typeof publicationsSchema>;
 export type PublicationMeta = z.infer<typeof publicationMetaSchema>;
 export type Delta = z.infer<typeof deltaSchema>;
 
-export type PaginationCursor = z.infer<typeof paginationCursorSchema>;
 export type PaginationRequest = z.infer<typeof paginationRequestSchema>;
 export type PaginationState = z.infer<typeof paginationStateSchema>;
 export type PaginationMeta = z.infer<typeof paginationMetaSchema>;

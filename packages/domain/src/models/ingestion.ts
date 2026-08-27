@@ -24,6 +24,7 @@ export const ingestionRunsQuerySchema = z.object({
   filters: z
     .object({
       query: z.string().trim().min(1).max(255).optional(),
+      sourceId: z.string().trim().min(1).max(255).optional(),
       states: z.array(ingestionRunStateSchema).max(INGESTION_RUN_STATES.length).optional(),
     })
     .optional(),

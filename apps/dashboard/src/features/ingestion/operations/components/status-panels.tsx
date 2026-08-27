@@ -9,7 +9,7 @@ import {
   ItemTitle,
 } from "@basango/ui/components/item";
 
-import { relativeTime, stateVariant } from "../ingestion-metrics";
+import { relativeTime, stateVariant } from "../../shared/ingestion-formatters";
 import type { IngestionAgent } from "../types";
 import { DashboardPanel, EmptyState } from "./dashboard-primitives";
 

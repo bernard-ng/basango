@@ -15,11 +15,8 @@ export const Route = createFileRoute("/sources/$id")({
       context.trpc.sources.getPublications.queryOptions({ id: params.id }),
     );
     void context.queryClient.prefetchQuery(context.trpc.categories.list.queryOptions());
-    void context.queryClient.prefetchInfiniteQuery(
-      context.trpc.articles.list.infiniteQueryOptions(
-        { limit: 12, sourceId: params.id },
-        { getNextPageParam: (lastPage) => lastPage.meta.nextCursor, initialCursor: null },
-      ),
+    void context.queryClient.prefetchQuery(
+      context.trpc.articles.list.queryOptions({ limit: 12, page: 1, sourceId: params.id }),
     );
 
     return context.queryClient.ensureQueryData(sourceQuery);

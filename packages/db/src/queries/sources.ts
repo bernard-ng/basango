@@ -1,6 +1,6 @@
 import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import { ID, Publication, Publications } from "@basango/domain/models";
-import { eq, max, min, sql } from "drizzle-orm";
+import { asc, count, eq, getTableColumns, max, min, sql } from "drizzle-orm";
 import * as uuid from "uuid";
 
 import { Database } from "#db/client";
@@ -12,21 +12,37 @@ import {
   GetCategorySharesParams,
   GetPublicationsParams,
 } from "#db/types/shared";
-import { CreateSourceParams, UpdateSourceParams } from "#db/types/sources";
-import { buildDateRange } from "#db/utils";
+import { CreateSourceParams, GetSourcesParams, UpdateSourceParams } from "#db/types/sources";
+import { buildDateRange, buildPaginatedResult, buildPaginationState } from "#db/utils";
 
-import { countArticlesBySourceId } from "./articles";
+export async function getSources(db: Database, params: GetSourcesParams) {
+  const pagination = buildPaginationState(params);
+  const [rows, total] = await Promise.all([
+    db
+      .select({
+        ...getTableColumns(sources),
+        articles: count(articles.id),
+      })
+      .from(sources)
+      .leftJoin(articles, eq(articles.sourceId, sources.id))
+      .groupBy(sources.id)
+      .orderBy(asc(sources.name), asc(sources.id))
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    db
+      .select({ value: count(sources.id) })
+      .from(sources)
+      .then((result) => result[0]?.value ?? 0),
+  ]);
 
-export async function getSources(db: Database) {
-  const rows = await db.query.sources.findMany();
-
-  return await Promise.all(
+  const items = await Promise.all(
     rows.map(async (row) => ({
       ...row,
-      articles: await countArticlesBySourceId(db, row.id),
       publications: await getSourcePublicationGraph(db, { id: row.id }),
     })),
   );
+
+  return buildPaginatedResult(items, pagination, total);
 }
 
 export async function createSource(db: Database, params: CreateSourceParams) {

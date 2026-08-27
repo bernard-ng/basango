@@ -6,11 +6,8 @@ import { ArticlesPage } from "#dashboard/features/content/articles/pages/article
 export const Route = createFileRoute("/articles/")({
   beforeLoad: ({ location }) => requireAdminSession(location.href),
   loader: ({ context }) => {
-    void context.queryClient.prefetchInfiniteQuery(
-      context.trpc.articles.list.infiniteQueryOptions(
-        { limit: 12 },
-        { getNextPageParam: (lastPage) => lastPage.meta.nextCursor, initialCursor: null },
-      ),
+    void context.queryClient.prefetchQuery(
+      context.trpc.articles.list.queryOptions({ limit: 12, page: 1 }),
     );
     void context.queryClient.prefetchQuery(context.trpc.categories.list.queryOptions());
   },

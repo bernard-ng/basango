@@ -30,7 +30,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 type Props = {
-  source: RouterOutputs["sources"]["list"][number];
+  source: RouterOutputs["sources"]["list"]["items"][number];
 };
 
 export function SourceCard({ source }: Props) {

@@ -84,6 +84,7 @@ describe("ingestion runs query", () => {
     const query = ingestionRunsQuerySchema.parse({
       filters: {
         query: "radio okapi",
+        sourceId: "radiookapi.net",
         states: ["running", "failed"],
       },
       page: {
@@ -97,6 +98,7 @@ describe("ingestion runs query", () => {
     });
 
     expect(query.page).toEqual({ current: 2, limit: 20 });
+    expect(query.filters?.sourceId).toBe("radiookapi.net");
     expect(query.filters?.states).toEqual(["running", "failed"]);
   });
 

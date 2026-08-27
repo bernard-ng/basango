@@ -1,4 +1,4 @@
-import type { IngestionRun } from "../operations/types";
+import type { IngestionRun } from "../runs/types";
 
 export const CRAWL_HISTORY_PAGE_SIZE = 50;
 
