@@ -69,7 +69,7 @@ BETTER_AUTH_URL=https://api.basango.ngandu.dev
 BETTER_AUTH_COOKIE_DOMAIN=.basango.ngandu.dev
 ```
 
-Put the API database, encryption key, crawler token, and Better Auth secret in root `.env.local`.
+Put the API database, crawler token, and Better Auth secret in root `.env.local`.
 That file is loaded after `.env.prod`, so it is the final file-based override and stays outside Git.
 Variables injected directly by PM2 or the host still take precedence. See the
 [environment configuration guide](environment.md) for the complete convention.

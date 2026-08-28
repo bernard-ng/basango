@@ -1,10 +1,11 @@
+import { createHash } from "node:crypto";
+
 import { createArticle } from "@basango/db/queries";
 import {
   articleHashSchema,
   createArticleResponseSchema,
   createArticleSchema,
 } from "@basango/domain/models";
-import { md5 } from "@basango/encryption";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -70,3 +71,7 @@ app.openapi(
 );
 
 export const articleIngestionRouter = app;
+
+function md5(value: string): string {
+  return createHash("md5").update(value).digest("hex");
+}

@@ -20,7 +20,6 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "test": "bun test src",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"

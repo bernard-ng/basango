@@ -32,7 +32,6 @@ must not be added under `apps/` or `packages/`.
 - `@basango/db` owns Drizzle schemas, PostgreSQL access, queries, and persistence services. Client applications must
   not import it.
 - `@basango/logger` owns structured server logging.
-- `@basango/encryption` owns server-side encryption and hashing behavior.
 - `@basango/tsconfig` owns shared TypeScript compiler defaults.
 
 A shared package is justified when it has at least two real consumers or one clear package-owned responsibility. A
@@ -47,8 +46,7 @@ Each arrow points from the importer to the dependency:
 dashboard -> api (exported tRPC types only), domain, ui
 mobile    -> domain (platform-neutral contracts only)
 api       -> db, domain, logger
-db        -> domain, encryption, logger
-encryption -> domain
+db        -> domain, logger
 logger     -> domain
 ui         -> third-party UI libraries only
 domain     -> platform-neutral libraries only
@@ -57,7 +55,7 @@ domain     -> platform-neutral libraries only
 The following constraints preserve those boundaries:
 
 - no package imports from an application;
-- no client application imports `@basango/db`, `@basango/logger`, or `@basango/encryption`;
+- no client application imports `@basango/db` or `@basango/logger`;
 - dashboard imports API router types only through the explicit `@basango/api/trpc/routers/_app` export;
 - mobile does not import `@basango/ui` or browser-only modules;
 - packages do not re-export another package's domain symbols as their own;

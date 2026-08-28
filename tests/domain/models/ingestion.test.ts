@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+  closeIngestionRunsSchema,
   ingestionChangeSchema,
   ingestionRunsQuerySchema,
   ingestionSignalSchema,
-} from "./ingestion";
+} from "../../../packages/domain/src/models/ingestion";
 
 const envelope = {
   agentId: "crawler-lubumbashi-01",
@@ -107,6 +108,34 @@ describe("ingestion runs query", () => {
       ingestionRunsQuerySchema.safeParse({
         filters: { states: ["offline"] },
         page: { current: 1, limit: 100 },
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("manual ingestion run closure", () => {
+  test("accepts multiple runs with a terminal state", () => {
+    const closure = closeIngestionRunsSchema.parse({
+      runIds: ["0198d7e4-df8c-7000-8000-000000000002", "0198d7e4-df8c-7000-8000-000000000003"],
+      state: "completed",
+    });
+
+    expect(closure.runIds).toHaveLength(2);
+    expect(closure.state).toBe("completed");
+  });
+
+  test("rejects empty batches and active target states", () => {
+    expect(closeIngestionRunsSchema.safeParse({ runIds: [], state: "failed" }).success).toBe(false);
+    expect(
+      closeIngestionRunsSchema.safeParse({
+        runIds: ["0198d7e4-df8c-7000-8000-000000000002"],
+        state: "running",
+      }).success,
+    ).toBe(false);
+    expect(
+      closeIngestionRunsSchema.safeParse({
+        runIds: ["0198d7e4-df8c-7000-8000-000000000002", "0198d7e4-df8c-7000-8000-000000000002"],
+        state: "completed",
       }).success,
     ).toBe(false);
   });

@@ -3,7 +3,6 @@
     "@ai-sdk/google": "^2.0.44",
     "@ai-sdk/openai": "^2.0.75",
     "@basango/domain": "workspace:*",
-    "@basango/encryption": "workspace:*",
     "@basango/logger": "workspace:*",
     "@date-fns/utc": "^2.1.1",
     "ai": "^5.0.105",

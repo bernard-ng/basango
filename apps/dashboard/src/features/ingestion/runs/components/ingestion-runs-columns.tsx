@@ -1,4 +1,5 @@
 import { Badge } from "@basango/ui/components/badge";
+import { Checkbox } from "@basango/ui/components/checkbox";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { formatDuration, relativeTime, stateVariant } from "../../shared/ingestion-formatters";
@@ -6,6 +7,27 @@ import type { IngestionRun } from "../types";
 
 export function createIngestionRunColumns(): ColumnDef<IngestionRun>[] {
   return [
+    {
+      cell: ({ row }) => (
+        <Checkbox
+          aria-label={`Select run for ${row.original.sourceId}`}
+          checked={row.getIsSelected()}
+          disabled={!row.getCanSelect()}
+          onCheckedChange={(checked) => row.toggleSelected(checked)}
+        />
+      ),
+      enableHiding: false,
+      enableSorting: false,
+      header: ({ table }) => (
+        <Checkbox
+          aria-label="Select all runs on this page"
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={table.getIsSomePageRowsSelected()}
+          onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked)}
+        />
+      ),
+      id: "select",
+    },
     {
       accessorKey: "sourceId",
       cell: ({ row }) => (

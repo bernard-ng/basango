@@ -1,12 +1,13 @@
-import type { IngestionRunsQuery } from "@basango/domain/models";
+import type { CloseIngestionRuns, IngestionRunsQuery } from "@basango/domain/models";
 import type { SQL } from "drizzle-orm";
-import { and, asc, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 
 import type { Database } from "#db/client";
-import { ingestionRuns } from "#db/schema";
+import { ingestionAgents, ingestionRuns } from "#db/schema";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
+const MANUAL_FAILURE_MESSAGE = "Manually marked as failed from the dashboard.";
 
 const sortColumns = {
   agentId: ingestionRuns.agentId,
@@ -53,6 +54,39 @@ export async function listIngestionRuns(db: Database, params: IngestionRunsQuery
       total,
     },
   };
+}
+
+export async function closeIngestionRuns(db: Database, params: CloseIngestionRuns) {
+  const completedAt = new Date();
+
+  return db.transaction(async (tx) => {
+    const releasedAgents = await tx
+      .update(ingestionAgents)
+      .set({ activeRunId: null, state: "idle" })
+      .where(inArray(ingestionAgents.activeRunId, params.runIds))
+      .returning({ id: ingestionAgents.id });
+    const updatedRuns = await tx
+      .update(ingestionRuns)
+      .set({
+        completedAt: sql`COALESCE(${ingestionRuns.completedAt}, ${completedAt})`,
+        durationMs: sql`COALESCE(${ingestionRuns.durationMs}, GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (${completedAt} - COALESCE(${ingestionRuns.startedAt}, ${ingestionRuns.createdAt}))) * 1000)::bigint))`,
+        ...(params.state === "failed"
+          ? { error: sql`COALESCE(${ingestionRuns.error}, ${MANUAL_FAILURE_MESSAGE})` }
+          : { error: null }),
+        lastSignalAt: completedAt,
+        state: params.state,
+      })
+      .where(and(inArray(ingestionRuns.id, params.runIds), ne(ingestionRuns.state, params.state)))
+      .returning({ id: ingestionRuns.id });
+    const updatedRunIds = updatedRuns.map((run) => run.id);
+
+    return {
+      releasedAgentCount: releasedAgents.length,
+      runIds: updatedRunIds,
+      unchangedCount: params.runIds.length - updatedRunIds.length,
+      updatedCount: updatedRunIds.length,
+    };
+  });
 }
 
 function buildRunsFilter(params: IngestionRunsQuery): SQL | undefined {

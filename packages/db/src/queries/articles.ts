@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import {
   Article,
@@ -8,7 +10,6 @@ import {
   Publications,
   Sentiment,
 } from "@basango/domain/models";
-import { md5 } from "@basango/encryption";
 import type { SQL } from "drizzle-orm";
 import { count, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import * as uuid from "uuid";
@@ -247,4 +248,8 @@ export async function getArticlesSourceDistribution(
     items: data.rows,
     total: data.rows.reduce((acc, item) => acc + item.count, 0),
   };
+}
+
+function md5(value: string): string {
+  return createHash("md5").update(value).digest("hex");
 }

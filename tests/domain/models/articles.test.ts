@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 
-import { articleHashSchema, createArticleResponseSchema, getArticlesSchema } from "./articles";
+import {
+  articleHashSchema,
+  createArticleResponseSchema,
+  getArticlesSchema,
+} from "../../../packages/domain/src/models/articles";
 
 describe("article ingestion contracts", () => {
   test("accepts the crawler's lowercase MD5 article identity", () => {

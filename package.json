@@ -60,8 +60,8 @@
     "prepare": "husky",
     "start:api": "turbo start --filter=@basango/api",
     "start:dashboard": "turbo start --filter=@basango/dashboard",
-    "test": "turbo run test --parallel",
-    "typecheck": "turbo run typecheck"
+    "test": "bun test tests",
+    "typecheck": "turbo run typecheck && tsc --noEmit --project tests/tsconfig.json"
   },
   "workspaces": [
     "packages/*",

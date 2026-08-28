@@ -2,6 +2,8 @@ import z from "zod";
 
 export const INGESTION_RUN_STATES = ["preparing", "running", "completed", "failed"] as const;
 
+export const INGESTION_RUN_TERMINAL_STATES = ["completed", "failed"] as const;
+
 export const INGESTION_CHANGE_TOPICS = ["agents", "runs", "summary", "throughput"] as const;
 
 export const INGESTION_RUN_SORT_FIELDS = [
@@ -19,6 +21,15 @@ export const INGESTION_RUN_SORT_FIELDS = [
 ] as const;
 
 export const ingestionRunStateSchema = z.enum(INGESTION_RUN_STATES);
+
+export const closeIngestionRunsSchema = z.object({
+  runIds: z
+    .array(z.uuid())
+    .min(1)
+    .max(100)
+    .refine((runIds) => new Set(runIds).size === runIds.length, "Run IDs must be unique."),
+  state: z.enum(INGESTION_RUN_TERMINAL_STATES),
+});
 
 export const ingestionRunsQuerySchema = z.object({
   filters: z
@@ -105,6 +116,7 @@ export const ingestionChangeSchema = z.object({
 
 export type IngestionChange = z.infer<typeof ingestionChangeSchema>;
 export type IngestionChangeTopic = (typeof INGESTION_CHANGE_TOPICS)[number];
+export type CloseIngestionRuns = z.infer<typeof closeIngestionRunsSchema>;
 export type IngestionRunMetrics = z.infer<typeof ingestionRunMetricsSchema>;
 export type IngestionRunsQuery = z.infer<typeof ingestionRunsQuerySchema>;
 export type IngestionRunState = z.infer<typeof ingestionRunStateSchema>;

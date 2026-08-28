@@ -12,7 +12,11 @@ export type DataTableToolbarProps<TData> = {
   filters?: (table: Table<TData>) => ReactNode;
   store: Pick<
     TableStore,
-    "globalFilter" | "globalFilterInput" | "setGlobalFilter" | "setGlobalFilterInput"
+    | "globalFilter"
+    | "globalFilterInput"
+    | "rowSelection"
+    | "setGlobalFilter"
+    | "setGlobalFilterInput"
   >;
   table: Table<TData>;
 };

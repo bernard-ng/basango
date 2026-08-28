@@ -5,14 +5,12 @@ import z from "zod";
 
 import { ApiConfigurationSchema } from "./api";
 import { DatabaseConfigurationSchema } from "./database";
-import { EncryptionConfigurationSchema } from "./encryption";
 import { resolveEnvFiles } from "./environment";
 import { LoggerConfigurationSchema } from "./logger";
 import { SharedConfigurationSchema } from "./shared";
 
 export * from "./api";
 export * from "./database";
-export * from "./encryption";
 export * from "./logger";
 export * from "./shared";
 
@@ -27,7 +25,6 @@ export const { env, config } = await defineConfig({
       "BASANGO_API_CRAWLER_TOKEN",
       "BASANGO_API_KEY",
       "BASANGO_DATABASE_URL",
-      "BASANGO_ENCRYPTION_KEY",
       "BASANGO_RESEND_API_KEY",
       "BETTER_AUTH_SECRET",
     ],
@@ -57,7 +54,6 @@ export const { env, config } = await defineConfig({
       BASANGO_CRAWLER_SQLITE_PATH: z.string().optional(),
       BASANGO_CRAWLER_UPDATE_DIRECTION: z.string().optional(),
       BASANGO_DATABASE_URL: z.string().min(1),
-      BASANGO_ENCRYPTION_KEY: z.string().min(1),
       BASANGO_ENV_PATH: z.string().optional(),
       BASANGO_LOGGER_LEVEL: z.string().default("info"),
       BASANGO_LOGGER_PRETTY: z.string().optional(),
@@ -72,14 +68,12 @@ export const { env, config } = await defineConfig({
   schema: z.object({
     api: ApiConfigurationSchema,
     database: DatabaseConfigurationSchema,
-    encryption: EncryptionConfigurationSchema,
     logger: LoggerConfigurationSchema,
     shared: SharedConfigurationSchema,
   }),
   sources: [
     jsonFile("config/api.json", { name: "api" }),
     jsonFile("config/database.json", { name: "database" }),
-    jsonFile("config/encryption.json", { name: "encryption" }),
     jsonFile("config/logger.json", { name: "logger" }),
     jsonFile("config/shared.json", { name: "shared" }),
   ],

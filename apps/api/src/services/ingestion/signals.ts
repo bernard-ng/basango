@@ -6,6 +6,7 @@ import type {
   IngestionSignal,
   IngestionSignalType,
 } from "@basango/domain/models";
+import * as uuid from "uuid";
 
 import { invalidateIngestionThroughput } from "./throughput";
 
@@ -36,7 +37,7 @@ export async function acceptIngestionSignal(db: Database, signal: IngestionSigna
       invalidateIngestionThroughput();
     }
 
-    queueIngestionChange(signal);
+    queueSignalChange(signal);
   }
 
   return result;
@@ -52,13 +53,24 @@ export function getIngestionChangeTopics(type: IngestionSignalType) {
   return topicsBySignalType[type];
 }
 
-function queueIngestionChange(signal: IngestionSignal) {
-  for (const topic of getIngestionChangeTopics(signal.type)) {
+export function announceIngestionChange(topics: readonly IngestionChangeTopic[]) {
+  queueIngestionChange({ latestSignalId: uuid.v7(), topics: [...topics] });
+}
+
+function queueSignalChange(signal: IngestionSignal) {
+  queueIngestionChange({
+    latestSignalId: signal.signalId,
+    topics: getIngestionChangeTopics(signal.type),
+  });
+}
+
+function queueIngestionChange(change: IngestionChange) {
+  for (const topic of change.topics) {
     pendingTopics.add(topic);
   }
 
-  if (!pendingSignalId || signal.signalId > pendingSignalId) {
-    pendingSignalId = signal.signalId;
+  if (!pendingSignalId || change.latestSignalId > pendingSignalId) {
+    pendingSignalId = change.latestSignalId;
   }
 
   if (!flushTimer) {

@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 
-import { getSourcePublicationBoundsResponseSchema, getSourcesSchema } from "./sources";
+import {
+  getSourcePublicationBoundsResponseSchema,
+  getSourcesSchema,
+} from "../../../packages/domain/src/models/sources";
 
 describe("source list contracts", () => {
   test("accepts offset pagination", () => {

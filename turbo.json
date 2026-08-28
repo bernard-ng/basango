@@ -22,9 +22,6 @@
     "start": {
       "cache": false
     },
-    "test": {
-      "cache": false
-    },
     "topo": {
       "dependsOn": ["^topo"]
     },

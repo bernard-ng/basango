@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 
-import type { CrawlTimelineWindow } from "./crawl-history-model";
+import type { CrawlTimelineWindow } from "../../../../../apps/dashboard/src/features/ingestion/history/crawl-history-model";
 import {
   createCrawlTimelineTicks,
   expandCrawlTimelineWindow,
   getCrawlTimelineWidth,
-} from "./crawl-timeline-scale";
+} from "../../../../../apps/dashboard/src/features/ingestion/history/crawl-timeline-scale";
 
 const HOUR_MS = 60 * 60 * 1_000;
 const referenceMs = new Date("2026-08-26T12:00:00.000Z").getTime();

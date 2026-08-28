@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 
-import type { IngestionRun } from "../runs/types";
 import {
   createTimelineWindow,
   getRunDurationMs,
   getTimelineBarBounds,
-} from "./crawl-history-model";
+} from "../../../../../apps/dashboard/src/features/ingestion/history/crawl-history-model";
+import type { IngestionRun } from "../../../../../apps/dashboard/src/features/ingestion/runs/types";
 
 describe("crawl history model", () => {
   test("uses signal timestamps when a run has no final duration", () => {

@@ -53,7 +53,6 @@ BETTER_AUTH_COOKIE_DOMAIN=.basango.ngandu.dev
 # .env.local
 BASANGO_API_CRAWLER_TOKEN=replace-with-a-long-random-secret
 BASANGO_DATABASE_URL=postgresql://...
-BASANGO_ENCRYPTION_KEY=replace-with-a-64-character-key
 BETTER_AUTH_SECRET=replace-with-a-long-random-secret
 ```
 

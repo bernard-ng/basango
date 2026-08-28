@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 
-import { loginSchema, passwordSchema, requestPasswordResetSchema } from "./auth";
+import {
+  loginSchema,
+  passwordSchema,
+  requestPasswordResetSchema,
+} from "../../../packages/domain/src/models/auth";
 
 describe("authentication schemas", () => {
   test("normalizes login and reset email addresses", () => {

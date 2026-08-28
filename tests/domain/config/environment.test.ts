@@ -3,7 +3,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { normalizeNodeEnvironment, readEnvFiles, resolveEnvFiles } from "./environment";
+import {
+  normalizeNodeEnvironment,
+  readEnvFiles,
+  resolveEnvFiles,
+} from "../../../packages/domain/src/config/environment";
 
 const temporaryDirectories: string[] = [];
 

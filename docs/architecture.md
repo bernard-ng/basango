@@ -40,7 +40,7 @@ their owning applications. Shared packages own stable, reusable contracts or inf
 home for new application behavior.
 
 The dashboard consumes the API through its app-owned tRPC client and imports router types only from the API's explicit
-public export. Client applications never import persistence, logging, or encryption packages. The React Native
+public export. Client applications never import persistence or logging packages. The React Native
 application may share platform-neutral domain contracts, but it must not consume the DOM-based `@basango/ui` package.
 
 See the [TypeScript application architecture](web/README.md) for the dependency graph and package recommendations, and

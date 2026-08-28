@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "#api/*": ["../apps/api/src/*"],
+      "#dashboard/*": ["../apps/dashboard/src/*"],
+      "#db/*": ["../packages/db/src/*"],
+      "#domain/*": ["../packages/domain/src/*"]
+    },
+    "types": ["bun"]
+  },
+  "extends": "../packages/tsconfig/base.json",
+  "include": ["**/*.ts"]
+}

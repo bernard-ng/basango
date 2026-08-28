@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { getIngestionChangeTopics } from "./signals";
+import { getIngestionChangeTopics } from "../../../../apps/api/src/services/ingestion/signals";
 
 describe("ingestion change topics", () => {
   test("limits heartbeats to agent state", () => {

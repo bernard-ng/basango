@@ -40,7 +40,7 @@ Architecture
 - Keep route composition, navigation, environment access, and platform behavior in the owning application.
 - Start new behavior in its owning application. Extract it only for at least two real consumers or a clear package-owned responsibility.
 - Packages expose small, intentional interfaces and hide cohesive implementation details.
-- No package may import from an application. No client application may import `@basango/db`, `@basango/logger`, or `@basango/encryption`.
+- No package may import from an application. No client application may import `@basango/db` or `@basango/logger`.
 - Dashboard code imports API router types only through the explicit `@basango/api/trpc/routers/_app` export.
 - Mobile may share platform-neutral domain contracts but must not import the DOM-based `@basango/ui` package.
 - Follow the dependency graph in `docs/web/README.md`. A new lateral package dependency requires a real ownership relationship and a documentation update.
@@ -128,7 +128,8 @@ Logging
 - Production logs are structured JSON; non-production uses `pino-pretty` transport.
 
 Testing
-- Use `vitest` where present. Add tests locally to the package being changed.
+- Keep tests under the root `tests/` directory, mirroring their owning workspace and source path.
+- Use `bun:test` unless an existing test area already uses another runner.
 - Keep tests fast and focused. Do not introduce global test state.
 
 Quality Gates

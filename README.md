@@ -21,7 +21,6 @@
 |-------------------|-----------------------------------------------|
 | Database          | [README.md](./packages/db/README.md)          |
 | Domain            | [README.md](./packages/domain/README.md)      |
-| Encryption        | [README.md](./packages/encryption/README.md)  |
 | Logger            | [README.md](./packages/logger/README.md)      |
 | User Interface    | [README.md](./packages/ui/README.md)          |
 

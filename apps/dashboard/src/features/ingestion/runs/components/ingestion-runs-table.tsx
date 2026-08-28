@@ -20,6 +20,7 @@ import { useTRPC } from "#dashboard/app/trpc/client";
 
 import { buildIngestionRunsQuery, resolveIngestionRunStates } from "../ingestion-runs-query";
 import type { IngestionRun } from "../types";
+import { IngestionRunsBulkActions } from "./ingestion-runs-bulk-actions";
 import { createIngestionRunColumns } from "./ingestion-runs-columns";
 
 const DEFAULT_TABLE_ID = "operations.recent-runs";
@@ -96,7 +97,15 @@ export function IngestionRunsTable({
             filters={(currentTable) => <RunStateFilter table={currentTable} />}
             store={tableStore}
             table={table}
-          />
+          >
+            <IngestionRunsBulkActions
+              runIds={table
+                .getRowModel()
+                .rows.filter((row) => tableStore.rowSelection[row.id])
+                .map((row) => row.id)}
+              table={table}
+            />
+          </DataTableToolbar>
         )}
       />
     </>
