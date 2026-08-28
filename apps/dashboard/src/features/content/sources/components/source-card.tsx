@@ -15,6 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@basango/ui/components/chart";
+import { Progress } from "@basango/ui/components/progress";
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "#dashboard/app/components/recharts";
 import { formatDate, formatNumber } from "#dashboard/app/utils/formatters";
@@ -29,11 +30,14 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-type Props = {
+type SourceCardProps = {
   source: RouterOutputs["sources"]["list"]["items"][number];
 };
 
-export function SourceCard({ source }: Props) {
+export function SourceCard({ source }: SourceCardProps) {
+  const coveragePercent = source.coveragePercent;
+  const hasCoverage = coveragePercent !== null && coveragePercent !== undefined;
+
   return (
     <Card>
       <CardHeader>
@@ -79,11 +83,26 @@ export function SourceCard({ source }: Props) {
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          {formatNumber(source.articles)} articles crawled
-        </div>
-        <div className="text-muted-foreground leading-none">Showing last 30 days</div>
+      <CardFooter className="flex-col items-start gap-3 text-sm">
+        {hasCoverage ? (
+          <div className="w-full space-y-2">
+            <div className="flex items-center justify-between gap-3 font-medium">
+              <span>Archive coverage</span>
+              <span>{coveragePercent}%</span>
+            </div>
+            <Progress aria-label={`${source.name} archive coverage`} value={coveragePercent} />
+            <div className="text-muted-foreground leading-none">
+              {formatNumber(source.articles)} of about{" "}
+              {formatNumber(source.estimatedArticles ?? undefined)} articles
+            </div>
+          </div>
+        ) : (
+          <div className="w-full space-y-1">
+            <div className="font-medium">{formatNumber(source.articles)} articles crawled</div>
+            <div className="text-muted-foreground leading-none">Coverage estimate unavailable</div>
+          </div>
+        )}
+        <div className="text-muted-foreground leading-none">Publication trend: last 30 days</div>
       </CardFooter>
     </Card>
   );

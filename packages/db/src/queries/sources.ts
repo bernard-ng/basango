@@ -1,9 +1,10 @@
 import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
-import { ID, Publication, Publications } from "@basango/domain/models";
-import { asc, count, eq, getTableColumns, max, min, sql } from "drizzle-orm";
+import type { ID, Publication, Publications } from "@basango/domain/models";
+import { calculateSourceCoveragePercent } from "@basango/domain/models";
+import { asc, count, eq, getTableColumns, max, min, or, sql } from "drizzle-orm";
 import * as uuid from "uuid";
 
-import { Database } from "#db/client";
+import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
 import { articles, categories, sources } from "#db/schema";
 import {
@@ -12,7 +13,12 @@ import {
   GetCategorySharesParams,
   GetPublicationsParams,
 } from "#db/types/shared";
-import { CreateSourceParams, GetSourcesParams, UpdateSourceParams } from "#db/types/sources";
+import type {
+  CreateSourceParams,
+  GetSourcesParams,
+  SyncCrawlerSourcesParams,
+  UpdateSourceParams,
+} from "#db/types/sources";
 import { buildDateRange, buildPaginatedResult, buildPaginationState } from "#db/utils";
 
 export async function getSources(db: Database, params: GetSourcesParams) {
@@ -38,6 +44,7 @@ export async function getSources(db: Database, params: GetSourcesParams) {
   const items = await Promise.all(
     rows.map(async (row) => ({
       ...row,
+      coveragePercent: calculateSourceCoveragePercent(row.articles, row.estimatedArticles),
       publications: await getSourcePublicationGraph(db, { id: row.id }),
     })),
   );
@@ -52,6 +59,91 @@ export async function createSource(db: Database, params: CreateSourceParams) {
     .returning();
 
   return result;
+}
+
+export async function syncCrawlerSources(db: Database, params: SyncCrawlerSourcesParams) {
+  const synchronizedAt = new Date();
+
+  return db.transaction(async (tx) => {
+    let created = 0;
+    let updated = 0;
+
+    for (const source of params.sources) {
+      const [existing] = await tx
+        .select()
+        .from(sources)
+        .where(
+          or(
+            sql`lower(${sources.name}) = lower(${source.name})`,
+            sql`lower(${sources.url}) = lower(${source.url})`,
+          ),
+        )
+        .limit(1);
+
+      if (existing) {
+        await tx
+          .update(sources)
+          .set({
+            coverageUpdatedAt:
+              source.estimatedArticles === undefined ? existing.coverageUpdatedAt : synchronizedAt,
+            estimatedArticles: source.estimatedArticles ?? existing.estimatedArticles,
+            name: source.name,
+            updatedAt: synchronizedAt,
+            url: source.url,
+          })
+          .where(eq(sources.id, existing.id));
+        updated += 1;
+        continue;
+      }
+
+      const [inserted] = await tx
+        .insert(sources)
+        .values({
+          coverageUpdatedAt: source.estimatedArticles === undefined ? undefined : synchronizedAt,
+          estimatedArticles: source.estimatedArticles,
+          id: uuid.v7(),
+          name: source.name,
+          url: source.url,
+        })
+        .onConflictDoNothing()
+        .returning({ id: sources.id });
+
+      if (inserted) {
+        created += 1;
+        continue;
+      }
+
+      const [raced] = await tx
+        .select()
+        .from(sources)
+        .where(
+          or(
+            sql`lower(${sources.name}) = lower(${source.name})`,
+            sql`lower(${sources.url}) = lower(${source.url})`,
+          ),
+        )
+        .limit(1);
+
+      if (!raced) {
+        throw new Error(`Could not synchronize crawler source '${source.name}'`);
+      }
+
+      await tx
+        .update(sources)
+        .set({
+          coverageUpdatedAt:
+            source.estimatedArticles === undefined ? raced.coverageUpdatedAt : synchronizedAt,
+          estimatedArticles: source.estimatedArticles ?? raced.estimatedArticles,
+          name: source.name,
+          updatedAt: synchronizedAt,
+          url: source.url,
+        })
+        .where(eq(sources.id, raced.id));
+      updated += 1;
+    }
+
+    return { created, updated };
+  });
 }
 
 export async function updateSource(db: Database, params: UpdateSourceParams) {

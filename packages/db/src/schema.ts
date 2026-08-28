@@ -145,9 +145,11 @@ export const verifications = pgTable(
 export const sources = pgTable(
   "source",
   {
+    coverageUpdatedAt: timestamp("coverage_updated_at"),
     credibility: jsonb("credibility").$type<Credibility>(),
     description: varchar({ length: 1024 }),
     displayName: varchar("display_name", { length: 255 }),
+    estimatedArticles: integer("estimated_articles"),
     id: uuid().primaryKey().notNull(),
     name: varchar({ length: 255 }).notNull(),
     updatedAt: timestamp("updated_at"),

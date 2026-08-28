@@ -1,4 +1,9 @@
-import type { Credibility, ID, PaginationRequest } from "@basango/domain/models";
+import type {
+  Credibility,
+  ID,
+  PaginationRequest,
+  SyncCrawlerSources,
+} from "@basango/domain/models";
 
 export type UpdateSourceParams = {
   id: ID;
@@ -22,3 +27,5 @@ export type GetSourceByIdParams = {
 };
 
 export type GetSourcesParams = PaginationRequest;
+
+export type SyncCrawlerSourcesParams = SyncCrawlerSources;
