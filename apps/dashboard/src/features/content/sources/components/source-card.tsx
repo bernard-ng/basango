@@ -83,7 +83,7 @@ export function SourceCard({ source }: SourceCardProps) {
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-3 text-sm">
+      <CardFooter className="flex-col items-start text-sm">
         {hasCoverage ? (
           <div className="w-full space-y-2">
             <div className="flex items-center justify-between gap-3 font-medium">
@@ -97,12 +97,12 @@ export function SourceCard({ source }: SourceCardProps) {
             </div>
           </div>
         ) : (
-          <div className="w-full space-y-1">
+          <div className="w-full space-y-2">
             <div className="font-medium">{formatNumber(source.articles)} articles crawled</div>
+            <Progress aria-hidden="true" value={0} />
             <div className="text-muted-foreground leading-none">Coverage estimate unavailable</div>
           </div>
         )}
-        <div className="text-muted-foreground leading-none">Publication trend: last 30 days</div>
       </CardFooter>
     </Card>
   );
