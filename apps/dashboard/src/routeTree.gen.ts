@@ -16,8 +16,10 @@ import { Route as IngestionRouteImport } from './routes/ingestion'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as AgentsAgentIdRouteImport } from './routes/agents/$agentId'
 import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
 import { Route as ArticlesIdRouteImport } from './routes/articles/$id'
+import { Route as RunsRunIdRouteImport } from './routes/runs/$runId'
 import { Route as SourcesIndexRouteImport } from './routes/sources/index'
 import { Route as SourcesIdRouteImport } from './routes/sources/$id'
 
@@ -56,6 +58,11 @@ const TimelineRoute = TimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentsAgentIdRoute = AgentsAgentIdRouteImport.update({
+  id: '/agents/$agentId',
+  path: '/agents/$agentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
   id: '/articles/',
   path: '/articles/',
@@ -64,6 +71,11 @@ const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
 const ArticlesIdRoute = ArticlesIdRouteImport.update({
   id: '/articles/$id',
   path: '/articles/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RunsRunIdRoute = RunsRunIdRouteImport.update({
+  id: '/runs/$runId',
+  path: '/runs/$runId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SourcesIndexRoute = SourcesIndexRouteImport.update({
@@ -85,7 +97,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/timeline': typeof TimelineRoute
+  '/agents/$agentId': typeof AgentsAgentIdRoute
   '/articles/$id': typeof ArticlesIdRoute
+  '/runs/$runId': typeof RunsRunIdRoute
   '/sources/$id': typeof SourcesIdRoute
   '/articles/': typeof ArticlesIndexRoute
   '/sources/': typeof SourcesIndexRoute
@@ -98,7 +112,9 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/timeline': typeof TimelineRoute
+  '/agents/$agentId': typeof AgentsAgentIdRoute
   '/articles/$id': typeof ArticlesIdRoute
+  '/runs/$runId': typeof RunsRunIdRoute
   '/sources/$id': typeof SourcesIdRoute
   '/articles': typeof ArticlesIndexRoute
   '/sources': typeof SourcesIndexRoute
@@ -112,7 +128,9 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/timeline': typeof TimelineRoute
+  '/agents/$agentId': typeof AgentsAgentIdRoute
   '/articles/$id': typeof ArticlesIdRoute
+  '/runs/$runId': typeof RunsRunIdRoute
   '/sources/$id': typeof SourcesIdRoute
   '/articles/': typeof ArticlesIndexRoute
   '/sources/': typeof SourcesIndexRoute
@@ -127,7 +145,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/timeline'
+    | '/agents/$agentId'
     | '/articles/$id'
+    | '/runs/$runId'
     | '/sources/$id'
     | '/articles/'
     | '/sources/'
@@ -140,7 +160,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/timeline'
+    | '/agents/$agentId'
     | '/articles/$id'
+    | '/runs/$runId'
     | '/sources/$id'
     | '/articles'
     | '/sources'
@@ -153,7 +175,9 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/timeline'
+    | '/agents/$agentId'
     | '/articles/$id'
+    | '/runs/$runId'
     | '/sources/$id'
     | '/articles/'
     | '/sources/'
@@ -167,7 +191,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TimelineRoute: typeof TimelineRoute
+  AgentsAgentIdRoute: typeof AgentsAgentIdRoute
   ArticlesIdRoute: typeof ArticlesIdRoute
+  RunsRunIdRoute: typeof RunsRunIdRoute
   SourcesIdRoute: typeof SourcesIdRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
   SourcesIndexRoute: typeof SourcesIndexRoute
@@ -224,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TimelineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agents/$agentId': {
+      id: '/agents/$agentId'
+      path: '/agents/$agentId'
+      fullPath: '/agents/$agentId'
+      preLoaderRoute: typeof AgentsAgentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/articles/': {
       id: '/articles/'
       path: '/articles'
@@ -236,6 +269,13 @@ declare module '@tanstack/react-router' {
       path: '/articles/$id'
       fullPath: '/articles/$id'
       preLoaderRoute: typeof ArticlesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/runs/$runId': {
+      id: '/runs/$runId'
+      path: '/runs/$runId'
+      fullPath: '/runs/$runId'
+      preLoaderRoute: typeof RunsRunIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sources/': {
@@ -263,7 +303,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TimelineRoute: TimelineRoute,
+  AgentsAgentIdRoute: AgentsAgentIdRoute,
   ArticlesIdRoute: ArticlesIdRoute,
+  RunsRunIdRoute: RunsRunIdRoute,
   SourcesIdRoute: SourcesIdRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
   SourcesIndexRoute: SourcesIndexRoute,

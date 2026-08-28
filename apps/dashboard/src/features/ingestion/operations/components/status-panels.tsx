@@ -8,6 +8,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@basango/ui/components/item";
+import { Link } from "@tanstack/react-router";
 
 import { relativeTime, stateVariant } from "../../shared/ingestion-formatters";
 import type { IngestionAgent } from "../types";
@@ -50,7 +51,15 @@ function AgentHealthItem({ agent }: AgentHealthItemProps) {
         />
       </ItemMedia>
       <ItemContent className="min-w-0">
-        <ItemTitle className="max-w-full truncate">{agent.id}</ItemTitle>
+        <ItemTitle className="max-w-full truncate">
+          <Link
+            className="underline-offset-4 hover:underline"
+            params={{ agentId: agent.id }}
+            to="/agents/$agentId"
+          >
+            {agent.id}
+          </Link>
+        </ItemTitle>
         <ItemDescription className="truncate text-xs">
           {agent.version ? `v${agent.version} · ` : ""}seen {relativeTime(agent.lastSeenAt)}
         </ItemDescription>

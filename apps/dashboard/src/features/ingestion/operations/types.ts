@@ -16,6 +16,8 @@ export type IngestionMetrics = {
   discovered: number;
   failed: number;
   persisted: number;
+  processed: number;
+  skipped: number;
 };
 
 export type ThroughputPoint = Pick<IngestionMetrics, "delivered" | "discovered" | "persisted"> & {

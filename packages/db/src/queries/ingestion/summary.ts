@@ -10,6 +10,8 @@ type IngestionTotals = {
   discovered: number;
   failed: number;
   persisted: number;
+  processed: number;
+  skipped: number;
 };
 
 const EMPTY_TOTALS: IngestionTotals = {
@@ -17,6 +19,8 @@ const EMPTY_TOTALS: IngestionTotals = {
   discovered: 0,
   failed: 0,
   persisted: 0,
+  processed: 0,
+  skipped: 0,
 };
 
 export async function getIngestionSummary(db: Database) {
@@ -33,6 +37,8 @@ export async function getIngestionSummary(db: Database) {
       discovered: current.discovered + run.articlesDiscovered,
       failed: current.failed + run.articlesFailed,
       persisted: current.persisted + run.articlesPersisted,
+      processed: current.processed + (run.articlesProcessed ?? 0),
+      skipped: current.skipped + (run.articlesSkipped ?? 0),
     }),
     { ...EMPTY_TOTALS },
   );

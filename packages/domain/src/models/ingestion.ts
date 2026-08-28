@@ -22,18 +22,48 @@ export const INGESTION_RUN_SORT_FIELDS = [
 
 export const ingestionRunStateSchema = z.enum(INGESTION_RUN_STATES);
 
+const ingestionRunIdsSchema = z
+  .array(z.uuid())
+  .min(1)
+  .max(100)
+  .refine((runIds) => new Set(runIds).size === runIds.length, "Run IDs must be unique.");
+
+const ingestionActivityPageSchema = z
+  .object({
+    current: z.number().int().positive().default(1),
+    limit: z.number().int().min(10).max(50).default(20),
+  })
+  .optional();
+
 export const closeIngestionRunsSchema = z.object({
-  runIds: z
-    .array(z.uuid())
-    .min(1)
-    .max(100)
-    .refine((runIds) => new Set(runIds).size === runIds.length, "Run IDs must be unique."),
+  runIds: ingestionRunIdsSchema,
   state: z.enum(INGESTION_RUN_TERMINAL_STATES),
+});
+
+export const deleteIngestionRunsSchema = z.object({
+  runIds: ingestionRunIdsSchema,
+});
+
+export const ingestionRunParamsSchema = z.object({
+  runId: z.uuid(),
+});
+
+export const ingestionRunActivitiesQuerySchema = ingestionRunParamsSchema.extend({
+  page: ingestionActivityPageSchema,
+});
+
+export const ingestionAgentParamsSchema = z.object({
+  agentId: z.string().trim().min(1).max(255),
+});
+
+export const ingestionAgentActivitiesQuerySchema = ingestionAgentParamsSchema.extend({
+  page: ingestionActivityPageSchema,
 });
 
 export const ingestionRunsQuerySchema = z.object({
   filters: z
     .object({
+      agentId: z.string().trim().min(1).max(255).optional(),
       query: z.string().trim().min(1).max(255).optional(),
       sourceId: z.string().trim().min(1).max(255).optional(),
       states: z.array(ingestionRunStateSchema).max(INGESTION_RUN_STATES.length).optional(),
@@ -117,6 +147,9 @@ export const ingestionChangeSchema = z.object({
 export type IngestionChange = z.infer<typeof ingestionChangeSchema>;
 export type IngestionChangeTopic = (typeof INGESTION_CHANGE_TOPICS)[number];
 export type CloseIngestionRuns = z.infer<typeof closeIngestionRunsSchema>;
+export type DeleteIngestionRuns = z.infer<typeof deleteIngestionRunsSchema>;
+export type IngestionAgentActivitiesQuery = z.infer<typeof ingestionAgentActivitiesQuerySchema>;
+export type IngestionRunActivitiesQuery = z.infer<typeof ingestionRunActivitiesQuerySchema>;
 export type IngestionRunMetrics = z.infer<typeof ingestionRunMetricsSchema>;
 export type IngestionRunsQuery = z.infer<typeof ingestionRunsQuerySchema>;
 export type IngestionRunState = z.infer<typeof ingestionRunStateSchema>;

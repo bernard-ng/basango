@@ -35,13 +35,26 @@ const latencyConfig = {
   duration: { color: "var(--chart-4)", label: "Duration (min)" },
 } satisfies ChartConfig;
 
-export function ThroughputPanel({ data }: { data: ThroughputPoint[] }) {
+type ThroughputPanelProps = {
+  data: ThroughputPoint[];
+  description?: string;
+};
+
+type PipelineStagesPanelProps = {
+  data: PipelinePoint[];
+  description?: string;
+};
+
+type RunDurationPanelProps = {
+  data: LatencyPoint[];
+};
+
+export function ThroughputPanel({
+  data,
+  description = "Articles processed per 3-minute interval over the last 30 minutes",
+}: ThroughputPanelProps) {
   return (
-    <DashboardPanel
-      description="Articles processed per 3-minute interval over the last 30 minutes"
-      title="Throughput"
-      trailing={<ThroughputLegend />}
-    >
+    <DashboardPanel description={description} title="Throughput" trailing={<ThroughputLegend />}>
       <ChartContainer className="h-[280px] w-full" config={throughputConfig}>
         <AreaChart accessibilityLayer data={data} margin={{ left: -16, right: 8 }}>
           <defs>
@@ -84,9 +97,12 @@ export function ThroughputPanel({ data }: { data: ThroughputPoint[] }) {
   );
 }
 
-export function PipelineStagesPanel({ data }: { data: PipelinePoint[] }) {
+export function PipelineStagesPanel({
+  data,
+  description = "Totals across the latest runs",
+}: PipelineStagesPanelProps) {
   return (
-    <DashboardPanel description="Totals across the latest runs" title="Pipeline stages">
+    <DashboardPanel description={description} title="Pipeline stages">
       <ChartContainer className="h-[280px] w-full" config={pipelineConfig}>
         <BarChart accessibilityLayer data={data} layout="vertical" margin={{ left: 8 }}>
           <CartesianGrid horizontal={false} strokeDasharray="3 3" />
@@ -104,7 +120,7 @@ export function PipelineStagesPanel({ data }: { data: PipelinePoint[] }) {
   );
 }
 
-export function RunDurationPanel({ data }: { data: LatencyPoint[] }) {
+export function RunDurationPanel({ data }: RunDurationPanelProps) {
   return (
     <DashboardPanel description="Completion time in minutes for recent runs" title="Run duration">
       {data.length === 0 ? (

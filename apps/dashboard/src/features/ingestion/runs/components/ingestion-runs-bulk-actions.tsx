@@ -1,28 +1,13 @@
 "use client";
 
-import type { IngestionRunState } from "@basango/domain/models";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@basango/ui/components/alert-dialog";
 import { Button } from "@basango/ui/components/button";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Table } from "@tanstack/react-table";
-import { CircleCheckIcon, CircleXIcon } from "lucide-react";
+import { CircleCheckIcon, CircleXIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
-import { useTRPC } from "#dashboard/app/trpc/client";
-
-import type { IngestionRun } from "../types";
-
-type TerminalRunState = Extract<IngestionRunState, "completed" | "failed">;
+import { useIngestionRunActions } from "../hooks/use-ingestion-run-actions";
+import type { IngestionRun, IngestionRunAction } from "../types";
+import { IngestionRunActionDialog } from "./ingestion-run-action-dialog";
 
 type IngestionRunsBulkActionsProps = {
   runIds: string[];
@@ -30,66 +15,43 @@ type IngestionRunsBulkActionsProps = {
 };
 
 export function IngestionRunsBulkActions({ runIds, table }: IngestionRunsBulkActionsProps) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-  const [targetState, setTargetState] = useState<TerminalRunState | undefined>(undefined);
+  const [action, setAction] = useState<IngestionRunAction | undefined>(undefined);
+  const { closeRuns, deleteRuns } = useIngestionRunActions();
   const selectedCount = runIds.length;
-  const closeRuns = useMutation(
-    trpc.operations.closeIngestionRuns.mutationOptions({
-      onError(error) {
-        toast.error(error.message ?? "Unable to close the selected runs.");
-      },
-      onSuccess(result, input) {
-        if (result.updatedCount > 0) {
-          toast.success(formatSuccessMessage(result.updatedCount, input.state));
-        }
-
-        if (result.unchangedCount > 0) {
-          toast.info(
-            `${result.unchangedCount} ${pluralize("run", result.unchangedCount)} already had that status or were unavailable.`,
-          );
-        }
-
-        table.resetRowSelection();
-        setTargetState(undefined);
-        void Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: trpc.operations.getIngestionAgents.queryKey(),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: trpc.operations.getIngestionSummary.queryKey(),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: trpc.operations.listIngestionRuns.queryKey(),
-          }),
-        ]);
-      },
-    }),
-  );
+  const isPending = closeRuns.isPending || deleteRuns.isPending;
 
   if (selectedCount === 0) {
     return null;
   }
 
-  function closeSelectedRuns() {
-    if (!targetState) {
+  function finishAction() {
+    table.resetRowSelection();
+    setAction(undefined);
+  }
+
+  function confirmAction() {
+    if (!action) {
       return;
     }
 
-    closeRuns.mutate({
-      runIds,
-      state: targetState,
-    });
+    const options = { onSuccess: finishAction };
+
+    if (action === "delete") {
+      deleteRuns.mutate({ runIds }, options);
+      return;
+    }
+
+    closeRuns.mutate({ runIds, state: action }, options);
   }
 
   return (
     <>
       <span className="text-xs text-muted-foreground">
-        {selectedCount} {pluralize("run", selectedCount)} selected
+        {selectedCount} {selectedCount === 1 ? "run" : "runs"} selected
       </span>
       <Button
-        disabled={closeRuns.isPending}
-        onClick={() => setTargetState("completed")}
+        disabled={isPending}
+        onClick={() => setAction("completed")}
         size="sm"
         type="button"
         variant="outline"
@@ -98,53 +60,36 @@ export function IngestionRunsBulkActions({ runIds, table }: IngestionRunsBulkAct
         Mark completed
       </Button>
       <Button
-        disabled={closeRuns.isPending}
-        onClick={() => setTargetState("failed")}
+        disabled={isPending}
+        onClick={() => setAction("failed")}
         size="sm"
         type="button"
-        variant="destructive"
+        variant="outline"
       >
         <CircleXIcon />
         Mark failed
       </Button>
-      <AlertDialog
+      <Button
+        disabled={isPending}
+        onClick={() => setAction("delete")}
+        size="sm"
+        type="button"
+        variant="destructive"
+      >
+        <Trash2Icon />
+        Delete history
+      </Button>
+      <IngestionRunActionDialog
+        action={action}
+        count={selectedCount}
+        isPending={isPending}
+        onConfirm={confirmAction}
         onOpenChange={(open) => {
-          if (!open && !closeRuns.isPending) {
-            setTargetState(undefined);
+          if (!open && !isPending) {
+            setAction(undefined);
           }
         }}
-        open={targetState !== undefined}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Mark {selectedCount} {pluralize("run", selectedCount)} as {targetState}?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              The selected runs will be assigned this final status. This also releases any agent
-              that still points to one of these runs.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={closeRuns.isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={closeRuns.isPending}
-              onClick={closeSelectedRuns}
-              variant={targetState === "failed" ? "destructive" : "default"}
-            >
-              {closeRuns.isPending ? "Updating…" : "Confirm"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      />
     </>
   );
-}
-
-function formatSuccessMessage(count: number, state: TerminalRunState) {
-  return `${count} ${pluralize("run", count)} marked as ${state}.`;
-}
-
-function pluralize(noun: string, count: number) {
-  return count === 1 ? noun : `${noun}s`;
 }

@@ -2,7 +2,12 @@ import { describe, expect, test } from "bun:test";
 
 import {
   closeIngestionRunsSchema,
+  deleteIngestionRunsSchema,
+  ingestionAgentActivitiesQuerySchema,
+  ingestionAgentParamsSchema,
   ingestionChangeSchema,
+  ingestionRunActivitiesQuerySchema,
+  ingestionRunParamsSchema,
   ingestionRunsQuerySchema,
   ingestionSignalSchema,
 } from "../../../packages/domain/src/models/ingestion";
@@ -84,6 +89,7 @@ describe("ingestion runs query", () => {
   test("accepts server pagination, status filters, and sorting", () => {
     const query = ingestionRunsQuerySchema.parse({
       filters: {
+        agentId: "crawler-lubumbashi-01",
         query: "radio okapi",
         sourceId: "radiookapi.net",
         states: ["running", "failed"],
@@ -99,6 +105,7 @@ describe("ingestion runs query", () => {
     });
 
     expect(query.page).toEqual({ current: 2, limit: 20 });
+    expect(query.filters?.agentId).toBe("crawler-lubumbashi-01");
     expect(query.filters?.sourceId).toBe("radiookapi.net");
     expect(query.filters?.states).toEqual(["running", "failed"]);
   });
@@ -136,6 +143,73 @@ describe("manual ingestion run closure", () => {
       closeIngestionRunsSchema.safeParse({
         runIds: ["0198d7e4-df8c-7000-8000-000000000002", "0198d7e4-df8c-7000-8000-000000000002"],
         state: "completed",
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("ingestion run cleanup", () => {
+  test("accepts a unique batch of run IDs", () => {
+    const cleanup = deleteIngestionRunsSchema.parse({
+      runIds: ["0198d7e4-df8c-7000-8000-000000000002", "0198d7e4-df8c-7000-8000-000000000003"],
+    });
+
+    expect(cleanup.runIds).toHaveLength(2);
+  });
+
+  test("rejects empty and duplicate batches", () => {
+    expect(deleteIngestionRunsSchema.safeParse({ runIds: [] }).success).toBe(false);
+    expect(
+      deleteIngestionRunsSchema.safeParse({
+        runIds: ["0198d7e4-df8c-7000-8000-000000000002", "0198d7e4-df8c-7000-8000-000000000002"],
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("ingestion run details", () => {
+  test("accepts a run identifier and paginated activity query", () => {
+    const runId = "0198d7e4-df8c-7000-8000-000000000002";
+
+    expect(ingestionRunParamsSchema.parse({ runId })).toEqual({ runId });
+    expect(
+      ingestionRunActivitiesQuerySchema.parse({
+        page: { current: 2, limit: 20 },
+        runId,
+      }),
+    ).toEqual({ page: { current: 2, limit: 20 }, runId });
+  });
+
+  test("rejects invalid run identifiers and oversized activity pages", () => {
+    expect(ingestionRunParamsSchema.safeParse({ runId: "not-a-run" }).success).toBe(false);
+    expect(
+      ingestionRunActivitiesQuerySchema.safeParse({
+        page: { current: 1, limit: 100 },
+        runId: "0198d7e4-df8c-7000-8000-000000000002",
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("ingestion agent details", () => {
+  test("accepts agent identifiers and paginated activity queries", () => {
+    const agentId = "crawler-lubumbashi-01";
+
+    expect(ingestionAgentParamsSchema.parse({ agentId })).toEqual({ agentId });
+    expect(
+      ingestionAgentActivitiesQuerySchema.parse({
+        agentId,
+        page: { current: 2, limit: 20 },
+      }),
+    ).toEqual({ agentId, page: { current: 2, limit: 20 } });
+  });
+
+  test("rejects empty agent identifiers and oversized activity pages", () => {
+    expect(ingestionAgentParamsSchema.safeParse({ agentId: "" }).success).toBe(false);
+    expect(
+      ingestionAgentActivitiesQuerySchema.safeParse({
+        agentId: "crawler-lubumbashi-01",
+        page: { current: 1, limit: 100 },
       }).success,
     ).toBe(false);
   });

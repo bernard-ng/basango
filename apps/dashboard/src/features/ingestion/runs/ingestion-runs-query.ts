@@ -9,6 +9,7 @@ import type { useTableStore } from "@basango/ui/stores/table-store";
 export function buildIngestionRunsQuery(
   store: ReturnType<typeof useTableStore>,
   sourceId?: string,
+  agentId?: string,
 ): IngestionRunsQuery {
   const query = store.globalFilter.trim();
   const states = resolveIngestionRunStates(
@@ -16,8 +17,8 @@ export function buildIngestionRunsQuery(
   );
   const sorting = store.sorting[0];
   const filters =
-    query || sourceId || states.length > 0
-      ? { query: query || undefined, sourceId, states }
+    query || sourceId || agentId || states.length > 0
+      ? { agentId, query: query || undefined, sourceId, states }
       : undefined;
   const sort =
     sorting && isSortField(sorting.id)

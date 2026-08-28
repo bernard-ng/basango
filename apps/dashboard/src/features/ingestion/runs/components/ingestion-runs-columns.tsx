@@ -1,9 +1,11 @@
 import { Badge } from "@basango/ui/components/badge";
 import { Checkbox } from "@basango/ui/components/checkbox";
+import { Link } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { formatDuration, relativeTime, stateVariant } from "../../shared/ingestion-formatters";
 import type { IngestionRun } from "../types";
+import { IngestionRunRowActions } from "./ingestion-run-row-actions";
 
 export function createIngestionRunColumns(): ColumnDef<IngestionRun>[] {
   return [
@@ -52,9 +54,13 @@ export function createIngestionRunColumns(): ColumnDef<IngestionRun>[] {
     {
       accessorKey: "agentId",
       cell: ({ row }) => (
-        <span className="block max-w-44 truncate text-muted-foreground">
+        <Link
+          className="block max-w-44 truncate font-medium text-foreground underline-offset-4 hover:underline"
+          params={{ agentId: row.original.agentId }}
+          to="/agents/$agentId"
+        >
           {row.original.agentId}
-        </span>
+        </Link>
       ),
       header: "Agent",
     },
@@ -103,6 +109,13 @@ export function createIngestionRunColumns(): ColumnDef<IngestionRun>[] {
         </time>
       ),
       header: "Updated",
+    },
+    {
+      cell: ({ row }) => <IngestionRunRowActions run={row.original} />,
+      enableHiding: false,
+      enableSorting: false,
+      header: () => <span className="sr-only">Actions</span>,
+      id: "actions",
     },
   ];
 }

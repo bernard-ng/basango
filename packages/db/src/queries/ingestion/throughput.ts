@@ -4,6 +4,7 @@ import type { Database } from "#db/client";
 
 const THROUGHPUT_BUCKETS = 10;
 const THROUGHPUT_WINDOW_MS = 30 * 60 * 1000;
+const RUN_THROUGHPUT_BUCKETS = 12;
 
 type ThroughputBucket = {
   [key: string]: unknown;
@@ -112,5 +113,71 @@ export async function getIngestionThroughput(db: Database) {
     articlesDiscovered: bucket.articlesDiscovered,
     articlesPersisted: bucket.articlesPersisted,
     occurredAt: new Date(start.getTime() + bucket.bucket * bucketSizeMs),
+  }));
+}
+
+type RunThroughputWindow = {
+  end: Date;
+  runId: string;
+  start: Date;
+};
+
+export async function getIngestionRunThroughput(db: Database, window: RunThroughputWindow) {
+  const durationMs = Math.max(1, window.end.getTime() - window.start.getTime());
+  const bucketSizeMs = durationMs / RUN_THROUGHPUT_BUCKETS;
+  const result = await db.execute<ThroughputBucket>(sql`
+    WITH signals AS (
+      SELECT
+        activity.id,
+        activity.occurred_at,
+        COALESCE((activity.data -> 'metrics' ->> 'articlesDelivered')::int, 0) AS delivered,
+        COALESCE((activity.data -> 'metrics' ->> 'articlesDiscovered')::int, 0) AS discovered,
+        COALESCE((activity.data -> 'metrics' ->> 'articlesPersisted')::int, 0) AS persisted
+      FROM ingestion_activity activity
+      WHERE activity.run_id = ${window.runId}::uuid
+        AND activity.data ? 'metrics'
+    ),
+    deltas AS (
+      SELECT
+        occurred_at,
+        GREATEST(delivered - LAG(delivered, 1, 0) OVER ordered_signals, 0) AS delivered,
+        GREATEST(discovered - LAG(discovered, 1, 0) OVER ordered_signals, 0) AS discovered,
+        GREATEST(persisted - LAG(persisted, 1, 0) OVER ordered_signals, 0) AS persisted
+      FROM signals
+      WINDOW ordered_signals AS (ORDER BY occurred_at, id)
+    ),
+    bucketed AS (
+      SELECT
+        LEAST(
+          ${RUN_THROUGHPUT_BUCKETS - 1},
+          GREATEST(
+            0,
+            FLOOR(
+              EXTRACT(EPOCH FROM (deltas.occurred_at - ${window.start}::timestamptz)) * 1000
+              / ${bucketSizeMs}::double precision
+            )::int
+          )
+        ) AS bucket,
+        SUM(deltas.delivered)::int AS delivered,
+        SUM(deltas.discovered)::int AS discovered,
+        SUM(deltas.persisted)::int AS persisted
+      FROM deltas
+      GROUP BY 1
+    )
+    SELECT
+      series.bucket,
+      COALESCE(bucketed.delivered, 0)::int AS "articlesDelivered",
+      COALESCE(bucketed.discovered, 0)::int AS "articlesDiscovered",
+      COALESCE(bucketed.persisted, 0)::int AS "articlesPersisted"
+    FROM generate_series(0, ${RUN_THROUGHPUT_BUCKETS - 1}) AS series(bucket)
+    LEFT JOIN bucketed USING (bucket)
+    ORDER BY series.bucket
+  `);
+
+  return result.rows.map((bucket) => ({
+    articlesDelivered: bucket.articlesDelivered,
+    articlesDiscovered: bucket.articlesDiscovered,
+    articlesPersisted: bucket.articlesPersisted,
+    occurredAt: new Date(window.start.getTime() + bucket.bucket * bucketSizeMs),
   }));
 }

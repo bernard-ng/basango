@@ -1,9 +1,16 @@
-import type { CloseIngestionRuns, IngestionRunsQuery } from "@basango/domain/models";
+import type {
+  CloseIngestionRuns,
+  DeleteIngestionRuns,
+  IngestionRunsQuery,
+} from "@basango/domain/models";
 import type { SQL } from "drizzle-orm";
 import { and, asc, count, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 
 import type { Database } from "#db/client";
-import { ingestionAgents, ingestionRuns } from "#db/schema";
+import { NotFoundError } from "#db/errors";
+import { ingestionActivities, ingestionAgents, ingestionRuns } from "#db/schema";
+
+import { getIngestionRunThroughput } from "./throughput";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
@@ -56,6 +63,22 @@ export async function listIngestionRuns(db: Database, params: IngestionRunsQuery
   };
 }
 
+export async function getIngestionRunDetails(db: Database, runId: string) {
+  const run = await db.query.ingestionRuns.findFirst({
+    where: eq(ingestionRuns.id, runId),
+  });
+
+  if (!run) {
+    throw new NotFoundError("Ingestion run not found");
+  }
+
+  const start = run.startedAt ?? run.createdAt;
+  const end = run.completedAt ?? run.lastSignalAt;
+  const throughput = await getIngestionRunThroughput(db, { end, runId, start });
+
+  return { run, throughput };
+}
+
 export async function closeIngestionRuns(db: Database, params: CloseIngestionRuns) {
   const completedAt = new Date();
 
@@ -89,11 +112,69 @@ export async function closeIngestionRuns(db: Database, params: CloseIngestionRun
   });
 }
 
+export async function deleteIngestionRuns(db: Database, params: DeleteIngestionRuns) {
+  return db.transaction(async (tx) => {
+    const terminalRuns = await tx
+      .select({ id: ingestionRuns.id })
+      .from(ingestionRuns)
+      .where(
+        and(
+          inArray(ingestionRuns.id, params.runIds),
+          inArray(ingestionRuns.state, ["completed", "failed"]),
+        ),
+      );
+    const terminalRunIds = terminalRuns.map((run) => run.id);
+
+    if (terminalRunIds.length === 0) {
+      return {
+        deletedActivityCount: 0,
+        deletedCount: 0,
+        releasedAgentCount: 0,
+        runIds: [],
+        skippedCount: params.runIds.length,
+      };
+    }
+
+    const releasedAgents = await tx
+      .update(ingestionAgents)
+      .set({ activeRunId: null, state: "idle" })
+      .where(inArray(ingestionAgents.activeRunId, terminalRunIds))
+      .returning({ id: ingestionAgents.id });
+    const deletedRuns = await tx
+      .delete(ingestionRuns)
+      .where(
+        and(
+          inArray(ingestionRuns.id, terminalRunIds),
+          inArray(ingestionRuns.state, ["completed", "failed"]),
+        ),
+      )
+      .returning({ id: ingestionRuns.id });
+    const deletedRunIds = deletedRuns.map((run) => run.id);
+    const deletedActivities = await tx
+      .delete(ingestionActivities)
+      .where(inArray(ingestionActivities.runId, deletedRunIds))
+      .returning({ id: ingestionActivities.id });
+
+    return {
+      deletedActivityCount: deletedActivities.length,
+      deletedCount: deletedRunIds.length,
+      releasedAgentCount: releasedAgents.length,
+      runIds: deletedRunIds,
+      skippedCount: params.runIds.length - deletedRunIds.length,
+    };
+  });
+}
+
 function buildRunsFilter(params: IngestionRunsQuery): SQL | undefined {
   const conditions: SQL[] = [];
+  const agentId = params.filters?.agentId;
   const query = params.filters?.query;
   const sourceId = params.filters?.sourceId;
   const states = params.filters?.states;
+
+  if (agentId) {
+    conditions.push(eq(ingestionRuns.agentId, agentId));
+  }
 
   if (sourceId) {
     conditions.push(eq(ingestionRuns.sourceId, sourceId));

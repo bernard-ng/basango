@@ -33,7 +33,9 @@ const stateLabels: Record<IngestionRunState, string> = {
 };
 
 type IngestionRunsTableProps = {
+  agentId?: string;
   realtime?: boolean;
+  refetchInterval?: false | number;
   sourceId?: string;
   tableId?: string;
 };
@@ -43,7 +45,9 @@ type RunStateFilterProps = {
 };
 
 export function IngestionRunsTable({
+  agentId,
   realtime = true,
+  refetchInterval = false,
   sourceId,
   tableId = DEFAULT_TABLE_ID,
 }: IngestionRunsTableProps) {
@@ -52,7 +56,7 @@ export function IngestionRunsTable({
     pagination: { pageIndex: 0, pageSize: 10 },
     sorting: [{ desc: true, id: "lastSignalAt" }],
   });
-  const queryInput = buildIngestionRunsQuery(store, sourceId);
+  const queryInput = buildIngestionRunsQuery(store, sourceId, agentId);
   const transportOptions = realtime ? { trpc: { context: { realtime: true } } } : {};
   const listRuns = useQuery({
     ...trpc.operations.listIngestionRuns.queryOptions(queryInput, {
@@ -62,6 +66,7 @@ export function IngestionRunsTable({
       ...transportOptions,
     }),
     placeholderData: keepPreviousData,
+    refetchInterval,
   });
   const columns = useMemo<ColumnDef<IngestionRun>[]>(() => createIngestionRunColumns(), []);
 
@@ -92,7 +97,11 @@ export function IngestionRunsTable({
         toolbar={({ store: tableStore, table }) => (
           <DataTableToolbar
             filterPlaceholder={
-              sourceId ? "Search agent or error…" : "Search source, agent, or error…"
+              sourceId
+                ? "Search agent or error…"
+                : agentId
+                  ? "Search source or error…"
+                  : "Search source, agent, or error…"
             }
             filters={(currentTable) => <RunStateFilter table={currentTable} />}
             store={tableStore}
