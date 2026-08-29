@@ -10,7 +10,6 @@ import type z from "zod";
 import { authClient } from "#mobile/application/auth/auth-client";
 import { useTRPC } from "#mobile/application/trpc/client";
 import { formatRelativeTime } from "#mobile/features/content/shared/format-relative-time";
-import { BottomSheetModal } from "#mobile/ui/components/bottom-sheet-modal";
 import { Button } from "#mobile/ui/components/button";
 import { IconButton } from "#mobile/ui/components/icon-button";
 import { Input } from "#mobile/ui/components/input";
@@ -28,21 +27,7 @@ type ArticleCommentsProps = {
   enabled: boolean;
 };
 
-type ArticleCommentsModalProps = {
-  articleId: string;
-  onClose: () => void;
-  visible: boolean;
-};
-
-export function ArticleCommentsModal({ articleId, onClose, visible }: ArticleCommentsModalProps) {
-  return (
-    <BottomSheetModal onClose={onClose} title="Commentaires" visible={visible}>
-      <ArticleComments articleId={articleId} enabled={visible} />
-    </BottomSheetModal>
-  );
-}
-
-function ArticleComments({ articleId, enabled }: ArticleCommentsProps) {
+export function ArticleComments({ articleId, enabled }: ArticleCommentsProps) {
   const colors = useAppColors();
   const session = authClient.useSession();
   const queryClient = useQueryClient();
@@ -85,9 +70,10 @@ function ArticleComments({ articleId, enabled }: ArticleCommentsProps) {
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+    <KeyboardAvoidingView behavior="padding" collapsable={false} style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={{ gap: 20, paddingBottom: 32, paddingHorizontal: 20 }}
+        contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >

@@ -1,32 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { BookmarkIcon, MessageCircleIcon, Share2Icon } from "lucide-react-native";
-import { useState } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Linking, Share } from "react-native";
 import { H5, ScrollView, Separator, XStack, YStack } from "tamagui";
 
 import { useTRPC } from "#mobile/application/trpc/client";
 import { SourceReference } from "#mobile/features/content/articles/components/source-reference";
-import { BookmarkPickerModal } from "#mobile/features/content/bookmarks/components/bookmark-picker-modal";
-import { ArticleCommentsModal } from "#mobile/features/content/comments/components/article-comments";
 import { formatPublicationDate } from "#mobile/features/content/shared/format-publication-date";
 import { toPlainText } from "#mobile/features/content/shared/to-plain-text";
-import { Button } from "#mobile/ui/components/button";
-import { IconButton } from "#mobile/ui/components/icon-button";
 import { Screen } from "#mobile/ui/components/screen";
 import { ErrorState, LoadingState } from "#mobile/ui/components/status-state";
 import { Text } from "#mobile/ui/components/text";
 import { screenBottomPadding, screenGutter } from "#mobile/ui/layout";
-import { useAppColors } from "#mobile/ui/theme";
 
 export default function ArticleDetailsRoute() {
-  const colors = useAppColors();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const trpc = useTRPC();
   const article = useQuery(trpc.feed.articles.get.queryOptions({ id }));
-  const [isBookmarkPickerVisible, setBookmarkPickerVisible] = useState(false);
-  const [isCommentsVisible, setCommentsVisible] = useState(false);
 
   async function handleShare() {
     if (!article.data) {
@@ -58,24 +49,42 @@ export default function ArticleDetailsRoute() {
 
   return (
     <Screen hasNativeHeader>
-      <Stack.Screen
-        options={{
-          headerRight: ({ tintColor }) => (
-            <XStack alignItems="center">
-              <IconButton
-                accessibilityLabel="Ajouter aux signets"
-                onPress={() => setBookmarkPickerVisible(true)}
-              >
-                <BookmarkIcon color={tintColor ?? colors.primary} size={22} strokeWidth={1.8} />
-              </IconButton>
-              <IconButton accessibilityLabel="Partager l’article" onPress={handleShare}>
-                <Share2Icon color={tintColor ?? colors.primary} size={22} strokeWidth={1.8} />
-              </IconButton>
-            </XStack>
-          ),
-          title: "",
-        }}
-      />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          accessibilityLabel="Ajouter aux signets"
+          icon="bookmark"
+          onPress={() =>
+            router.push({
+              params: { articleId: article.data.id },
+              pathname: "/(app)/(tabs)/articles/bookmark-picker",
+            })
+          }
+        />
+        <Stack.Toolbar.Button
+          accessibilityLabel="Partager l’article"
+          icon="square.and.arrow.up"
+          onPress={handleShare}
+        />
+        <Stack.Toolbar.Menu accessibilityLabel="Actions de l’article" icon="ellipsis">
+          <Stack.Toolbar.MenuAction
+            icon="bubble.left"
+            onPress={() =>
+              router.push({
+                params: { articleId: article.data.id },
+                pathname: "/(app)/(tabs)/articles/comments",
+              })
+            }
+          >
+            Commentaires
+          </Stack.Toolbar.MenuAction>
+          <Stack.Toolbar.MenuAction
+            icon="safari"
+            onPress={() => void Linking.openURL(article.data.link)}
+          >
+            Ouvrir sur le site
+          </Stack.Toolbar.MenuAction>
+        </Stack.Toolbar.Menu>
+      </Stack.Toolbar>
 
       <ScrollView
         contentContainerStyle={{
@@ -123,32 +132,8 @@ export default function ArticleDetailsRoute() {
           <Text fontSize={16} lineHeight={25} marginTop="$2">
             {toPlainText(article.data.body)}
           </Text>
-
-          <Button onPress={() => void Linking.openURL(article.data.link)} width="100%">
-            Consulter l’article
-          </Button>
-
-          <Button
-            icon={<MessageCircleIcon color={colors.primary} size={19} strokeWidth={1.8} />}
-            onPress={() => setCommentsVisible(true)}
-            variant="outline"
-            width="100%"
-          >
-            Commentaires
-          </Button>
         </YStack>
       </ScrollView>
-
-      <ArticleCommentsModal
-        articleId={article.data.id}
-        onClose={() => setCommentsVisible(false)}
-        visible={isCommentsVisible}
-      />
-      <BookmarkPickerModal
-        articleId={article.data.id}
-        onClose={() => setBookmarkPickerVisible(false)}
-        visible={isBookmarkPickerVisible}
-      />
     </Screen>
   );
 }

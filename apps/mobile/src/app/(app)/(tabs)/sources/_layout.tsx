@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 
+import { fadeHeaderOptions } from "#mobile/ui/navigation/fade-header-options";
 import { useStackScreenOptions } from "#mobile/ui/navigation/use-stack-screen-options";
 import { useAppColors } from "#mobile/ui/theme";
 
@@ -18,7 +19,7 @@ export default function SourcesLayout() {
           Sources
         </Stack.Title>
       </Stack.Screen>
-      <Stack.Screen name="[id]" options={{ title: "Source" }} />
+      <Stack.Screen name="[id]" options={{ ...fadeHeaderOptions, title: "Source" }} />
     </Stack>
   );
 }

@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { ExternalLinkIcon } from "lucide-react-native";
 import { useState } from "react";
-import { FlatList, Linking, RefreshControl, StyleSheet } from "react-native";
+import { FlatList, Linking, RefreshControl } from "react-native";
 import { XStack, YStack } from "tamagui";
 
 import { useTRPC } from "#mobile/application/trpc/client";
 import { ArticleCard } from "#mobile/features/content/articles/components/article-card";
 import { ArticleListFooter } from "#mobile/features/content/articles/components/article-list-footer";
 import { useInfiniteArticles } from "#mobile/features/content/articles/hooks/use-infinite-articles";
-import { FollowButton } from "#mobile/features/content/sources/components/follow-button";
-import { Button } from "#mobile/ui/components/button";
+import { useSourceFollowAction } from "#mobile/features/content/sources/hooks/use-source-follow-action";
+import type { Source } from "#mobile/features/content/types";
 import { Screen } from "#mobile/ui/components/screen";
 import { SourceAvatar } from "#mobile/ui/components/source-avatar";
 import { EmptyState, ErrorState, LoadingState } from "#mobile/ui/components/status-state";
@@ -56,12 +55,8 @@ export default function SourceDetailsRoute() {
 
   return (
     <Screen backgroundColor="$groupedBackground" hasNativeHeader>
-      <Stack.Screen
-        options={{
-          contentStyle: { backgroundColor: colors.groupedBackground },
-          title: displayName,
-        }}
-      />
+      <Stack.Title style={{ color: colors.foreground }}>{displayName}</Stack.Title>
+      <SourceToolbar source={source.data} />
       <FlatList
         contentContainerStyle={{
           paddingBottom: screenBottomPadding,
@@ -101,23 +96,6 @@ export default function SourceDetailsRoute() {
                   ) : null}
                 </YStack>
               </XStack>
-
-              <XStack
-                borderTopColor="$separator"
-                borderTopWidth={StyleSheet.hairlineWidth}
-                gap="$3"
-                padding="$3"
-              >
-                <FollowButton presentation="regular" source={source.data} />
-                <Button
-                  flex={1}
-                  onPress={() => void Linking.openURL(source.data.url)}
-                  variant="outline"
-                >
-                  <ExternalLinkIcon color={colors.foreground} size={18} strokeWidth={1.8} />
-                  <Text fontWeight="600">Voir le site</Text>
-                </Button>
-              </XStack>
             </YStack>
 
             <Text fontSize="$6" fontWeight="700">
@@ -140,5 +118,29 @@ export default function SourceDetailsRoute() {
         style={{ backgroundColor: colors.groupedBackground, flex: 1 }}
       />
     </Screen>
+  );
+}
+
+type SourceToolbarProps = {
+  source: Source;
+};
+
+function SourceToolbar({ source }: SourceToolbarProps) {
+  const followAction = useSourceFollowAction(source);
+
+  return (
+    <Stack.Toolbar placement="right">
+      <Stack.Toolbar.Button
+        accessibilityLabel={source.followed ? "Ne plus suivre" : "Suivre"}
+        disabled={followAction.isPending}
+        icon={source.followed ? "checkmark" : "plus"}
+        onPress={followAction.toggleFollow}
+      />
+      <Stack.Toolbar.Button
+        accessibilityLabel="Ouvrir le site"
+        icon="safari"
+        onPress={() => void Linking.openURL(source.url)}
+      />
+    </Stack.Toolbar>
   );
 }

@@ -42,9 +42,9 @@
   "name": "@basango/mobile",
   "private": true,
   "scripts": {
-    "android": "expo start --android",
+    "android": "expo run:android",
     "dev": "expo start",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "lint": "biome check .",
     "start": "expo start",
     "typecheck": "tsc --noEmit"

@@ -1,6 +1,7 @@
 import { createBookmarkSchema } from "@basango/domain/models";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ScrollView, XStack, YStack } from "tamagui";
@@ -8,68 +9,72 @@ import type z from "zod";
 
 import { useTRPC } from "#mobile/application/trpc/client";
 import type { Bookmark } from "#mobile/features/content/types";
-import { BottomSheetModal } from "#mobile/ui/components/bottom-sheet-modal";
-import { Button } from "#mobile/ui/components/button";
 import { Input } from "#mobile/ui/components/input";
 import { Switch } from "#mobile/ui/components/switch";
 import { Text } from "#mobile/ui/components/text";
+import { useAppColors } from "#mobile/ui/theme";
 
 const bookmarkFormSchema = createBookmarkSchema;
 
-type BookmarkForm = z.input<typeof bookmarkFormSchema>;
+type BookmarkFormValues = z.input<typeof bookmarkFormSchema>;
 
-type BookmarkFormModalProps = {
+type BookmarkFormProps = {
   bookmark?: Bookmark;
-  onClose: () => void;
-  visible: boolean;
 };
 
-export function BookmarkFormModal({ bookmark, onClose, visible }: BookmarkFormModalProps) {
+export function BookmarkForm({ bookmark }: BookmarkFormProps) {
+  const colors = useAppColors();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const trpc = useTRPC();
-  const form = useForm<BookmarkForm>({
+  const form = useForm<BookmarkFormValues>({
     defaultValues: { description: "", isPublic: false, name: "" },
     mode: "onChange",
     resolver: zodResolver(bookmarkFormSchema),
   });
+
+  function showError(error: unknown) {
+    const fallback = bookmark
+      ? "Impossible de modifier ce signet."
+      : "Impossible de créer ce signet.";
+    const message =
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string"
+        ? error.message
+        : fallback;
+
+    form.setError("root", { message });
+  }
+
+  function handleSuccess() {
+    void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
+    router.back();
+  }
+
   const createBookmark = useMutation(
     trpc.feed.bookmarks.create.mutationOptions({
-      onError(error) {
-        form.setError("root", { message: error.message || "Impossible de créer ce signet." });
-      },
-      onSuccess() {
-        void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
-        form.reset();
-        onClose();
-      },
+      onError: showError,
+      onSuccess: handleSuccess,
     }),
   );
   const updateBookmark = useMutation(
     trpc.feed.bookmarks.update.mutationOptions({
-      onError(error) {
-        form.setError("root", { message: error.message || "Impossible de modifier ce signet." });
-      },
-      onSuccess() {
-        void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
-        form.reset();
-        onClose();
-      },
+      onError: showError,
+      onSuccess: handleSuccess,
     }),
   );
 
   useEffect(() => {
-    if (!visible) {
-      return;
-    }
-
     form.reset({
       description: bookmark?.description ?? "",
       isPublic: bookmark?.isPublic ?? false,
       name: bookmark?.name ?? "",
     });
-  }, [bookmark, form, visible]);
+  }, [bookmark, form]);
 
-  function handleSubmit(values: BookmarkForm) {
+  function handleSubmit(values: BookmarkFormValues) {
     const input = {
       description: values.description?.trim() || undefined,
       isPublic: values.isPublic ?? false,
@@ -84,14 +89,38 @@ export function BookmarkFormModal({ bookmark, onClose, visible }: BookmarkFormMo
     createBookmark.mutate(input);
   }
 
+  const isPending = createBookmark.isPending || updateBookmark.isPending;
+  const title = bookmark ? "Modifier le signet" : "Nouveau signet";
+
   return (
-    <BottomSheetModal
-      onClose={onClose}
-      title={bookmark ? "Modifier le signet" : "Nouveau signet"}
-      visible={visible}
-    >
+    <>
+      <Stack.Title style={{ color: colors.foreground }}>{title}</Stack.Title>
+      <Stack.Toolbar placement="left">
+        <Stack.Toolbar.Button
+          accessibilityLabel="Fermer"
+          icon="xmark"
+          onPress={() => router.back()}
+        />
+      </Stack.Toolbar>
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          disabled={!form.formState.isValid || isPending}
+          onPress={form.handleSubmit(handleSubmit)}
+          variant="done"
+        >
+          {bookmark ? "Enregistrer" : "Créer"}
+        </Stack.Toolbar.Button>
+      </Stack.Toolbar>
+
       <ScrollView
-        contentContainerStyle={{ gap: 20, paddingBottom: 24, paddingHorizontal: 20 }}
+        backgroundColor="$groupedBackground"
+        contentContainerStyle={{
+          gap: 20,
+          paddingBottom: 24,
+          paddingHorizontal: 20,
+          paddingTop: 20,
+        }}
+        contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
       >
         <Text variant="caption">
@@ -163,15 +192,7 @@ export function BookmarkFormModal({ bookmark, onClose, visible }: BookmarkFormMo
             {form.formState.errors.root.message}
           </Text>
         ) : null}
-
-        <Button
-          disabled={!form.formState.isValid}
-          isLoading={createBookmark.isPending || updateBookmark.isPending}
-          onPress={form.handleSubmit(handleSubmit)}
-        >
-          {bookmark ? "Enregistrer" : "Créer le signet"}
-        </Button>
       </ScrollView>
-    </BottomSheetModal>
+    </>
   );
 }

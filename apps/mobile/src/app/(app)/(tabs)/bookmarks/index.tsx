@@ -1,22 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
-import { PlusIcon } from "lucide-react-native";
+import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { YStack } from "tamagui";
 
 import { useTRPC } from "#mobile/application/trpc/client";
 import { BookmarkCard } from "#mobile/features/content/bookmarks/components/bookmark-card";
-import { BookmarkFormModal } from "#mobile/features/content/bookmarks/components/bookmark-form-modal";
-import { IconButton } from "#mobile/ui/components/icon-button";
 import { EmptyState, ErrorState, LoadingState } from "#mobile/ui/components/status-state";
 import { screenBottomPadding, screenGutter, sectionGap } from "#mobile/ui/layout";
 import { useAppColors } from "#mobile/ui/theme";
 
 export default function BookmarksRoute() {
   const colors = useAppColors();
+  const router = useRouter();
   const trpc = useTRPC();
-  const [isFormVisible, setFormVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const bookmarks = useQuery(trpc.feed.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
 
@@ -30,15 +27,13 @@ export default function BookmarksRoute() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerRight: () => (
-            <IconButton accessibilityLabel="Créer un signet" onPress={() => setFormVisible(true)}>
-              <PlusIcon color={colors.primary} size={24} strokeWidth={1.8} />
-            </IconButton>
-          ),
-        }}
-      />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          accessibilityLabel="Créer un signet"
+          icon="plus"
+          onPress={() => router.push("/(app)/(tabs)/bookmarks/form")}
+        />
+      </Stack.Toolbar>
       <ScrollView
         contentContainerStyle={{
           gap: sectionGap,
@@ -78,8 +73,6 @@ export default function BookmarksRoute() {
           </YStack>
         )}
       </ScrollView>
-
-      <BookmarkFormModal onClose={() => setFormVisible(false)} visible={isFormVisible} />
     </>
   );
 }

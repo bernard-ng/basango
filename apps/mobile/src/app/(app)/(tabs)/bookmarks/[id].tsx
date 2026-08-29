@@ -1,17 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { MoreHorizontalIcon, Trash2Icon } from "lucide-react-native";
-import { useState } from "react";
+import { Trash2Icon } from "lucide-react-native";
 import { Alert, FlatList } from "react-native";
 import { Button as TamaguiButton, YStack } from "tamagui";
 
 import { useTRPC } from "#mobile/application/trpc/client";
 import { ArticleCard } from "#mobile/features/content/articles/components/article-card";
 import { ArticleListFooter } from "#mobile/features/content/articles/components/article-list-footer";
-import { BookmarkFormModal } from "#mobile/features/content/bookmarks/components/bookmark-form-modal";
 import { useInfiniteBookmarkArticles } from "#mobile/features/content/bookmarks/hooks/use-infinite-bookmark-articles";
-import { Button } from "#mobile/ui/components/button";
-import { IconButton } from "#mobile/ui/components/icon-button";
 import { Screen } from "#mobile/ui/components/screen";
 import { EmptyState, ErrorState, LoadingState } from "#mobile/ui/components/status-state";
 import { Text } from "#mobile/ui/components/text";
@@ -24,7 +20,6 @@ export default function BookmarkDetailsRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
-  const [isFormVisible, setFormVisible] = useState(false);
   const bookmarks = useQuery(trpc.feed.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
   const articles = useInfiniteBookmarkArticles(id);
   const deleteBookmark = useMutation(
@@ -85,19 +80,30 @@ export default function BookmarkDetailsRoute() {
 
   return (
     <Screen backgroundColor="$groupedBackground" hasNativeHeader>
-      <Stack.Screen
-        options={{
-          headerRight: ({ tintColor }) => (
-            <IconButton
-              accessibilityLabel="Modifier le signet"
-              onPress={() => setFormVisible(true)}
-            >
-              <MoreHorizontalIcon color={tintColor ?? colors.primary} size={24} strokeWidth={1.8} />
-            </IconButton>
-          ),
-          title: bookmark.name,
-        }}
-      />
+      <Stack.Title style={{ color: colors.foreground }}>{bookmark.name}</Stack.Title>
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Menu accessibilityLabel="Actions du signet" icon="ellipsis">
+          <Stack.Toolbar.MenuAction
+            icon="pencil"
+            onPress={() =>
+              router.push({
+                params: { bookmarkId: bookmark.id },
+                pathname: "/(app)/(tabs)/bookmarks/form",
+              })
+            }
+          >
+            Modifier
+          </Stack.Toolbar.MenuAction>
+          <Stack.Toolbar.MenuAction
+            destructive
+            disabled={deleteBookmark.isPending}
+            icon="trash"
+            onPress={handleDeleteBookmark}
+          >
+            Supprimer
+          </Stack.Toolbar.MenuAction>
+        </Stack.Toolbar.Menu>
+      </Stack.Toolbar>
       <FlatList
         contentContainerStyle={{
           paddingBottom: screenBottomPadding,
@@ -114,20 +120,11 @@ export default function BookmarkDetailsRoute() {
           />
         }
         ListFooterComponent={
-          <YStack gap="$3" paddingTop="$3">
-            <ArticleListFooter
-              hasError={articles.isFetchNextPageError}
-              isLoading={articles.isFetchingNextPage}
-              onRetry={articles.loadNextPage}
-            />
-            <Button
-              isLoading={deleteBookmark.isPending}
-              onPress={handleDeleteBookmark}
-              variant="destructive"
-            >
-              Supprimer le signet
-            </Button>
-          </YStack>
+          <ArticleListFooter
+            hasError={articles.isFetchNextPageError}
+            isLoading={articles.isFetchingNextPage}
+            onRetry={articles.loadNextPage}
+          />
         }
         ListHeaderComponent={
           <YStack gap="$2" marginBottom="$4">
@@ -159,12 +156,6 @@ export default function BookmarkDetailsRoute() {
         )}
         showsVerticalScrollIndicator={false}
         style={{ backgroundColor: colors.groupedBackground, flex: 1 }}
-      />
-
-      <BookmarkFormModal
-        bookmark={bookmark}
-        onClose={() => setFormVisible(false)}
-        visible={isFormVisible}
       />
     </Screen>
   );
