@@ -70,7 +70,7 @@ Organize growing application code by bounded context and product capability befo
 
 ```text
 src/features/<context>/<capability>/
-  pages/
+  pages/ or screens/
   components/
   hooks/
   <capability>-query.ts
@@ -78,9 +78,9 @@ src/features/<context>/<capability>/
   <capability>-copy.ts
 ```
 
-This is a target shape, not a reason for a repository-wide move. Existing top-level `components/`, `hooks/`, and route
-modules may evolve capability by capability. Keep a private single-consumer component or hook beside its owner when
-that improves locality.
+Dashboard capabilities use `pages/`; mobile capabilities use `screens/`. This is a target shape, not a reason for a
+repository-wide move. Existing top-level `components/`, `hooks/`, and route modules may evolve capability by
+capability. Keep a private single-consumer component or hook beside its owner when that improves locality.
 
 Route modules should compose feature interfaces and own route concerns. They should not accumulate reusable business
 logic, cache policy, large presentation trees, or transport normalization.
@@ -102,11 +102,15 @@ The mobile reader mirrors those ownership boundaries with Expo-specific names:
 
 ```text
 apps/mobile/src/
-  app/          # Expo Router route modules only
-  application/  # native auth, providers, environment, and typed tRPC client
+  app/          # Expo Router screen re-exports and framework-owned navigation layouts
+  application/  # native auth, providers, environment, app-level screens, and typed tRPC client
   features/     # reader capabilities and product components
   ui/           # app-local native primitives and theme helpers
 ```
+
+Mobile screen route modules do not define React components; each directly re-exports a feature- or application-owned
+screen so product state, queries, and presentation stay outside the routing tree. Expo Router `_layout.tsx` modules
+are the framework-level exception and own their navigator composition in place.
 
 ## Package interfaces
 

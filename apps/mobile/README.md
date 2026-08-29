@@ -23,10 +23,10 @@ target.
 
 ## Structure
 
-- `src/app` contains Expo Router routes only.
-- `src/application` owns authentication, runtime configuration, providers, and the typed tRPC
-  client.
-- `src/features` groups reader capabilities.
+- `src/app` contains Expo Router screen re-exports and framework-owned `_layout.tsx` navigators.
+- `src/application` owns authentication, runtime configuration, providers, app-level screens, and
+  the typed tRPC client.
+- `src/features` groups reader capabilities and their native screens.
 - `src/ui` contains the application-local, shadcn-inspired React Native primitives.
 - `src/global.css` owns the Uniwind theme tokens and light/dark palettes.
 

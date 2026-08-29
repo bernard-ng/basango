@@ -17,7 +17,7 @@ import { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
 import { getOrCreateSourceIdByName } from "#db/queries/sources";
 import { articles, categories, sources } from "#db/schema";
-import { classifyCategory, ensureCanonicalCategory } from "#db/services/category-classifier";
+import { classifyArticleCategory } from "#db/services/category-classifier";
 import { CreateArticleParams, GetArticlesParams } from "#db/types/articles";
 import { GetDistributionsParams, GetPublicationsParams } from "#db/types/shared";
 import {
@@ -49,8 +49,9 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
     }),
   };
 
-  const category = await ensureCanonicalCategory(db, classifyCategory(data).category);
+  const category = await classifyArticleCategory(db, data);
   data.categoryId = category.id;
+  data.clustered = true;
 
   const [result] = await db
     .insert(articles)

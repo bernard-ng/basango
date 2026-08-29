@@ -1,12 +1,12 @@
 import { createBookmarkSchema } from "@basango/domain/models";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { ScrollView, XStack, YStack } from "tamagui";
 import type z from "zod";
 
+import { useZodForm } from "#mobile/application/hooks/use-zod-form";
 import { useTRPC } from "#mobile/application/trpc/client";
 import type { Bookmark } from "#mobile/features/content/types";
 import { Input } from "#mobile/ui/components/input";
@@ -27,10 +27,9 @@ export function BookmarkForm({ bookmark }: BookmarkFormProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
   const trpc = useTRPC();
-  const form = useForm<BookmarkFormValues>({
+  const form = useZodForm(bookmarkFormSchema, {
     defaultValues: { description: "", isPublic: false, name: "" },
     mode: "onChange",
-    resolver: zodResolver(bookmarkFormSchema),
   });
 
   function showError(error: unknown) {
@@ -123,12 +122,6 @@ export function BookmarkForm({ bookmark }: BookmarkFormProps) {
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
       >
-        <Text variant="caption">
-          {bookmark
-            ? "Mettez à jour le nom et la visibilité de cette collection."
-            : "Créez une collection pour retrouver facilement vos articles."}
-        </Text>
-
         <Controller
           control={form.control}
           name="name"

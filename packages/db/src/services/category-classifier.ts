@@ -1,34 +1,33 @@
 import { logger } from "@basango/logger";
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 
-import { Database } from "#db/client";
+import type { Database } from "#db/client";
 import { articles, categories } from "#db/schema";
 import { DEFAULT_CATEGORY } from "#domain/constants";
 import { Categories } from "#domain/models";
 
 type CategoryRow = typeof categories.$inferSelect;
-type CanonicalCategory = (typeof Categories)[number];
 type ArticleCategories = Pick<typeof articles.$inferSelect, "categories" | "id">;
+type ClassifierCategory = Pick<CategoryRow, "candidates" | "id" | "name" | "slug" | "weight">;
 
 type CategoryScore = {
-  category: (typeof Categories)[number];
+  category: ClassifierCategory;
   matches: number;
   score: number;
 };
 
 const BATCH_SIZE = 50_000;
-const CATEGORY_MAP = new Map(Categories.map((category, index) => [category.slug, index]));
-const CANDIDATE_MAP = buildCandidateMap();
 const FALLBACK_CATEGORY = Categories.find((category) => category.slug === DEFAULT_CATEGORY)!;
 
 export class CategoryClassifier {
   constructor(private readonly db: Database) {}
 
   async classifyPendingArticles(limit: number = BATCH_SIZE) {
-    const canonical = await this.ensureCanonicalCategories();
+    const configured = await getClassificationCategories(this.db);
+    const categoryMap = new Map(configured.map((category) => [category.slug, category]));
 
-    if (canonical.size === 0) {
-      logger.warn("No canonical categories available for clustering");
+    if (categoryMap.size === 0) {
+      logger.warn("No categories available for clustering");
       return { matched: 0, processed: 0, unmatched: 0 };
     }
 
@@ -50,12 +49,9 @@ export class CategoryClassifier {
     let matched = 0;
     let unmatched = 0;
 
-    const fallbackRow = canonical.get(FALLBACK_CATEGORY.slug);
-
     for (const article of pending) {
-      const best = classifyCategory(article);
-
-      const targetRow = canonical.get(best.category.slug) ?? fallbackRow;
+      const best = classifyCategory(article, configured);
+      const targetRow = categoryMap.get(best.category.slug);
 
       await this.db
         .update(articles)
@@ -87,71 +83,33 @@ export class CategoryClassifier {
     logger.info({ matched, processed, unmatched }, "Category clustering run completed");
     return { matched, processed, unmatched };
   }
-
-  private async ensureCanonicalCategories(): Promise<Map<string, CategoryRow>> {
-    const payload = Categories.map(
-      (category) =>
-        ({
-          candidates: category.candidates,
-          description: category.description ?? null,
-          embeddings: null,
-          id: category.id,
-          name: category.name,
-          slug: category.slug,
-          weight: category.weight,
-        }) satisfies typeof categories.$inferInsert,
-    );
-
-    await this.db.insert(categories).values(payload).onConflictDoNothing();
-
-    const existing = await this.db.query.categories.findMany({
-      where: inArray(
-        categories.slug,
-        Categories.map((category) => category.slug),
-      ),
-    });
-
-    const map = new Map<string, CategoryRow>();
-
-    for (const row of existing) {
-      map.set(row.slug, row);
-    }
-
-    if (!map.has(FALLBACK_CATEGORY.slug)) {
-      logger.warn("Fallback main category is missing from canonical categories");
-    }
-
-    return map;
-  }
 }
 
-export async function ensureCanonicalCategory(
+export async function classifyArticleCategory(
   db: Database,
-  category: CanonicalCategory,
+  article: ArticleCategories,
 ): Promise<CategoryRow> {
-  const payload = {
-    candidates: category.candidates,
-    description: category.description ?? null,
-    embeddings: null,
-    id: category.id,
-    name: category.name,
-    slug: category.slug,
-    weight: category.weight,
-  } satisfies typeof categories.$inferInsert;
+  const configured = await getClassificationCategories(db);
+  const best = classifyCategory(article, configured);
+  const category = configured.find((item) => item.slug === best.category.slug);
 
-  const [created] = await db.insert(categories).values(payload).onConflictDoNothing().returning();
-  if (created) return created;
-
-  const existing = await db.query.categories.findFirst({
-    where: eq(categories.slug, category.slug),
-  });
-  if (!existing) {
-    throw new Error(`Could not initialize canonical category '${category.slug}'`);
+  if (!category) {
+    throw new Error("No category is available for article classification");
   }
-  return existing;
+
+  return category;
 }
 
-export function classifyCategory(article: ArticleCategories): CategoryScore {
+export function classifyCategory(
+  article: ArticleCategories,
+  configured: readonly ClassifierCategory[] = Categories,
+): CategoryScore {
+  const fallback =
+    configured.find((category) => category.slug === DEFAULT_CATEGORY) ??
+    [...configured].sort((left, right) => left.weight - right.weight)[0] ??
+    FALLBACK_CATEGORY;
+  const categoryOrder = new Map(configured.map((category, index) => [category.slug, index]));
+  const candidateMap = buildCandidateMap(configured);
   const rawCategories = article.categories ?? [];
   const normalizedCategories = Array.from(
     new Set(
@@ -164,7 +122,7 @@ export function classifyCategory(article: ArticleCategories): CategoryScore {
   const scores = new Map<string, CategoryScore>();
 
   for (const normalized of normalizedCategories) {
-    const categories = CANDIDATE_MAP.get(normalized);
+    const categories = candidateMap.get(normalized);
     if (!categories) continue;
 
     for (const category of categories) {
@@ -183,7 +141,7 @@ export function classifyCategory(article: ArticleCategories): CategoryScore {
   }
 
   if (scores.size === 0) {
-    return { category: FALLBACK_CATEGORY, matches: 0, score: 0 };
+    return { category: fallback, matches: 0, score: 0 };
   }
 
   const [first, ...rest] = Array.from(scores.values());
@@ -201,19 +159,51 @@ export function classifyCategory(article: ArticleCategories): CategoryScore {
       return candidate.matches > winner.matches ? candidate : winner;
     }
 
-    const winnerOrder = CATEGORY_MAP.get(winner.category.slug) ?? Number.MAX_SAFE_INTEGER;
-    const candidateOrder = CATEGORY_MAP.get(candidate.category.slug) ?? Number.MAX_SAFE_INTEGER;
+    const winnerOrder = categoryOrder.get(winner.category.slug) ?? Number.MAX_SAFE_INTEGER;
+    const candidateOrder = categoryOrder.get(candidate.category.slug) ?? Number.MAX_SAFE_INTEGER;
 
     return candidateOrder < winnerOrder ? candidate : winner;
-  }, first ?? { category: FALLBACK_CATEGORY, matches: 0, score: 0 });
+  }, first ?? { category: fallback, matches: 0, score: 0 });
 
   return best;
 }
 
-function buildCandidateMap(): Map<string, (typeof Categories)[number][]> {
-  const map = new Map<string, (typeof Categories)[number][]>();
+async function getClassificationCategories(db: Database): Promise<CategoryRow[]> {
+  let configured = await db.query.categories.findMany({
+    orderBy: [desc(categories.weight), asc(categories.name)],
+  });
 
-  for (const category of Categories) {
+  if (configured.length > 0) {
+    return configured;
+  }
+
+  const payload = Categories.map(
+    (category) =>
+      ({
+        candidates: category.candidates,
+        description: category.description ?? null,
+        embeddings: null,
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        weight: category.weight,
+      }) satisfies typeof categories.$inferInsert,
+  );
+
+  await db.insert(categories).values(payload).onConflictDoNothing();
+  configured = await db.query.categories.findMany({
+    orderBy: [desc(categories.weight), asc(categories.name)],
+  });
+
+  return configured;
+}
+
+function buildCandidateMap(
+  configured: readonly ClassifierCategory[],
+): Map<string, ClassifierCategory[]> {
+  const map = new Map<string, ClassifierCategory[]>();
+
+  for (const category of configured) {
     for (const candidate of category.candidates) {
       const normalized = normalizeCategory(candidate);
       if (!normalized) continue;

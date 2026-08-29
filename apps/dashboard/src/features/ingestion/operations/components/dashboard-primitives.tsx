@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@basango/ui/components/card";
 import { Skeleton } from "@basango/ui/components/skeleton";
-import type { LucideIcon } from "lucide-react";
 import { Server, Wifi, WifiOff } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -32,43 +31,6 @@ export function DashboardPanel({
         {trailing}
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">{children}</CardContent>
-    </Card>
-  );
-}
-
-export function MetricCard({
-  detail,
-  icon: Icon,
-  label,
-  suffix,
-  tone,
-  value,
-}: {
-  detail: string;
-  icon: LucideIcon;
-  label: string;
-  suffix?: string;
-  tone: "danger" | "healthy" | "neutral" | "warning";
-  value: number;
-}) {
-  const toneClass = {
-    danger: "text-destructive",
-    healthy: "text-emerald-600 dark:text-emerald-400",
-    neutral: "text-foreground",
-    warning: "text-amber-600 dark:text-amber-400",
-  }[tone];
-
-  return (
-    <Card className="flex flex-col gap-2 border-border bg-card p-4">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="text-4xl font-semibold tabular-nums">
-        {value.toLocaleString()}
-        {suffix}
-      </p>
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Icon className={`size-4 ${toneClass}`} />
-        <span className="text-muted-foreground">{detail}</span>
-      </div>
     </Card>
   );
 }

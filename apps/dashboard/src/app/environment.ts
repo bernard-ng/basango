@@ -1,3 +1,5 @@
+import dashboardPackage from "../../package.json";
+
 export function getPublicApiUrl() {
   return (
     import.meta.env.VITE_PUBLIC_API_URL ??
@@ -7,7 +9,7 @@ export function getPublicApiUrl() {
 }
 
 export function getPublicVersion() {
-  return import.meta.env.VITE_PUBLIC_VERSION ?? process.env.VITE_PUBLIC_VERSION ?? "0.0.0";
+  return dashboardPackage.version;
 }
 
 export function getUrl() {

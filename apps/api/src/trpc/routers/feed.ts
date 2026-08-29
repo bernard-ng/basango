@@ -5,6 +5,7 @@ import {
   deleteReaderBookmark,
   deleteReaderComment,
   followReaderSource,
+  getReaderArticleBookmarkMemberships,
   getReaderArticleById,
   getReaderArticles,
   getReaderBookmarkArticles,
@@ -72,6 +73,10 @@ const feedBookmarksRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return getReaderBookmarkArticles(ctx.db, ctx.session.user.id, input);
     }),
+
+  memberships: protectedProcedure.input(readerArticleSchema).query(async ({ ctx, input }) => {
+    return getReaderArticleBookmarkMemberships(ctx.db, ctx.session.user.id, input.id);
+  }),
 
   removeArticle: protectedProcedure
     .input(bookmarkArticleSchema)

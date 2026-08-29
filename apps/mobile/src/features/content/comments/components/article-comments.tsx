@@ -1,13 +1,12 @@
 import { createCommentSchema } from "@basango/domain/models";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react-native";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Alert, KeyboardAvoidingView } from "react-native";
 import { ScrollView, Separator, XStack, YStack } from "tamagui";
-import type z from "zod";
 
 import { authClient } from "#mobile/application/auth/auth-client";
+import { useZodForm } from "#mobile/application/hooks/use-zod-form";
 import { useTRPC } from "#mobile/application/trpc/client";
 import { formatRelativeTime } from "#mobile/features/content/shared/format-relative-time";
 import { Button } from "#mobile/ui/components/button";
@@ -19,8 +18,6 @@ import { Text } from "#mobile/ui/components/text";
 import { useAppColors } from "#mobile/ui/theme";
 
 const commentFormSchema = createCommentSchema.pick({ content: true });
-
-type CommentForm = z.infer<typeof commentFormSchema>;
 
 type ArticleCommentsProps = {
   articleId: string;
@@ -36,10 +33,9 @@ export function ArticleComments({ articleId, enabled }: ArticleCommentsProps) {
     ...trpc.feed.comments.list.queryOptions({ articleId, limit: 50, page: 1 }),
     enabled,
   });
-  const form = useForm<CommentForm>({
+  const form = useZodForm(commentFormSchema, {
     defaultValues: { content: "" },
     mode: "onChange",
-    resolver: zodResolver(commentFormSchema),
   });
   const createComment = useMutation(
     trpc.feed.comments.create.mutationOptions({

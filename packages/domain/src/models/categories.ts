@@ -3,7 +3,7 @@ import z from "zod";
 import { idSchema } from "./shared";
 
 export const categorySchema = z.object({
-  candidates: z.array(z.string()),
+  candidates: z.array(z.string().trim().min(1).max(255)),
   createdAt: z.coerce.date(),
   description: z.string().max(512).optional(),
   embeddings: z.array(z.number()).optional(),
@@ -11,10 +11,35 @@ export const categorySchema = z.object({
   name: z.string().min(1).max(255),
   slug: z.string().min(1).max(255),
   updatedAt: z.coerce.date().optional(),
-  weight: z.number().int(),
+  weight: z.number().int().min(0).max(100),
 });
 
+export const createCategorySchema = categorySchema
+  .pick({
+    candidates: true,
+    description: true,
+    name: true,
+    slug: true,
+    weight: true,
+  })
+  .extend({
+    candidates: categorySchema.shape.candidates.min(1),
+    name: categorySchema.shape.name.trim(),
+    slug: categorySchema.shape.slug
+      .trim()
+      .toLowerCase()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase words separated by hyphens."),
+  });
+
+export const updateCategorySchema = createCategorySchema.extend({
+  id: categorySchema.shape.id,
+});
+
+export const deleteCategorySchema = categorySchema.pick({ id: true });
+
 export type Category = z.infer<typeof categorySchema>;
+export type CreateCategory = z.infer<typeof createCategorySchema>;
+export type UpdateCategory = z.infer<typeof updateCategorySchema>;
 
 export const Categories: Category[] = [
   {

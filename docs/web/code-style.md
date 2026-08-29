@@ -245,7 +245,7 @@ Organize growing application code by bounded context and capability:
 
 ```text
 src/features/<context>/<capability>/
-  pages/
+  pages/ or screens/
   components/
   hooks/
   <capability>-query.ts
@@ -253,9 +253,10 @@ src/features/<context>/<capability>/
   <capability>-copy.ts
 ```
 
-Use `pages/`, `components/`, and `hooks/` for exported modules in those roles. Private single-consumer modules may stay
-beside their owner. Keep a schema, query module, or copy module at the capability root until it forms a real group.
-Split a growing capability by narrower product responsibility rather than creating a generic dumping ground.
+Dashboard capabilities use `pages/`; mobile capabilities use `screens/`. Use `components/` and `hooks/` for exported
+modules in those roles. Private single-consumer modules may stay beside their owner. Keep a schema, query module, or
+copy module at the capability root until it forms a real group. Split a growing capability by narrower product
+responsibility rather than creating a generic dumping ground.
 
 Prefer responsibility names over vague modules:
 

@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IngestionRouteImport } from './routes/ingestion'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as AgentsAgentIdRouteImport } from './routes/agents/$agentId'
 import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
 import { Route as ArticlesIdRouteImport } from './routes/articles/$id'
@@ -26,6 +28,11 @@ import { Route as SourcesIdRouteImport } from './routes/sources/$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -56,6 +63,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const TimelineRoute = TimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgentsAgentIdRoute = AgentsAgentIdRouteImport.update({
@@ -91,12 +103,14 @@ const SourcesIdRoute = SourcesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/timeline': typeof TimelineRoute
+  '/users': typeof UsersRoute
   '/agents/$agentId': typeof AgentsAgentIdRoute
   '/articles/$id': typeof ArticlesIdRoute
   '/runs/$runId': typeof RunsRunIdRoute
@@ -106,12 +120,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/timeline': typeof TimelineRoute
+  '/users': typeof UsersRoute
   '/agents/$agentId': typeof AgentsAgentIdRoute
   '/articles/$id': typeof ArticlesIdRoute
   '/runs/$runId': typeof RunsRunIdRoute
@@ -122,12 +138,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/timeline': typeof TimelineRoute
+  '/users': typeof UsersRoute
   '/agents/$agentId': typeof AgentsAgentIdRoute
   '/articles/$id': typeof ArticlesIdRoute
   '/runs/$runId': typeof RunsRunIdRoute
@@ -139,12 +157,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/categories'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
     | '/login'
     | '/reset-password'
     | '/timeline'
+    | '/users'
     | '/agents/$agentId'
     | '/articles/$id'
     | '/runs/$runId'
@@ -154,12 +174,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/categories'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
     | '/login'
     | '/reset-password'
     | '/timeline'
+    | '/users'
     | '/agents/$agentId'
     | '/articles/$id'
     | '/runs/$runId'
@@ -169,12 +191,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/categories'
     | '/dashboard'
     | '/forgot-password'
     | '/ingestion'
     | '/login'
     | '/reset-password'
     | '/timeline'
+    | '/users'
     | '/agents/$agentId'
     | '/articles/$id'
     | '/runs/$runId'
@@ -185,12 +209,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   IngestionRoute: typeof IngestionRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TimelineRoute: typeof TimelineRoute
+  UsersRoute: typeof UsersRoute
   AgentsAgentIdRoute: typeof AgentsAgentIdRoute
   ArticlesIdRoute: typeof ArticlesIdRoute
   RunsRunIdRoute: typeof RunsRunIdRoute
@@ -206,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -248,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/timeline'
       fullPath: '/timeline'
       preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agents/$agentId': {
@@ -297,12 +337,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   IngestionRoute: IngestionRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TimelineRoute: TimelineRoute,
+  UsersRoute: UsersRoute,
   AgentsAgentIdRoute: AgentsAgentIdRoute,
   ArticlesIdRoute: ArticlesIdRoute,
   RunsRunIdRoute: RunsRunIdRoute,

@@ -34,7 +34,7 @@ export default function ArticlesLayout() {
         options={{
           ...fadeHeaderOptions,
           presentation: "pageSheet",
-          title: "Ajouter à un signet",
+          title: "Signets",
         }}
       />
       <Stack.Screen

@@ -6,6 +6,7 @@ export {
   addReaderArticleToBookmark,
   createReaderBookmark,
   deleteReaderBookmark,
+  getReaderArticleBookmarkMemberships,
   getReaderBookmarkArticles,
   getReaderBookmarks,
   removeReaderArticleFromBookmark,

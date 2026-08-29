@@ -51,5 +51,6 @@
     "start": "NODE_ENV=production node .output/server/index.mjs",
     "typecheck": "tsc --noEmit"
   },
-  "type": "module"
+  "type": "module",
+  "version": "1.0.0"
 }

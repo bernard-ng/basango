@@ -129,6 +129,23 @@ export async function getReaderBookmarkArticles(
   return buildPaginatedResult(rows, pagination, total);
 }
 
+export async function getReaderArticleBookmarkMemberships(
+  db: Database,
+  userId: string,
+  articleId: string,
+) {
+  const rows = await db
+    .select({ bookmarkId: bookmarkArticles.bookmarkId })
+    .from(bookmarkArticles)
+    .innerJoin(
+      bookmarks,
+      and(eq(bookmarks.id, bookmarkArticles.bookmarkId), eq(bookmarks.userId, userId)),
+    )
+    .where(eq(bookmarkArticles.articleId, articleId));
+
+  return { bookmarkIds: rows.map((row) => row.bookmarkId) };
+}
+
 export async function addReaderArticleToBookmark(
   db: Database,
   userId: string,

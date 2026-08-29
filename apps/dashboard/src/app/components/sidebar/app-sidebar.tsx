@@ -25,8 +25,13 @@ const navigationGroups = [
     items: [
       { title: "Sources", url: "/sources" },
       { title: "Articles", url: "/articles" },
+      { title: "Categories", url: "/categories" },
     ],
     title: "Content",
+  },
+  {
+    items: [{ title: "Users", url: "/users" }],
+    title: "Access",
   },
 ] as const;
 
