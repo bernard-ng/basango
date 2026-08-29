@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { classifyCategory } from "../../../packages/db/src/services/category-classifier";
+import { Categories } from "../../../packages/domain/src/models/categories";
 
 const configured = [
   {
@@ -44,5 +45,28 @@ describe("managed category classifier", () => {
 
     expect(result.category.slug).toBe("news");
     expect(result.matches).toBe(0);
+  });
+
+  test("classifies common source labels with the static category map", () => {
+    const expectations = {
+      "actualite-en-rdc": "actualites-faits-divers",
+      actualites: "actualites-faits-divers",
+      "actualites-en": "actualites-faits-divers",
+      "actualites-sw": "actualites-faits-divers",
+      alaune: "actualites-faits-divers",
+      gouvernance: "politique-gouvernement",
+      international: "international-regions",
+      nation: "actualites-faits-divers",
+      securite: "politique-gouvernement",
+      "securite-defense": "politique-gouvernement",
+      social: "societe-vie-quotidienne",
+      sécurité: "politique-gouvernement",
+    } as const;
+
+    for (const [label, expectedSlug] of Object.entries(expectations)) {
+      const result = classifyCategory({ categories: [label], id: label }, Categories);
+
+      expect(result.category.slug).toBe(expectedSlug);
+    }
   });
 });
