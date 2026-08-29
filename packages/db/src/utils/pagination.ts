@@ -49,15 +49,15 @@ export function buildPaginatedResult<T>(
   };
 }
 
-export function applyFilters(
-  // biome-ignore lint/suspicious/noExplicitAny: drizzle types to be fixed
-  query: any,
-  filters: SQL<unknown>[],
-): typeof query {
+export function applyFilters<TQuery>(query: TQuery, filters: SQL<unknown>[]): TQuery {
+  const filterableQuery = query as TQuery & {
+    where(filter: SQL<unknown>): TQuery;
+  };
+
   if (filters.length === 1) {
-    return query.where(filters[0]);
+    return filterableQuery.where(filters[0] as SQL<unknown>);
   } else if (filters.length > 1) {
-    return query.where(and(...filters));
+    return filterableQuery.where(and(...filters) as SQL<unknown>);
   }
   return query;
 }

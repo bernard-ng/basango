@@ -20,9 +20,9 @@ or personal secrets in `.env`.
 `.env.test`, or `.env.prod` respectively. The file suffixes stay concise while `NODE_ENV` follows
 the values expected by Node.js and React tooling.
 
-The API, Drizzle commands, and dashboard build share this ordering. The dashboard exposes only
-variables prefixed with `VITE_` to browser code. If the mobile application gains public runtime
-configuration, use `EXPO_PUBLIC_` variables and keep them in these same root files.
+The API, Drizzle commands, dashboard build, and Expo application share this ordering. The dashboard
+exposes only variables prefixed with `VITE_` to browser code. Expo exposes only variables prefixed
+with `EXPO_PUBLIC_` to native client code; keep them in these same root files.
 
 ## Local development
 
@@ -31,6 +31,7 @@ The committed `.env` is enough for the default local Docker services. Put person
 
 ```dotenv
 BASANGO_API_CRAWLER_TOKEN=my-local-token
+EXPO_PUBLIC_API_URL=http://192.168.1.20:3080
 ```
 
 Use `.env.dev` when an override should apply to every developer on one machine but should still be

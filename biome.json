@@ -43,6 +43,7 @@
       "**",
       "!apps/mobile-legacy",
       "!apps/api-legacy",
+      "!apps/mobile/src/uniwind-types.d.ts",
       "!apps/dashboard/src/routeTree.gen.ts"
     ]
   },

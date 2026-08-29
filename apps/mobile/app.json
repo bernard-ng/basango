@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "package": "dev.ngandu.basango",
+      "predictiveBackGestureEnabled": false
+    },
+    "experiments": {
+      "reactCompiler": true,
+      "typedRoutes": true
+    },
+    "githubUrl": "https://github.com/bernard-ng/basango",
+    "icon": "./assets/images/icon.png",
+    "ios": {
+      "bundleIdentifier": "dev.ngandu.basango",
+      "icon": "./assets/expo.icon",
+      "supportsTablet": true
+    },
+    "name": "Basango",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#007AFF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ]
+    ],
+    "scheme": "basango",
+    "slug": "basango",
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.0"
+  }
+}

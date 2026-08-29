@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 
 import { DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import {
-  Article,
   Distribution,
   Distributions,
   ID,
@@ -161,7 +160,7 @@ export async function getArticles(db: Database, params: GetArticlesParams) {
     ),
   ]);
 
-  return buildPaginatedResult<Article>(rows, pagination, total);
+  return buildPaginatedResult(rows, pagination, total);
 }
 
 export async function getArticlesPublicationGraph(

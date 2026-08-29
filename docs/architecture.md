@@ -39,9 +39,15 @@ The dashboard and mobile reader keep platform-specific routes, navigation, envir
 their owning applications. Shared packages own stable, reusable contracts or infrastructure; they are not a default
 home for new application behavior.
 
-The dashboard consumes the API through its app-owned tRPC client and imports router types only from the API's explicit
-public export. Client applications never import persistence or logging packages. The React Native
-application may share platform-neutral domain contracts, but it must not consume the DOM-based `@basango/ui` package.
+The dashboard and mobile reader consume the API through app-owned tRPC clients and import router types only from the
+API's explicit public export. Client applications never import persistence or logging packages. The React Native
+application also shares platform-neutral domain contracts, but it does not consume the DOM-based `@basango/ui`
+package. Its shadcn-inspired native primitives and Uniwind theme stay local to `apps/mobile` so platform behavior and
+visual decisions remain owned by the application.
+
+The reader surface is authenticated end to end while registration remains open. Better Auth owns the shared identity
+and session tables; the Expo client persists native session cookies through SecureStore. Protected reader tRPC
+procedures scope bookmarks, followed sources, and comments to the authenticated user.
 
 See the [TypeScript application architecture](web/README.md) for the dependency graph and package recommendations, and
 the [TypeScript and React code-style guide](web/code-style.md) for the normative module-design rules.

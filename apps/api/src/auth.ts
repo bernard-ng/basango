@@ -3,6 +3,7 @@ import { accounts, sessions, users, verifications } from "@basango/db/schema";
 import { config, env } from "@basango/domain/config";
 import { logger } from "@basango/logger";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { v7 as uuidv7 } from "uuid";
@@ -15,6 +16,11 @@ const cookieDomain = env.BETTER_AUTH_COOKIE_DOMAIN?.trim();
 const secret =
   env.BETTER_AUTH_SECRET?.trim() ??
   (isProduction ? undefined : "basango-local-better-auth-secret-change-me");
+const mobileOrigins = [
+  "basango://",
+  "basango://*",
+  ...(!isProduction ? ["exp://", "exp://**", "exp://192.168.*.*:*/**"] : []),
+];
 
 if (!secret) {
   throw new Error("BETTER_AUTH_SECRET is required in production.");
@@ -47,7 +53,8 @@ export const auth = betterAuth({
     },
   }),
   emailAndPassword: {
-    disableSignUp: true,
+    autoSignIn: true,
+    disableSignUp: false,
     enabled: true,
     maxPasswordLength: 72,
     minPasswordLength: 8,
@@ -65,6 +72,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    expo(),
     admin({
       adminRoles: ["admin"],
       defaultRole: "user",
@@ -75,7 +83,7 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
   },
-  trustedOrigins: [...config.api.cors.origin],
+  trustedOrigins: [...config.api.cors.origin, ...mobileOrigins],
 });
 
 export type AuthSession = typeof auth.$Infer.Session;

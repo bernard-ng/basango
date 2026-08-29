@@ -23,6 +23,9 @@ Environment files are an exception to application ownership: all TypeScript appl
 precedence documented in the [environment configuration guide](../environment.md). Application-specific `.env` files
 must not be added under `apps/` or `packages/`.
 
+The root Bun configuration uses hoisted dependency linking so Expo autolinking sees one physical copy of each native
+module. Keep native dependency versions aligned with the installed Expo SDK before changing that layout.
+
 ## Shared packages
 
 - `@basango/domain` owns runtime schemas and inferred TypeScript contracts shared across process boundaries. It must
@@ -44,7 +47,7 @@ Each arrow points from the importer to the dependency:
 
 ```text
 dashboard -> api (exported tRPC types only), domain, ui
-mobile    -> domain (platform-neutral contracts only)
+mobile    -> api (exported tRPC types only), domain
 api       -> db, domain, logger
 db        -> domain, logger
 logger     -> domain
@@ -56,7 +59,7 @@ The following constraints preserve those boundaries:
 
 - no package imports from an application;
 - no client application imports `@basango/db` or `@basango/logger`;
-- dashboard imports API router types only through the explicit `@basango/api/trpc/routers/_app` export;
+- dashboard and mobile import API router types only through the explicit `@basango/api/trpc/routers/_app` export;
 - mobile does not import `@basango/ui` or browser-only modules;
 - packages do not re-export another package's domain symbols as their own;
 - a new lateral package dependency needs a real ownership relationship and an update to this graph.
@@ -95,6 +98,16 @@ The root route owns the public-versus-authenticated shell decision. Authenticate
 session guard, preload route data, and render a feature page. Feature pages own presentation and query consumption;
 they do not import route modules or generated route symbols.
 
+The mobile reader mirrors those ownership boundaries with Expo-specific names:
+
+```text
+apps/mobile/src/
+  app/          # Expo Router route modules only
+  application/  # native auth, providers, environment, and typed tRPC client
+  features/     # reader capabilities and product components
+  ui/           # app-local native primitives and theme helpers
+```
+
 ## Package interfaces
 
 Cross a package seam only through an entry declared in that package's `exports` map. Use relative imports inside the
@@ -109,7 +122,7 @@ Shared versions used by multiple workspaces belong in the root Bun catalog and p
 
 ## Data access
 
-The dashboard consumes the API through the app-owned tRPC client. For direct operations, compose TanStack Query's
+The dashboard and mobile reader consume the API through app-owned tRPC clients. For direct operations, compose TanStack Query's
 `useQuery` and `useMutation` with `trpc.*.queryOptions()` and `trpc.*.mutationOptions()`. Use procedure-owned query
 keys for invalidation. A custom query function is reserved for a composed workflow, pagination adapter, server action,
 or deliberate transformation.

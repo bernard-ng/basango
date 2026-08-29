@@ -12,6 +12,20 @@ export const loginSchema = z.object({
   password: passwordSchema,
 });
 
+export const signUpSchema = loginSchema.extend({
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(255),
+});
+
 export const requestPasswordResetSchema = z.object({
   email: emailSchema,
 });
+
+export const resetPasswordSchema = z
+  .object({
+    confirmPassword: passwordSchema,
+    password: passwordSchema,
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"],
+  });
