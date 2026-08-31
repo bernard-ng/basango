@@ -23,11 +23,7 @@ type SourceDeleteDialogProps = {
   source: RouterOutputs["sources"]["getById"];
 };
 
-export function SourceDeleteDialog({
-  onOpenChange,
-  open,
-  source,
-}: SourceDeleteDialogProps) {
+export function SourceDeleteDialog({ onOpenChange, open, source }: SourceDeleteDialogProps) {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

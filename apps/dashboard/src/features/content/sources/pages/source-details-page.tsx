@@ -46,11 +46,7 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
                 <PencilIcon />
                 Edit source
               </Button>
-              <Button
-                onClick={() => setIsDeleteOpen(true)}
-                type="button"
-                variant="destructive"
-              >
+              <Button onClick={() => setIsDeleteOpen(true)} type="button" variant="destructive">
                 <Trash2Icon />
                 Delete source
               </Button>

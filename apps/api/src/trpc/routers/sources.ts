@@ -1,6 +1,6 @@
 import {
-  deleteSource,
   createSource,
+  deleteSource,
   getSourceById,
   getSourceCategoryShares,
   getSourcePublicationGraph,
@@ -8,8 +8,8 @@ import {
   updateSource,
 } from "@basango/db/queries";
 import {
-  deleteSourceSchema,
   createSourceSchema,
+  deleteSourceSchema,
   getCategorySharesSchema,
   getPublicationsSchema,
   getSourceSchema,
@@ -24,12 +24,12 @@ export const sourcesRouter = createTRPCRouter({
     return createSource(ctx.db, input);
   }),
 
-  getById: adminProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
-    return getSourceById(ctx.db, input.id);
-  }),
-
   delete: adminProcedure.input(deleteSourceSchema).mutation(async ({ ctx, input }) => {
     return deleteSource(ctx.db, input.id);
+  }),
+
+  getById: adminProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
+    return getSourceById(ctx.db, input.id);
   }),
 
   getCategoryShares: adminProcedure.input(getCategorySharesSchema).query(async ({ ctx, input }) => {
