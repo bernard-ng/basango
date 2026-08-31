@@ -12,7 +12,7 @@ import { getPublicApiUrl } from "#dashboard/app/environment";
 import { useTRPC } from "#dashboard/app/trpc/client";
 
 const REFRESH_COALESCE_MS = 750;
-const AGENT_ONLINE_WINDOW_MS = 45_000;
+const AGENT_ONLINE_WINDOW_MS = 60_000;
 const ALL_CHANGE_TOPICS: readonly IngestionChangeTopic[] = [
   "agents",
   "runs",

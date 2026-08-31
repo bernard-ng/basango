@@ -59,7 +59,6 @@ To ensure quality and reliability, the dataset prioritizes reputable news source
 | beto.cd                   | https://www.beto.cd                 |
 | newscd.net                | https://newscd.net                  |
 | africanewsrdc.net         | https://www.africanewsrdc.net       |
-| angazainstitute.ac.cd     | https://angazainstitute.ac.cd       |
 | b-onetv.cd                | https://b-onetv.cd                  |
 | bukavufm.com              | https://bukavufm.com                |
 | changement7.net           | https://changement7.net             |
@@ -72,12 +71,10 @@ To ensure quality and reliability, the dataset prioritizes reputable news source
 | geopolismagazine.org      | https://geopolismagazine.org        |
 | habarirdc.net             | https://habarirdc.net               |
 | kilalopress.net           | https://kilalopress.net             |
-| laprosperiteonline.net    | https://laprosperiteonline.net      |
 | laprunellerdc.cd          | https://laprunellerdc.cd            |
 | lesmedias.net             | https://lesmedias.net               |
 | lesvolcansnews.net        | https://lesvolcansnews.net          |
 | netic-news.net            | https://www.netic-news.net          |
-| objectif-infos.cd         | https://objectif-infos.cd           |
 | scooprdc.net              | https://scooprdc.net                |
 | journaldekinshasa.com     | https://www.journaldekinshasa.com   |
 | lepotentiel.cd            | https://lepotentiel.cd              |

@@ -4,7 +4,7 @@ import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
 import { ingestionAgents, ingestionRuns } from "#db/schema";
 
-const AGENT_ONLINE_WINDOW_MS = 45_000;
+const AGENT_ONLINE_WINDOW_MS = 60_000;
 
 export async function getIngestionAgents(db: Database) {
   const generatedAt = new Date();

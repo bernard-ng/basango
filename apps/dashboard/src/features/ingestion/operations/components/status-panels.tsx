@@ -24,7 +24,7 @@ type AgentHealthItemProps = {
 
 export function AgentHealthPanel({ agents }: AgentHealthPanelProps) {
   return (
-    <DashboardPanel description="45 second heartbeat window" title="Agent health">
+    <DashboardPanel description="1 minute heartbeat window" title="Agent health">
       <div className="h-[280px] overflow-auto pr-1">
         {agents.length === 0 ? (
           <EmptyState message="No ingestion agent has connected yet." />

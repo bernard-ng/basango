@@ -2,7 +2,7 @@ import { Badge } from "@basango/ui/components/badge";
 import { Button, buttonVariants } from "@basango/ui/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@basango/ui/components/tabs";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ExternalLinkIcon, PencilIcon } from "lucide-react";
+import { ExternalLinkIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { DetailsPageHeader } from "#dashboard/app/components/details-page-header";
@@ -14,6 +14,7 @@ import { CategorySharesChart } from "../components/category-shares-chart";
 import { PublicationGraphChart } from "../components/publication-graph-chart";
 import { SourceDetailsTab } from "../components/source-details-tab";
 import { SourceIngestionRuns } from "../components/source-ingestion-runs";
+import { SourceDeleteDialog } from "../dialogs/source-delete-dialog";
 import { SourceEditDialog } from "../dialogs/source-edit-dialog";
 
 type SourceDetailsPageProps = {
@@ -24,6 +25,7 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
   const trpc = useTRPC();
   const { data: source } = useSuspenseQuery(trpc.sources.getById.queryOptions({ id: sourceId }));
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   return (
     <PageLayout>
@@ -43,6 +45,14 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
               <Button onClick={() => setIsEditOpen(true)} type="button">
                 <PencilIcon />
                 Edit source
+              </Button>
+              <Button
+                onClick={() => setIsDeleteOpen(true)}
+                type="button"
+                variant="destructive"
+              >
+                <Trash2Icon />
+                Delete source
               </Button>
             </>
           }
@@ -82,6 +92,7 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
         </Tabs>
       </div>
 
+      <SourceDeleteDialog onOpenChange={setIsDeleteOpen} open={isDeleteOpen} source={source} />
       <SourceEditDialog onOpenChange={setIsEditOpen} open={isEditOpen} source={source} />
     </PageLayout>
   );

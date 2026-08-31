@@ -36,6 +36,8 @@ export const getSourceSchema = z.object({
   id: idSchema,
 });
 
+export const deleteSourceSchema = getSourceSchema;
+
 export const getSourcesSchema = paginationRequestSchema;
 
 export const getCategorySharesSchema = z.object({
