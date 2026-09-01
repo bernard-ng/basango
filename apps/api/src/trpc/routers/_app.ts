@@ -3,16 +3,16 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { createTRPCRouter } from "#api/trpc/init";
 import { articlesRouter } from "#api/trpc/routers/articles";
 import { categoriesRouter } from "#api/trpc/routers/categories";
-import { feedRouter } from "#api/trpc/routers/feed";
 import { operationsRouter } from "#api/trpc/routers/operations";
+import { publicRouter } from "#api/trpc/routers/public";
 import { reportsRouter } from "#api/trpc/routers/reports";
 import { sourcesRouter } from "#api/trpc/routers/sources";
 
 export const appRouter = createTRPCRouter({
   articles: articlesRouter,
   categories: categoriesRouter,
-  feed: feedRouter,
   operations: operationsRouter,
+  public: publicRouter,
   reports: reportsRouter,
   sources: sourcesRouter,
 });

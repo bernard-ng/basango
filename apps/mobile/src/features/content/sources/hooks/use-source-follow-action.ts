@@ -11,8 +11,8 @@ export function useSourceFollowAction(source: SourceFollowActionSource) {
   const trpc = useTRPC();
 
   function invalidateSources() {
-    void queryClient.invalidateQueries(trpc.feed.sources.list.queryFilter());
-    void queryClient.invalidateQueries(trpc.feed.sources.get.queryFilter());
+    void queryClient.invalidateQueries(trpc.public.sources.list.queryFilter());
+    void queryClient.invalidateQueries(trpc.public.sources.get.queryFilter());
   }
 
   function showError(error: unknown) {
@@ -28,13 +28,13 @@ export function useSourceFollowAction(source: SourceFollowActionSource) {
   }
 
   const follow = useMutation(
-    trpc.feed.sources.follow.mutationOptions({
+    trpc.public.sources.follow.mutationOptions({
       onError: showError,
       onSuccess: invalidateSources,
     }),
   );
   const unfollow = useMutation(
-    trpc.feed.sources.unfollow.mutationOptions({
+    trpc.public.sources.unfollow.mutationOptions({
       onError: showError,
       onSuccess: invalidateSources,
     }),

@@ -2,7 +2,7 @@
 
 ## Applications
 
-- `apps/api`: Hono REST and tRPC API. It separates machine ingestion writes from authenticated operations reads.
+- `apps/api`: Hono REST, tRPC, and MCP API. It separates machine ingestion writes from operations and reader-facing reads.
 - `apps/dashboard`: TanStack Start operations and dataset dashboard, including realtime ingestion monitoring.
 - `apps/mobile`: Expo React Native reader.
 - [`basango-rs`](https://github.com/bernard-ng/basango-rs): the only crawler implementation. It runs independently from this Bun workspace.
@@ -24,6 +24,20 @@ The crawler owns source adapters, Redis queues, workers, retries, its durable SQ
 Signals use stable `agent.*` and `run.*` names, UUID signal IDs, and absolute run metrics. This makes retries idempotent and keeps transport messages independent from the dashboard's read shape.
 
 Article ingestion uses an `Idempotency-Key` header equal to the MD5 identity of the article link. The API verifies that identity, then PostgreSQL's unique article-hash constraint and an atomic insert-on-conflict operation make retries return the canonical article instead of creating duplicates. The response states whether that request created the record.
+
+## Reader data flow
+
+```text
+mobile reader ──authenticated tRPC──┐
+                                   ├──► @basango/db public queries ──► articles, sources, categories
+MCP client ──Bearer POST /mcp───────┘
+```
+
+MCP is a read-only delivery surface over the same database query functions used by the mobile
+reader. It adds protocol schemas, tool annotations, JSON serialization, and a dedicated Bearer
+credential; it does not duplicate article business logic or introduce a separate news domain.
+Publication boundaries are absolute instants, while relative-date requests are interpreted in the
+configured `Africa/Lubumbashi` timezone.
 
 ## Packages
 

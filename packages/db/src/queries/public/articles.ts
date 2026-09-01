@@ -1,5 +1,5 @@
-import type { ReaderArticleList } from "@basango/domain/models";
-import { type SQL, count, desc, eq, sql } from "drizzle-orm";
+import type { ArticleList } from "@basango/domain/models/public";
+import { type SQL, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 
 import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
@@ -11,7 +11,7 @@ import {
   buildSearchQuery,
 } from "#db/utils";
 
-export const readerArticleOverviewSelection = {
+export const articleOverviewSelection = {
   categories: articles.categories,
   category: {
     id: categories.id,
@@ -32,12 +32,12 @@ export const readerArticleOverviewSelection = {
   title: articles.title,
 } as const;
 
-export async function getReaderArticles(db: Database, params: ReaderArticleList) {
+export async function getArticles(db: Database, params: ArticleList) {
   const pagination = buildPaginationState(params);
-  const filters = buildReaderArticleFilters(params);
+  const filters = buildArticleFilters(params);
 
   const query = db
-    .select(readerArticleOverviewSelection)
+    .select(articleOverviewSelection)
     .from(articles)
     .leftJoin(categories, eq(articles.categoryId, categories.id))
     .innerJoin(sources, eq(articles.sourceId, sources.id));
@@ -55,10 +55,10 @@ export async function getReaderArticles(db: Database, params: ReaderArticleList)
   return buildPaginatedResult(rows, pagination, total);
 }
 
-export async function getReaderArticleById(db: Database, id: string) {
+export async function getArticleById(db: Database, id: string) {
   const [item] = await db
     .select({
-      ...readerArticleOverviewSelection,
+      ...articleOverviewSelection,
       body: articles.body,
       link: articles.link,
     })
@@ -75,7 +75,7 @@ export async function getReaderArticleById(db: Database, id: string) {
   return item;
 }
 
-function buildReaderArticleFilters(params: ReaderArticleList): SQL<unknown>[] {
+function buildArticleFilters(params: ArticleList): SQL<unknown>[] {
   const filters: SQL<unknown>[] = [];
 
   if (params.sourceId) {
@@ -84,6 +84,14 @@ function buildReaderArticleFilters(params: ReaderArticleList): SQL<unknown>[] {
 
   if (params.categoryId) {
     filters.push(eq(articles.categoryId, params.categoryId));
+  }
+
+  if (params.publishedAfter) {
+    filters.push(gte(articles.publishedAt, params.publishedAfter));
+  }
+
+  if (params.publishedBefore) {
+    filters.push(lte(articles.publishedAt, params.publishedBefore));
   }
 
   if (params.search) {

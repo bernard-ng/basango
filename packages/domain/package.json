@@ -11,7 +11,8 @@
     "./config": "./src/config/index.ts",
     "./config/environment": "./src/config/environment.ts",
     "./constants": "./src/constants.ts",
-    "./models": "./src/models/index.ts"
+    "./models": "./src/models/index.ts",
+    "./models/public": "./src/models/public/index.ts"
   },
   "imports": {
     "#domain/*": "./src/*"

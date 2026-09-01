@@ -1,4 +1,4 @@
-import { getEarliestPublished, getLatestPublished } from "@basango/db/queries";
+import { getSourcePublicationBounds } from "@basango/db/queries";
 import {
   getSourcePublicationBoundsResponseSchema,
   getSourcePublicationBoundsSchema,
@@ -43,15 +43,9 @@ app.openapi(
   }),
   async (c) => {
     const { name } = c.req.valid("json");
-    const [latest, earliest] = await Promise.all([
-      getLatestPublished(c.get("db"), name),
-      getEarliestPublished(c.get("db"), name),
-    ]);
+    const bounds = await getSourcePublicationBounds(c.get("db"), name);
 
-    return c.json(
-      validateResponse({ earliest, latest }, getSourcePublicationBoundsResponseSchema),
-      200,
-    );
+    return c.json(validateResponse(bounds, getSourcePublicationBoundsResponseSchema), 200);
   },
 );
 

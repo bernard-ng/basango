@@ -21,17 +21,14 @@ export const { env, config } = await defineConfig({
   environment: {
     files: resolveEnvFiles(),
     redact: [
-      "BASANGO_ADMIN_PASSWORD",
       "BASANGO_API_CRAWLER_TOKEN",
       "BASANGO_API_KEY",
       "BASANGO_DATABASE_URL",
+      "BASANGO_MCP_TOKEN",
       "BASANGO_RESEND_API_KEY",
       "BETTER_AUTH_SECRET",
     ],
     schema: z.object({
-      BASANGO_ADMIN_EMAIL: z.string().optional(),
-      BASANGO_ADMIN_NAME: z.string().optional(),
-      BASANGO_ADMIN_PASSWORD: z.string().optional(),
       BASANGO_API_ALLOWED_ORIGINS: z.string().optional(),
       BASANGO_API_CRAWLER_ENDPOINT: z.string().optional(),
       BASANGO_API_CRAWLER_TOKEN: z.string().min(1),
@@ -57,6 +54,7 @@ export const { env, config } = await defineConfig({
       BASANGO_ENV_PATH: z.string().optional(),
       BASANGO_LOGGER_LEVEL: z.string().default("info"),
       BASANGO_LOGGER_PRETTY: z.string().optional(),
+      BASANGO_MCP_TOKEN: z.string().min(32),
       BASANGO_RESEND_API_KEY: z.string().optional(),
       BASANGO_RESEND_FROM_EMAIL: z.string().optional(),
       BETTER_AUTH_COOKIE_DOMAIN: z.string().optional(),

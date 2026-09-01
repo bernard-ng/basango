@@ -17,6 +17,7 @@ export const ApiConfigurationSchema = z.object({
   }),
   security: z.object({
     ingestionToken: z.string(),
+    mcpToken: z.string().min(32),
   }),
   server: z.object({
     host: z.string().default("localhost"),

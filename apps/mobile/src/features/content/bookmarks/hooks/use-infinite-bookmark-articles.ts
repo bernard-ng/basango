@@ -6,12 +6,12 @@ import { useTRPC, useTRPCClient } from "#mobile/application/trpc/client";
 import { ARTICLES_PAGE_SIZE } from "#mobile/features/content/articles/hooks/use-infinite-articles";
 import { getNextPage } from "#mobile/features/content/shared/get-next-page";
 
-type BookmarkArticlePage = RouterOutputs["feed"]["bookmarks"]["listArticles"];
+type BookmarkArticlePage = RouterOutputs["public"]["bookmarks"]["listArticles"];
 
 export function useInfiniteBookmarkArticles(bookmarkId: string) {
   const trpc = useTRPC();
   const trpcClient = useTRPCClient();
-  const queryKey = trpc.feed.bookmarks.listArticles.queryKey({
+  const queryKey = trpc.public.bookmarks.listArticles.queryKey({
     bookmarkId,
     limit: ARTICLES_PAGE_SIZE,
   });
@@ -26,7 +26,7 @@ export function useInfiniteBookmarkArticles(bookmarkId: string) {
     getNextPageParam: (lastPage) => getNextPage(lastPage.meta),
     initialPageParam: 1,
     queryFn: async ({ pageParam, signal }): Promise<BookmarkArticlePage> =>
-      trpcClient.feed.bookmarks.listArticles.query(
+      trpcClient.public.bookmarks.listArticles.query(
         { bookmarkId, limit: ARTICLES_PAGE_SIZE, page: pageParam },
         { signal },
       ),

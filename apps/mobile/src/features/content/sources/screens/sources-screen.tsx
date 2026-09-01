@@ -17,14 +17,14 @@ export function SourcesScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [search, setSearch] = useState("");
   const sources = useQuery(
-    trpc.feed.sources.list.queryOptions({
+    trpc.public.sources.list.queryOptions({
       limit: 100,
       page: 1,
       search: search.trim() || undefined,
     }),
   );
   const followedSources = useQuery(
-    trpc.feed.sources.list.queryOptions({ followedOnly: true, limit: 100, page: 1 }),
+    trpc.public.sources.list.queryOptions({ followedOnly: true, limit: 100, page: 1 }),
   );
 
   const sourceItems = sources.data?.items ?? [];

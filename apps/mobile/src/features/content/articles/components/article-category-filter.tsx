@@ -15,7 +15,7 @@ export function ArticleCategoryFilter({
   selectedCategoryId,
 }: ArticleCategoryFilterProps) {
   const trpc = useTRPC();
-  const categories = useQuery(trpc.feed.categories.list.queryOptions());
+  const categories = useQuery(trpc.public.categories.list.queryOptions());
 
   if (categories.isPending) {
     return <Spinner alignSelf="flex-start" color="$primary" marginVertical="$3" size="small" />;

@@ -1,4 +1,4 @@
-import { createCommentSchema } from "@basango/domain/models";
+import { createCommentSchema } from "@basango/domain/models/public";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react-native";
 import { Controller } from "react-hook-form";
@@ -30,7 +30,7 @@ export function ArticleComments({ articleId, enabled }: ArticleCommentsProps) {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
   const comments = useQuery({
-    ...trpc.feed.comments.list.queryOptions({ articleId, limit: 50, page: 1 }),
+    ...trpc.public.comments.list.queryOptions({ articleId, limit: 50, page: 1 }),
     enabled,
   });
   const form = useZodForm(commentFormSchema, {
@@ -38,22 +38,22 @@ export function ArticleComments({ articleId, enabled }: ArticleCommentsProps) {
     mode: "onChange",
   });
   const createComment = useMutation(
-    trpc.feed.comments.create.mutationOptions({
+    trpc.public.comments.create.mutationOptions({
       onError(error) {
         form.setError("root", {
           message: error.message || "Impossible de publier ce commentaire.",
         });
       },
       onSuccess() {
-        void queryClient.invalidateQueries(trpc.feed.comments.list.queryFilter({ articleId }));
+        void queryClient.invalidateQueries(trpc.public.comments.list.queryFilter({ articleId }));
         form.reset();
       },
     }),
   );
   const deleteComment = useMutation(
-    trpc.feed.comments.delete.mutationOptions({
+    trpc.public.comments.delete.mutationOptions({
       onSuccess() {
-        void queryClient.invalidateQueries(trpc.feed.comments.list.queryFilter({ articleId }));
+        void queryClient.invalidateQueries(trpc.public.comments.list.queryFilter({ articleId }));
       },
     }),
   );

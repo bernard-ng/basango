@@ -8,6 +8,7 @@
     "@hono/node-server": "^1.19.6",
     "@hono/trpc-server": "^0.4.0",
     "@hono/zod-openapi": "^1.1.4",
+    "@modelcontextprotocol/server": "^2.0.0",
     "@trpc/server": "^11.7.1",
     "better-auth": "1.7.2",
     "camelcase-keys": "^10.0.1",
@@ -28,7 +29,6 @@
   "name": "@basango/api",
   "private": true,
   "scripts": {
-    "auth:create-admin": "bun run src/scripts/create-admin.ts",
     "dev": "NODE_ENV=development bun run --hot src/index.ts",
     "start": "NODE_ENV=production bun run src/index.ts",
     "typecheck": "tsc --noEmit"

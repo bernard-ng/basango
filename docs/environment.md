@@ -31,6 +31,7 @@ The committed `.env` is enough for the default local Docker services. Put person
 
 ```dotenv
 BASANGO_API_CRAWLER_TOKEN=my-local-token
+BASANGO_MCP_TOKEN=replace-with-a-local-secret-of-at-least-32-characters
 EXPO_PUBLIC_API_URL=http://192.168.1.20:3080
 ```
 
@@ -54,8 +55,10 @@ BETTER_AUTH_COOKIE_DOMAIN=.basango.ngandu.dev
 # .env.local
 BASANGO_API_CRAWLER_TOKEN=replace-with-a-long-random-secret
 BASANGO_DATABASE_URL=postgresql://...
+BASANGO_MCP_TOKEN=replace-with-a-separate-long-random-secret
 BETTER_AUTH_SECRET=replace-with-a-long-random-secret
 ```
 
 The crawler uses the same ingestion token as the API but is configured in the crawler deployment,
-not in this TypeScript repository.
+not in this TypeScript repository. The MCP token is a separate read-only credential and must never
+be reused as the crawler token.

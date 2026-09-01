@@ -22,7 +22,7 @@ export function SourceDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const trpc = useTRPC();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const source = useQuery(trpc.feed.sources.get.queryOptions({ id }));
+  const source = useQuery(trpc.public.sources.get.queryOptions({ id }));
   const articleFeed = useInfiniteArticles({ sourceId: id });
 
   async function handleRefresh() {

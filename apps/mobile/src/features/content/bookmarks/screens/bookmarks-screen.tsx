@@ -15,7 +15,7 @@ export function BookmarksScreen() {
   const router = useRouter();
   const trpc = useTRPC();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const bookmarks = useQuery(trpc.feed.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
+  const bookmarks = useQuery(trpc.public.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
 
   const bookmarkItems = bookmarks.data?.items ?? [];
 

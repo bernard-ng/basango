@@ -41,6 +41,15 @@ TypeScript API's root `.env.local`. Keep both values secret. Before Certbot enab
 `http://api.basango.ngandu.dev` only for an initial connectivity check, then switch the crawler to
 the HTTPS endpoint.
 
+The `/mcp` route is also publicly reachable through Nginx and requires its own read-only Bearer
+credential. Configure a different random secret in the API's root `.env.local`:
+
+```dotenv
+BASANGO_MCP_TOKEN=replace-with-a-separate-long-random-secret
+```
+
+Configure the same value as the Bearer token in the MCP client. Do not reuse the crawler token.
+
 ## Application processes
 
 From `/var/www/html/basango.ngandu.dev`, deploy or restart with:
@@ -69,7 +78,7 @@ BETTER_AUTH_URL=https://api.basango.ngandu.dev
 BETTER_AUTH_COOKIE_DOMAIN=.basango.ngandu.dev
 ```
 
-Put the API database, crawler token, and Better Auth secret in root `.env.local`.
+Put the API database, crawler token, MCP token, and Better Auth secret in root `.env.local`.
 That file is loaded after `.env.prod`, so it is the final file-based override and stays outside Git.
 Variables injected directly by PM2 or the host still take precedence. See the
 [environment configuration guide](environment.md) for the complete convention.

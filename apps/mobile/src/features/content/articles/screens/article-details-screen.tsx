@@ -18,7 +18,7 @@ export function ArticleDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const trpc = useTRPC();
-  const article = useQuery(trpc.feed.articles.get.queryOptions({ id }));
+  const article = useQuery(trpc.public.articles.get.queryOptions({ id }));
   const articleBookmarks = useArticleBookmarks(id);
 
   async function handleShare() {

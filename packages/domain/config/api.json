@@ -4,6 +4,9 @@
       "allowedHeaders": [
         "Authorization",
         "Content-Type",
+        "MCP-Protocol-Version",
+        "Mcp-Method",
+        "Mcp-Name",
         "accept-language",
         "x-trpc-source",
         "x-user-locale",
@@ -11,11 +14,12 @@
         "x-user-country"
       ],
       "allowMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-      "exposeHeaders": ["Content-Length"],
+      "exposeHeaders": ["Content-Length", "MCP-Protocol-Version", "WWW-Authenticate"],
       "maxAge": 86400
     },
     "security": {
-      "ingestionToken": "%env(BASANGO_API_CRAWLER_TOKEN)%"
+      "ingestionToken": "%env(BASANGO_API_CRAWLER_TOKEN)%",
+      "mcpToken": "%env(BASANGO_MCP_TOKEN)%"
     },
     "server": {
       "host": "%env(BASANGO_API_HOST)%",

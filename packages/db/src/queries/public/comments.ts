@@ -1,4 +1,4 @@
-import type { CommentList, CreateComment } from "@basango/domain/models";
+import type { CommentList, CreateComment } from "@basango/domain/models/public";
 import { and, count, desc, eq } from "drizzle-orm";
 import { v7 as uuidv7 } from "uuid";
 
@@ -7,7 +7,7 @@ import { NotFoundError } from "#db/errors";
 import { comments, users } from "#db/schema";
 import { buildPaginatedResult, buildPaginationState } from "#db/utils";
 
-export async function getReaderComments(db: Database, params: CommentList) {
+export async function getComments(db: Database, params: CommentList) {
   const pagination = buildPaginationState(params);
   const filter = and(eq(comments.articleId, params.articleId), eq(comments.isSpam, false));
   const [rows, total] = await Promise.all([
@@ -39,7 +39,7 @@ export async function getReaderComments(db: Database, params: CommentList) {
   return buildPaginatedResult(rows, pagination, total);
 }
 
-export async function createReaderComment(db: Database, userId: string, input: CreateComment) {
+export async function createComment(db: Database, userId: string, input: CreateComment) {
   const [comment] = await db
     .insert(comments)
     .values({
@@ -67,7 +67,7 @@ export async function createReaderComment(db: Database, userId: string, input: C
   return { ...comment, author };
 }
 
-export async function deleteReaderComment(db: Database, userId: string, id: string) {
+export async function deleteComment(db: Database, userId: string, id: string) {
   const [comment] = await db
     .delete(comments)
     .where(and(eq(comments.id, id), eq(comments.userId, userId)))

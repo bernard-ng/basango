@@ -7,8 +7,8 @@ import { getNextPage } from "#mobile/features/content/shared/get-next-page";
 
 export const ARTICLES_PAGE_SIZE = 20;
 
-type ArticleFilters = Omit<RouterInputs["feed"]["articles"]["list"], "limit" | "page">;
-type ArticlePage = RouterOutputs["feed"]["articles"]["list"];
+type ArticleFilters = Omit<RouterInputs["public"]["articles"]["list"], "limit" | "page">;
+type ArticlePage = RouterOutputs["public"]["articles"]["list"];
 
 type UseInfiniteArticlesOptions = ArticleFilters & {
   enabled?: boolean;
@@ -23,7 +23,7 @@ export function useInfiniteArticles({
   const trpc = useTRPC();
   const trpcClient = useTRPCClient();
   const filters = { categoryId, search, sourceId };
-  const queryKey = trpc.feed.articles.list.queryKey({
+  const queryKey = trpc.public.articles.list.queryKey({
     ...filters,
     limit: ARTICLES_PAGE_SIZE,
   });
@@ -38,7 +38,7 @@ export function useInfiniteArticles({
     getNextPageParam: (lastPage) => getNextPage(lastPage.meta),
     initialPageParam: 1,
     queryFn: async ({ pageParam, signal }): Promise<ArticlePage> =>
-      trpcClient.feed.articles.list.query(
+      trpcClient.public.articles.list.query(
         { ...filters, limit: ARTICLES_PAGE_SIZE, page: pageParam },
         { signal },
       ),

@@ -1,21 +1,38 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+  ArticleListSchema,
+  SourceListSchema,
   createBookmarkSchema,
   createCommentSchema,
-  readerArticleListSchema,
-  readerSourceListSchema,
   updateBookmarkSchema,
-} from "../../../packages/domain/src/models/feed";
+} from "../../../packages/domain/src/models/public";
 
 const id = "0198f0e2-5c2d-7bba-ae95-3d7eae12b2bc";
 
-describe("reader feed schemas", () => {
-  test("accepts bounded reader filters", () => {
+describe("public schemas", () => {
+  test("accepts bounded article filters", () => {
+    const publishedAfter = "2026-09-01T00:00:00+02:00";
+    const publishedBefore = "2026-09-01T23:59:59.999+02:00";
+
     expect(
-      readerArticleListSchema.parse({ limit: 20, page: 1, search: "  économie  ", sourceId: id }),
-    ).toMatchObject({ limit: 20, page: 1, search: "économie", sourceId: id });
-    expect(readerSourceListSchema.parse({ followedOnly: true, limit: 20, page: 1 })).toMatchObject({
+      ArticleListSchema.parse({
+        limit: 20,
+        page: 1,
+        publishedAfter,
+        publishedBefore,
+        search: "  économie  ",
+        sourceId: id,
+      }),
+    ).toMatchObject({
+      limit: 20,
+      page: 1,
+      publishedAfter: new Date(publishedAfter),
+      publishedBefore: new Date(publishedBefore),
+      search: "économie",
+      sourceId: id,
+    });
+    expect(SourceListSchema.parse({ followedOnly: true, limit: 20, page: 1 })).toMatchObject({
       followedOnly: true,
       limit: 20,
       page: 1,

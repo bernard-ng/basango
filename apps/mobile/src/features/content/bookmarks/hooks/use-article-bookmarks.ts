@@ -5,8 +5,8 @@ import { Alert } from "react-native";
 
 import { useTRPC } from "#mobile/application/trpc/client";
 
-type ArticleBookmarkMemberships = RouterOutputs["feed"]["bookmarks"]["memberships"];
-type BookmarkList = RouterOutputs["feed"]["bookmarks"]["list"];
+type ArticleBookmarkMemberships = RouterOutputs["public"]["bookmarks"]["memberships"];
+type BookmarkList = RouterOutputs["public"]["bookmarks"]["list"];
 type BookmarkListSnapshot = [readonly unknown[], BookmarkList | undefined][];
 
 type BookmarkRollbackState = {
@@ -17,7 +17,7 @@ type BookmarkRollbackState = {
 export function useArticleBookmarks(articleId: string) {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
-  const membershipsQueryOptions = trpc.feed.bookmarks.memberships.queryOptions({ id: articleId });
+  const membershipsQueryOptions = trpc.public.bookmarks.memberships.queryOptions({ id: articleId });
   const memberships = useQuery(membershipsQueryOptions);
   const addRollbackState = useRef<BookmarkRollbackState | undefined>(undefined);
   const removeRollbackState = useRef<BookmarkRollbackState | undefined>(undefined);
@@ -40,30 +40,33 @@ export function useArticleBookmarks(articleId: string) {
   }
 
   function updateBookmarkCount(bookmarkId: string, difference: 1 | -1) {
-    queryClient.setQueriesData<BookmarkList>(trpc.feed.bookmarks.list.queryFilter(), (current) => {
-      if (!current) {
-        return current;
-      }
+    queryClient.setQueriesData<BookmarkList>(
+      trpc.public.bookmarks.list.queryFilter(),
+      (current) => {
+        if (!current) {
+          return current;
+        }
 
-      return {
-        ...current,
-        items: current.items.map((bookmark) =>
-          bookmark.id === bookmarkId
-            ? {
-                ...bookmark,
-                articlesCount: Math.max(0, bookmark.articlesCount + difference),
-              }
-            : bookmark,
-        ),
-      };
-    });
+        return {
+          ...current,
+          items: current.items.map((bookmark) =>
+            bookmark.id === bookmarkId
+              ? {
+                  ...bookmark,
+                  articlesCount: Math.max(0, bookmark.articlesCount + difference),
+                }
+              : bookmark,
+          ),
+        };
+      },
+    );
   }
 
   function invalidateBookmarkQueries() {
     void queryClient.invalidateQueries({ queryKey: membershipsQueryOptions.queryKey });
-    void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
+    void queryClient.invalidateQueries(trpc.public.bookmarks.list.queryFilter());
     void queryClient.invalidateQueries({
-      queryKey: trpc.feed.bookmarks.listArticles.pathKey(),
+      queryKey: trpc.public.bookmarks.listArticles.pathKey(),
     });
   }
 
@@ -79,7 +82,7 @@ export function useArticleBookmarks(articleId: string) {
   }
 
   const addArticle = useMutation({
-    ...trpc.feed.bookmarks.addArticle.mutationOptions(),
+    ...trpc.public.bookmarks.addArticle.mutationOptions(),
     onError(error) {
       restoreBookmarkState(addRollbackState.current);
       Alert.alert(
@@ -90,11 +93,11 @@ export function useArticleBookmarks(articleId: string) {
     async onMutate(input) {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: membershipsQueryOptions.queryKey }),
-        queryClient.cancelQueries(trpc.feed.bookmarks.list.queryFilter()),
+        queryClient.cancelQueries(trpc.public.bookmarks.list.queryFilter()),
       ]);
       addRollbackState.current = {
         bookmarkLists: queryClient.getQueriesData<BookmarkList>(
-          trpc.feed.bookmarks.list.queryFilter(),
+          trpc.public.bookmarks.list.queryFilter(),
         ),
         memberships: queryClient.getQueryData<ArticleBookmarkMemberships>(
           membershipsQueryOptions.queryKey,
@@ -109,7 +112,7 @@ export function useArticleBookmarks(articleId: string) {
     onSettled: invalidateBookmarkQueries,
   });
   const removeArticle = useMutation({
-    ...trpc.feed.bookmarks.removeArticle.mutationOptions(),
+    ...trpc.public.bookmarks.removeArticle.mutationOptions(),
     onError(error) {
       restoreBookmarkState(removeRollbackState.current);
       Alert.alert(
@@ -120,11 +123,11 @@ export function useArticleBookmarks(articleId: string) {
     async onMutate(input) {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: membershipsQueryOptions.queryKey }),
-        queryClient.cancelQueries(trpc.feed.bookmarks.list.queryFilter()),
+        queryClient.cancelQueries(trpc.public.bookmarks.list.queryFilter()),
       ]);
       removeRollbackState.current = {
         bookmarkLists: queryClient.getQueriesData<BookmarkList>(
-          trpc.feed.bookmarks.list.queryFilter(),
+          trpc.public.bookmarks.list.queryFilter(),
         ),
         memberships: queryClient.getQueryData<ArticleBookmarkMemberships>(
           membershipsQueryOptions.queryKey,

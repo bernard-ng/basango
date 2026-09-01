@@ -1,4 +1,4 @@
-import { createBookmarkSchema } from "@basango/domain/models";
+import { createBookmarkSchema } from "@basango/domain/models/public";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -48,18 +48,18 @@ export function BookmarkForm({ bookmark }: BookmarkFormProps) {
   }
 
   function handleSuccess() {
-    void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
+    void queryClient.invalidateQueries(trpc.public.bookmarks.list.queryFilter());
     router.back();
   }
 
   const createBookmark = useMutation(
-    trpc.feed.bookmarks.create.mutationOptions({
+    trpc.public.bookmarks.create.mutationOptions({
       onError: showError,
       onSuccess: handleSuccess,
     }),
   );
   const updateBookmark = useMutation(
-    trpc.feed.bookmarks.update.mutationOptions({
+    trpc.public.bookmarks.update.mutationOptions({
       onError: showError,
       onSuccess: handleSuccess,
     }),

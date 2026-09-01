@@ -9,7 +9,7 @@ export function BookmarkFormScreen() {
   const { bookmarkId } = useLocalSearchParams<{ bookmarkId?: string }>();
   const trpc = useTRPC();
   const bookmarks = useQuery({
-    ...trpc.feed.bookmarks.list.queryOptions({ limit: 100, page: 1 }),
+    ...trpc.public.bookmarks.list.queryOptions({ limit: 100, page: 1 }),
     enabled: Boolean(bookmarkId),
   });
 

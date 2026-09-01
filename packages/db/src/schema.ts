@@ -114,7 +114,6 @@ export const accounts = pgTable(
     providerId: text("provider_id").notNull(),
     refreshToken: text("refresh_token"),
     refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-    scope: text(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     userId: uuid("user_id").notNull(),
   },

@@ -20,21 +20,21 @@ export function BookmarkDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
-  const bookmarks = useQuery(trpc.feed.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
+  const bookmarks = useQuery(trpc.public.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
   const articles = useInfiniteBookmarkArticles(id);
   const deleteBookmark = useMutation(
-    trpc.feed.bookmarks.delete.mutationOptions({
+    trpc.public.bookmarks.delete.mutationOptions({
       onSuccess() {
-        void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
+        void queryClient.invalidateQueries(trpc.public.bookmarks.list.queryFilter());
         router.back();
       },
     }),
   );
   const removeArticle = useMutation(
-    trpc.feed.bookmarks.removeArticle.mutationOptions({
+    trpc.public.bookmarks.removeArticle.mutationOptions({
       onSuccess() {
         void articles.refetch();
-        void queryClient.invalidateQueries(trpc.feed.bookmarks.list.queryFilter());
+        void queryClient.invalidateQueries(trpc.public.bookmarks.list.queryFilter());
       },
     }),
   );

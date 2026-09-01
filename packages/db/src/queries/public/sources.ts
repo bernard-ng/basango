@@ -1,4 +1,4 @@
-import type { ReaderSourceList } from "@basango/domain/models";
+import type { SourceList } from "@basango/domain/models/public";
 import { type SQL, and, asc, count, eq, ilike, sql } from "drizzle-orm";
 import { v7 as uuidv7 } from "uuid";
 
@@ -7,7 +7,7 @@ import { NotFoundError } from "#db/errors";
 import { articles, followedSources, sources } from "#db/schema";
 import { applyFilters, buildPaginatedResult, buildPaginationState } from "#db/utils";
 
-export async function getReaderSources(db: Database, userId: string, params: ReaderSourceList) {
+export async function getSources(db: Database, userId: string | undefined, params: SourceList) {
   const pagination = buildPaginationState(params);
   const filters = buildSourceFilters(userId, params);
   const query = db
@@ -15,12 +15,7 @@ export async function getReaderSources(db: Database, userId: string, params: Rea
       articlesCount: count(articles.id),
       description: sources.description,
       displayName: sources.displayName,
-      followed: sql<boolean>`exists (
-        select 1
-        from ${followedSources}
-        where ${followedSources.followerId} = ${userId}
-          and ${followedSources.sourceId} = ${sources.id}
-      )`,
+      followed: followedSourceSelection(userId),
       id: sources.id,
       name: sources.name,
       url: sources.url,
@@ -42,18 +37,13 @@ export async function getReaderSources(db: Database, userId: string, params: Rea
   return buildPaginatedResult(rows, pagination, total);
 }
 
-export async function getReaderSourceById(db: Database, userId: string, id: string) {
+export async function getSourceById(db: Database, userId: string | undefined, id: string) {
   const [source] = await db
     .select({
       articlesCount: count(articles.id),
       description: sources.description,
       displayName: sources.displayName,
-      followed: sql<boolean>`exists (
-        select 1
-        from ${followedSources}
-        where ${followedSources.followerId} = ${userId}
-          and ${followedSources.sourceId} = ${sources.id}
-      )`,
+      followed: followedSourceSelection(userId),
       id: sources.id,
       name: sources.name,
       url: sources.url,
@@ -71,7 +61,7 @@ export async function getReaderSourceById(db: Database, userId: string, id: stri
   return source;
 }
 
-export async function followReaderSource(db: Database, userId: string, sourceId: string) {
+export async function followSource(db: Database, userId: string, sourceId: string) {
   await db
     .insert(followedSources)
     .values({ followerId: userId, id: uuidv7(), sourceId })
@@ -80,7 +70,7 @@ export async function followReaderSource(db: Database, userId: string, sourceId:
   return { followed: true, sourceId };
 }
 
-export async function unfollowReaderSource(db: Database, userId: string, sourceId: string) {
+export async function unfollowSource(db: Database, userId: string, sourceId: string) {
   await db
     .delete(followedSources)
     .where(and(eq(followedSources.followerId, userId), eq(followedSources.sourceId, sourceId)));
@@ -88,7 +78,7 @@ export async function unfollowReaderSource(db: Database, userId: string, sourceI
   return { followed: false, sourceId };
 }
 
-function buildSourceFilters(userId: string, params: ReaderSourceList): SQL<unknown>[] {
+function buildSourceFilters(userId: string | undefined, params: SourceList): SQL<unknown>[] {
   const filters: SQL<unknown>[] = [];
 
   if (params.search) {
@@ -96,13 +86,30 @@ function buildSourceFilters(userId: string, params: ReaderSourceList): SQL<unkno
   }
 
   if (params.followedOnly) {
-    filters.push(sql`exists (
-      select 1
-      from ${followedSources}
-      where ${followedSources.followerId} = ${userId}
-        and ${followedSources.sourceId} = ${sources.id}
-    )`);
+    filters.push(
+      userId
+        ? sql`exists (
+            select 1
+            from ${followedSources}
+            where ${followedSources.followerId} = ${userId}
+              and ${followedSources.sourceId} = ${sources.id}
+          )`
+        : sql`false`,
+    );
   }
 
   return filters;
+}
+
+function followedSourceSelection(userId: string | undefined) {
+  if (!userId) {
+    return sql<boolean>`false`;
+  }
+
+  return sql<boolean>`exists (
+    select 1
+    from ${followedSources}
+    where ${followedSources.followerId} = ${userId}
+      and ${followedSources.sourceId} = ${sources.id}
+  )`;
 }

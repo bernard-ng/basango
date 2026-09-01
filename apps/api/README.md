@@ -16,12 +16,24 @@ The domain package owns request validation. The ingestion service applies signal
 
 Authenticated administrators receive focused durable reads through `operations.getIngestionAgents`, `operations.getIngestionSummary`, `operations.getIngestionThroughput`, and `operations.listIngestionRuns` over tRPC. `GET /operations/ingestion/stream` sends coalesced, topic-based realtime invalidations and uses the same Better Auth session cookie as tRPC. The stream never serves as the source of truth or transmits dashboard data.
 
+## MCP article reads
+
+`POST /mcp` exposes the mobile reader's article, source, and category reads over stateless MCP
+Streamable HTTP. The server provides `list_articles`, `get_article`, `list_sources`, `get_source`,
+and `list_categories`; it does not expose bookmarks, follows, comments, administration, or writes.
+
+Every MCP request requires the raw `BASANGO_MCP_TOKEN` value as a Bearer token. The credential is
+independent from the crawler ingestion token.
+Article publication filters accept absolute ISO-8601 instants. MCP clients should interpret relative
+periods in Basango's `Africa/Lubumbashi` timezone.
+
 ## Authentication
 
 Better Auth owns password credentials, sessions, password-reset verifications, and roles. Public sign-up is disabled while the only client is the admin dashboard; future web and mobile clients can use the same `/api/auth/*` API after sign-up is enabled. Dashboard tRPC and operations endpoints require the `admin` role.
 
 Configure:
 
+- `BASANGO_MCP_TOKEN`: random secret with at least 32 characters for the read-only MCP endpoint.
 - `BETTER_AUTH_SECRET`: random secret with at least 32 characters; required in production.
 - `BETTER_AUTH_URL`: public API origin, for example `https://api.basango.ngandu.dev`.
 - `BETTER_AUTH_COOKIE_DOMAIN`: optional shared production domain, for example `.basango.ngandu.dev`, when API and clients use subdomains.
@@ -43,12 +55,3 @@ bun run migrate
 ```
 
 While the schema is still under active development, migration history is intentionally squashed into `0000_init.sql`. Databases that ran an older migration chain must be recreated before applying this baseline.
-
-Create the first dashboard administrator after migrating:
-
-```bash
-BASANGO_ADMIN_EMAIL=admin@example.com \
-BASANGO_ADMIN_NAME="Basango Admin" \
-BASANGO_ADMIN_PASSWORD="replace-with-a-strong-password" \
-bun --filter @basango/api auth:create-admin
-```

@@ -22,6 +22,7 @@
     "./client": "./src/client.ts",
     "./errors": "./src/errors.ts",
     "./queries": "./src/queries/index.ts",
+    "./queries/public": "./src/queries/public/index.ts",
     "./schema": "./src/schema.ts",
     "./utils": "./src/utils/index.ts"
   },

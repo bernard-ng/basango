@@ -6,6 +6,7 @@ import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
 import { auth } from "#api/auth";
+import { mcpRouter } from "#api/mcp/init";
 import { routers } from "#api/rest/routers";
 import { createTRPCContext } from "#api/trpc/init";
 import { appRouter } from "#api/trpc/routers/_app";
@@ -28,6 +29,7 @@ app.use(
 );
 
 app.all("/api/auth/*", (c) => auth.handler(c.req.raw));
+app.all("/mcp", (c) => mcpRouter(c.req.raw));
 
 app.use(
   "/trpc/*",

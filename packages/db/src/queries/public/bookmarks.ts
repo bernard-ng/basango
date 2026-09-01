@@ -3,17 +3,17 @@ import type {
   BookmarkList,
   CreateBookmark,
   UpdateBookmark,
-} from "@basango/domain/models";
+} from "@basango/domain/models/public";
 import { and, count, desc, eq } from "drizzle-orm";
 import { v7 as uuidv7 } from "uuid";
 
 import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
-import { readerArticleOverviewSelection } from "#db/queries/feed/articles";
+import { articleOverviewSelection } from "#db/queries/public/articles";
 import { articles, bookmarkArticles, bookmarks, categories, sources } from "#db/schema";
 import { buildPaginatedResult, buildPaginationState } from "#db/utils";
 
-export async function getReaderBookmarks(db: Database, userId: string, params: BookmarkList) {
+export async function getBookmarks(db: Database, userId: string, params: BookmarkList) {
   const pagination = buildPaginationState(params);
   const [rows, total] = await Promise.all([
     db
@@ -43,7 +43,7 @@ export async function getReaderBookmarks(db: Database, userId: string, params: B
   return buildPaginatedResult(rows, pagination, total);
 }
 
-export async function createReaderBookmark(db: Database, userId: string, input: CreateBookmark) {
+export async function createBookmark(db: Database, userId: string, input: CreateBookmark) {
   const [bookmark] = await db
     .insert(bookmarks)
     .values({
@@ -62,7 +62,7 @@ export async function createReaderBookmark(db: Database, userId: string, input: 
   return { ...bookmark, articlesCount: 0 };
 }
 
-export async function updateReaderBookmark(db: Database, userId: string, input: UpdateBookmark) {
+export async function updateBookmark(db: Database, userId: string, input: UpdateBookmark) {
   const [bookmark] = await db
     .update(bookmarks)
     .set({
@@ -86,7 +86,7 @@ export async function updateReaderBookmark(db: Database, userId: string, input: 
   return { ...bookmark, articlesCount: articleCount?.value ?? 0 };
 }
 
-export async function deleteReaderBookmark(db: Database, userId: string, id: string) {
+export async function deleteBookmark(db: Database, userId: string, id: string) {
   const [bookmark] = await db
     .delete(bookmarks)
     .where(and(eq(bookmarks.id, id), eq(bookmarks.userId, userId)))
@@ -99,7 +99,7 @@ export async function deleteReaderBookmark(db: Database, userId: string, id: str
   return bookmark;
 }
 
-export async function getReaderBookmarkArticles(
+export async function getBookmarkArticles(
   db: Database,
   userId: string,
   params: BookmarkArticleList,
@@ -110,7 +110,7 @@ export async function getReaderBookmarkArticles(
   const filter = eq(bookmarkArticles.bookmarkId, params.bookmarkId);
   const [rows, total] = await Promise.all([
     db
-      .select(readerArticleOverviewSelection)
+      .select(articleOverviewSelection)
       .from(bookmarkArticles)
       .innerJoin(articles, eq(bookmarkArticles.articleId, articles.id))
       .leftJoin(categories, eq(articles.categoryId, categories.id))
@@ -129,7 +129,7 @@ export async function getReaderBookmarkArticles(
   return buildPaginatedResult(rows, pagination, total);
 }
 
-export async function getReaderArticleBookmarkMemberships(
+export async function getArticleBookmarkMemberships(
   db: Database,
   userId: string,
   articleId: string,
@@ -146,7 +146,7 @@ export async function getReaderArticleBookmarkMemberships(
   return { bookmarkIds: rows.map((row) => row.bookmarkId) };
 }
 
-export async function addReaderArticleToBookmark(
+export async function addArticleToBookmark(
   db: Database,
   userId: string,
   bookmarkId: string,
@@ -159,7 +159,7 @@ export async function addReaderArticleToBookmark(
   return { articleId, bookmarkId, saved: true };
 }
 
-export async function removeReaderArticleFromBookmark(
+export async function removeArticleFromBookmark(
   db: Database,
   userId: string,
   bookmarkId: string,

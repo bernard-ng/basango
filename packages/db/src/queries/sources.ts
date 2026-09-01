@@ -1,5 +1,10 @@
 import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
-import type { ID, Publication, Publications } from "@basango/domain/models";
+import type {
+  ID,
+  Publication,
+  Publications,
+  SourcePublicationBounds,
+} from "@basango/domain/models";
 import { calculateSourceCoveragePercent } from "@basango/domain/models";
 import { asc, count, eq, getTableColumns, max, min, or, sql } from "drizzle-orm";
 import * as uuid from "uuid";
@@ -173,12 +178,6 @@ export async function deleteSource(db: Database, id: ID) {
   return result;
 }
 
-export async function getSourceByName(db: Database, name: string) {
-  return await db.query.sources.findFirst({
-    where: eq(sources.name, name),
-  });
-}
-
 export async function getSourceById(db: Database, id: ID) {
   const item = await db.query.sources.findFirst({
     where: eq(sources.id, id),
@@ -189,21 +188,6 @@ export async function getSourceById(db: Database, id: ID) {
   }
 
   return item;
-}
-
-export async function getSourceIdByName(db: Database, name: string): Promise<string> {
-  const result = await db.query.sources.findFirst({
-    columns: {
-      id: true,
-    },
-    where: eq(sources.name, name),
-  });
-
-  if (!result) {
-    throw new NotFoundError("Source not found");
-  }
-
-  return result.id;
 }
 
 export async function getOrCreateSourceIdByName(
@@ -302,26 +286,18 @@ export async function getSourceCategoryShares(
   return { items: data.rows, total: data.rowCount ?? 0 };
 }
 
-export async function getLatestPublished(db: Database, source: string): Promise<Date | null> {
-  const result = await db
+export async function getSourcePublicationBounds(
+  db: Database,
+  source: string,
+): Promise<SourcePublicationBounds> {
+  const [bounds] = await db
     .select({
-      publishedAt: max(articles.publishedAt),
+      earliest: min(articles.publishedAt),
+      latest: max(articles.publishedAt),
     })
     .from(articles)
     .innerJoin(sources, eq(articles.sourceId, sources.id))
     .where(eq(sources.name, source));
 
-  return result[0]?.publishedAt ?? null;
-}
-
-export async function getEarliestPublished(db: Database, source: string): Promise<Date | null> {
-  const result = await db
-    .select({
-      publishedAt: min(articles.publishedAt),
-    })
-    .from(articles)
-    .innerJoin(sources, eq(articles.sourceId, sources.id))
-    .where(eq(sources.name, source));
-
-  return result[0]?.publishedAt ?? null;
+  return bounds ?? { earliest: null, latest: null };
 }

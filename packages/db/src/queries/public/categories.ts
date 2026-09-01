@@ -3,7 +3,7 @@ import { asc, desc } from "drizzle-orm";
 import type { Database } from "#db/client";
 import { categories } from "#db/schema";
 
-export async function getReaderCategories(db: Database) {
+export async function getCategories(db: Database) {
   return db
     .select({
       description: categories.description,

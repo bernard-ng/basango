@@ -12,7 +12,7 @@ type BookmarkPickerProps = {
 
 export function BookmarkPicker({ articleId }: BookmarkPickerProps) {
   const trpc = useTRPC();
-  const bookmarks = useQuery(trpc.feed.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
+  const bookmarks = useQuery(trpc.public.bookmarks.list.queryOptions({ limit: 100, page: 1 }));
   const articleBookmarks = useArticleBookmarks(articleId);
   const bookmarkItems = bookmarks.data?.items ?? [];
   const isPending = bookmarks.isPending || articleBookmarks.isPending;
