@@ -4,6 +4,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@basango/ui/components/chart";
+import { TimerIcon } from "lucide-react";
 
 import {
   Area,
@@ -17,9 +18,10 @@ import {
   XAxis,
   YAxis,
 } from "#dashboard/app/components/recharts";
+import { IngestionEmptyState } from "#dashboard/features/ingestion/shared/components/ingestion-empty-state";
 
 import type { LatencyPoint, PipelinePoint, ThroughputPoint } from "../types";
-import { DashboardPanel, EmptyState } from "./dashboard-primitives";
+import { DashboardPanel } from "./dashboard-primitives";
 
 const throughputConfig = {
   delivered: { color: "var(--chart-3)", label: "Delivered" },
@@ -124,7 +126,12 @@ export function RunDurationPanel({ data }: RunDurationPanelProps) {
   return (
     <DashboardPanel description="Completion time in minutes for recent runs" title="Run duration">
       {data.length === 0 ? (
-        <EmptyState message="Duration telemetry will appear after a run completes." />
+        <IngestionEmptyState
+          className="h-[280px]"
+          description="Duration telemetry will appear after a run completes."
+          icon={TimerIcon}
+          title="No run duration data"
+        />
       ) : (
         <ChartContainer className="h-[280px] w-full" config={latencyConfig}>
           <LineChart accessibilityLayer data={data} margin={{ left: -12, right: 10 }}>

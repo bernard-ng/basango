@@ -44,23 +44,29 @@ export function buildCategoryDistributionChartModel(
       dataKey: `originalCategory${index}`,
     }));
   const seriesByCategory = new Map(series.map((item) => [item.category, item.dataKey]));
-  const data = items.map((item) => {
-    const datum: CategoryDistributionDatum = {
-      articleCount: item.articleCount,
-      category: item.category,
-      categorySlug: item.slug,
-    };
+  const data = [...items]
+    .sort((left, right) => {
+      return (
+        right.articleCount - left.articleCount || left.category.localeCompare(right.category, "fr")
+      );
+    })
+    .map((item) => {
+      const datum: CategoryDistributionDatum = {
+        articleCount: item.articleCount,
+        category: item.category,
+        categorySlug: item.slug,
+      };
 
-    for (const originalCategory of item.originalCategories) {
-      const dataKey = seriesByCategory.get(originalCategory.category);
+      for (const originalCategory of item.originalCategories) {
+        const dataKey = seriesByCategory.get(originalCategory.category);
 
-      if (dataKey) {
-        datum[dataKey] = originalCategory.count;
+        if (dataKey) {
+          datum[dataKey] = originalCategory.count;
+        }
       }
-    }
 
-    return datum;
-  });
+      return datum;
+    });
 
   return { data, series };
 }

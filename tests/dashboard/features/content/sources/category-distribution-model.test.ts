@@ -6,16 +6,6 @@ describe("category distribution chart model", () => {
   test("creates one bar per cluster and one series per original category", () => {
     const model = buildCategoryDistributionChartModel([
       {
-        articleCount: 5,
-        category: "Politics",
-        categoryId: "politics-id",
-        originalCategories: [
-          { category: "Elections", count: 3 },
-          { category: "Government", count: 2 },
-        ],
-        slug: "politics",
-      },
-      {
         articleCount: 2,
         category: "Society",
         categoryId: "society-id",
@@ -24,6 +14,16 @@ describe("category distribution chart model", () => {
           { category: "Culture", count: 1 },
         ],
         slug: "society",
+      },
+      {
+        articleCount: 5,
+        category: "Politics",
+        categoryId: "politics-id",
+        originalCategories: [
+          { category: "Elections", count: 3 },
+          { category: "Government", count: 2 },
+        ],
+        slug: "politics",
       },
     ]);
 

@@ -33,10 +33,10 @@ export const sourcesRouter = createTRPCRouter({
   }),
 
   getCategoryDistribution: adminProcedure
-    .input(getCategoryDistributionSchema)
-    .query(async ({ ctx, input }) => {
-      return getSourceCategoryDistribution(ctx.db, input);
-    }),
+      .input(getCategoryDistributionSchema)
+      .query(async ({ ctx, input }) => {
+        return getSourceCategoryDistribution(ctx.db, input);
+      }),
 
   getPublications: adminProcedure.input(getPublicationsSchema).query(async ({ ctx, input }) => {
     return getSourcePublicationGraph(ctx.db, input);

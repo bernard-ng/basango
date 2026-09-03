@@ -14,6 +14,7 @@ import { useMemo, useState } from "react";
 
 import { PageLayout } from "#dashboard/app/components/page-layout";
 import { useTRPC } from "#dashboard/app/trpc/client";
+import { IngestionEmptyState } from "#dashboard/features/ingestion/shared/components/ingestion-empty-state";
 
 import { CrawlHistoryTimeline } from "../components/crawl-history-timeline";
 import { CrawlHistoryLegend, CrawlHistoryToolbar } from "../components/crawl-history-toolbar";
@@ -93,13 +94,12 @@ export function CrawlHistoryPage() {
               <CrawlHistoryTimeline runs={runs} />
             </div>
           ) : (
-            <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center">
-              <TimerIcon className="mb-3 size-8 text-muted-foreground/60" />
-              <p className="font-medium">No crawl jobs found</p>
-              <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Try another filter, or wait until an agent begins collecting from a source.
-              </p>
-            </div>
+            <IngestionEmptyState
+              className="min-h-0"
+              description="Try another filter, or wait until an agent begins collecting from a source."
+              icon={TimerIcon}
+              title="No crawl jobs found"
+            />
           )}
           <div className="flex shrink-0 items-center justify-between gap-4 border-t px-4 py-3 text-xs text-muted-foreground">
             <span>

@@ -9,10 +9,13 @@ import {
   ItemTitle,
 } from "@basango/ui/components/item";
 import { Link } from "@tanstack/react-router";
+import { ServerIcon } from "lucide-react";
+
+import { IngestionEmptyState } from "#dashboard/features/ingestion/shared/components/ingestion-empty-state";
 
 import { relativeTime, stateVariant } from "../../shared/ingestion-formatters";
 import type { IngestionAgent } from "../types";
-import { DashboardPanel, EmptyState } from "./dashboard-primitives";
+import { DashboardPanel } from "./dashboard-primitives";
 
 type AgentHealthPanelProps = {
   agents: IngestionAgent[];
@@ -27,7 +30,12 @@ export function AgentHealthPanel({ agents }: AgentHealthPanelProps) {
     <DashboardPanel description="1 minute heartbeat window" title="Agent health">
       <div className="h-[280px] overflow-auto pr-1">
         {agents.length === 0 ? (
-          <EmptyState message="No ingestion agent has connected yet." />
+          <IngestionEmptyState
+            className="h-full"
+            description="No ingestion agent has connected yet."
+            icon={ServerIcon}
+            title="No agents connected"
+          />
         ) : (
           <ItemGroup className="gap-2" data-size="sm">
             {agents.map((agent) => (

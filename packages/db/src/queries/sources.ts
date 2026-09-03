@@ -10,6 +10,7 @@ import { calculateSourceCoveragePercent } from "@basango/domain/models";
 import {
   and,
   arrayContains,
+  asc,
   count,
   desc,
   eq,
@@ -50,7 +51,7 @@ export async function getSources(db: Database, params: GetSourcesParams) {
       .from(sources)
       .leftJoin(articles, eq(articles.sourceId, sources.id))
       .groupBy(sources.id)
-      .orderBy(desc(sources.updatedAt))
+      .orderBy(desc(count(articles.id)), asc(sources.name), asc(sources.id))
       .limit(pagination.limit)
       .offset(pagination.offset),
     db

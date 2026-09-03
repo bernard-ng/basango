@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@basango/ui/components/card";
 import { Skeleton } from "@basango/ui/components/skeleton";
-import { Server, Wifi, WifiOff } from "lucide-react";
+import { Wifi, WifiOff } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function DashboardPanel({
@@ -80,17 +80,6 @@ export function IngestionOperationsSkeleton() {
         <Skeleton className="h-[360px]" />
       </div>
       <Skeleton className="h-[34rem]" />
-    </div>
-  );
-}
-
-export function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="flex min-h-32 items-center justify-center rounded-md border border-dashed bg-muted/20 px-4">
-      <div className="text-center">
-        <Server className="mx-auto mb-2 size-5 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">{message}</p>
-      </div>
     </div>
   );
 }
