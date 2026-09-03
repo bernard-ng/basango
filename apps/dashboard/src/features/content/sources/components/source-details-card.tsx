@@ -5,11 +5,11 @@ import { Card, CardContent } from "@basango/ui/components/card";
 import { Detail, DetailsSection } from "#dashboard/app/components/detail-list";
 import { formatDate } from "#dashboard/app/utils/formatters";
 
-type SourceDetailsTabProps = {
+type SourceDetailsCardProps = {
   source: RouterOutputs["sources"]["getById"];
 };
 
-export function SourceDetailsTab({ source }: SourceDetailsTabProps) {
+export function SourceDetailsCard({ source }: SourceDetailsCardProps) {
   const credibility = source.credibility;
 
   return (

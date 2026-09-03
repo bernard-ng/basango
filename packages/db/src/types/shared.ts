@@ -1,16 +1,30 @@
-import { DateRange, ID } from "@basango/domain/models";
+import type { DateRange, ID } from "@basango/domain/models";
 
-export type CategoryShare = {
-  categoryId: string;
+export type OriginalCategoryDistribution = {
   category: string;
   count: number;
-  percentage: number;
+};
+
+export type CategoryDistributionItem = {
+  articleCount: number;
+  categoryId: string;
+  category: string;
+  originalCategories: OriginalCategoryDistribution[];
   slug: string;
 };
 
-export type CategoryShares = {
-  items: CategoryShare[];
+export type CategoryDistribution = {
+  items: CategoryDistributionItem[];
   total: number;
+};
+
+export type CategoryDistributionRow = {
+  articleCount: number;
+  categoryId: string;
+  category: string;
+  count: number;
+  originalCategory: string;
+  slug: string;
 };
 
 export type GetPublicationsParams = {
@@ -18,9 +32,8 @@ export type GetPublicationsParams = {
   range?: DateRange;
 };
 
-export type GetCategorySharesParams = {
+export type GetCategoryDistributionParams = {
   id: ID;
-  limit?: number;
 };
 
 export type GetDistributionsParams = {

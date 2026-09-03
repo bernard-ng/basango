@@ -3,8 +3,11 @@ import { getIngestionThroughput } from "@basango/db/queries";
 
 type ThroughputSnapshot = Awaited<ReturnType<typeof getIngestionThroughput>>;
 
+const THROUGHPUT_CACHE_MAX_AGE_MS = 15_000;
+
 let cachedGeneration = -1;
 let cachedSnapshot: ThroughputSnapshot | undefined;
+let cachedAt = 0;
 let generation = 0;
 let inFlightGeneration = -1;
 let inFlightSnapshot: Promise<ThroughputSnapshot> | undefined;
@@ -14,7 +17,13 @@ export function invalidateIngestionThroughput() {
 }
 
 export async function getIngestionThroughputSnapshot(db: Database) {
-  if (cachedSnapshot && cachedGeneration === generation) {
+  const now = Date.now();
+
+  if (
+    cachedSnapshot &&
+    cachedGeneration === generation &&
+    now - cachedAt < THROUGHPUT_CACHE_MAX_AGE_MS
+  ) {
     return cachedSnapshot;
   }
 
@@ -25,6 +34,7 @@ export async function getIngestionThroughputSnapshot(db: Database) {
   const requestedGeneration = generation;
   const request = getIngestionThroughput(db).then((snapshot) => {
     if (generation === requestedGeneration) {
+      cachedAt = Date.now();
       cachedGeneration = requestedGeneration;
       cachedSnapshot = snapshot;
     }

@@ -14,7 +14,8 @@ const app = new OpenAPIHono<Context>();
 
 app.openapi(
   createRoute({
-    description: "Get the current publication boundaries for one source.",
+    description:
+      "Get the current publication boundaries for one source and optional crawler category.",
     method: "post",
     middleware: [withIngestionAuth, withDatabase],
     operationId: "GetSourcePublicationBounds",
@@ -42,8 +43,8 @@ app.openapi(
     tags: ["Ingestion"],
   }),
   async (c) => {
-    const { name } = c.req.valid("json");
-    const bounds = await getSourcePublicationBounds(c.get("db"), name);
+    const input = c.req.valid("json");
+    const bounds = await getSourcePublicationBounds(c.get("db"), input);
 
     return c.json(validateResponse(bounds, getSourcePublicationBoundsResponseSchema), 200);
   },

@@ -8,7 +8,7 @@ All crawler writes require the raw `BASANGO_API_CRAWLER_TOKEN` value in the `Aut
 
 - `POST /ingest/articles` stores an idempotent crawled article.
 - `POST /ingest/signals` accepts idempotent `agent.*` and `run.*` operational signals.
-- `POST /ingest/sources/publication-bounds` returns the current collection boundary for a source.
+- `POST /ingest/sources/publication-bounds` returns the current collection boundary for a source, optionally scoped to a crawler category.
 
 The domain package owns request validation. The ingestion service applies signals to the durable operations projection; REST handlers do not contain projection logic.
 

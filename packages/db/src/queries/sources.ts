@@ -1,21 +1,34 @@
-import { DEFAULT_CATEGORY_SHARES_LIMIT, DEFAULT_TIMEZONE } from "@basango/domain/constants";
+import { DEFAULT_TIMEZONE } from "@basango/domain/constants";
 import type {
+  GetSourcePublicationBounds,
   ID,
   Publication,
   Publications,
   SourcePublicationBounds,
 } from "@basango/domain/models";
 import { calculateSourceCoveragePercent } from "@basango/domain/models";
-import { asc, count, eq, getTableColumns, max, min, or, sql } from "drizzle-orm";
+import {
+  and,
+  arrayContains,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  max,
+  min,
+  or,
+  sql,
+} from "drizzle-orm";
 import * as uuid from "uuid";
 
 import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
 import { articles, categories, sources } from "#db/schema";
-import {
-  CategoryShare,
-  CategoryShares,
-  GetCategorySharesParams,
+import type {
+  CategoryDistribution,
+  CategoryDistributionItem,
+  CategoryDistributionRow,
+  GetCategoryDistributionParams,
   GetPublicationsParams,
 } from "#db/types/shared";
 import type {
@@ -37,7 +50,7 @@ export async function getSources(db: Database, params: GetSourcesParams) {
       .from(sources)
       .leftJoin(articles, eq(articles.sourceId, sources.id))
       .groupBy(sources.id)
-      .orderBy(asc(sources.name), asc(sources.id))
+      .orderBy(desc(sources.updatedAt))
       .limit(pagination.limit)
       .offset(pagination.offset),
     db
@@ -261,35 +274,85 @@ export async function getSourcePublicationGraph(
   return { items: data.rows };
 }
 
-export async function getSourceCategoryShares(
+export async function getSourceCategoryDistribution(
   db: Database,
-  params: GetCategorySharesParams,
-): Promise<CategoryShares> {
-  const data = await db.execute<CategoryShare>(sql`
+  params: GetCategoryDistributionParams,
+): Promise<CategoryDistribution> {
+  const data = await db.execute<CategoryDistributionRow>(sql`
+    WITH source_articles AS (
+      SELECT
+        ${categories.id}::text AS "categoryId",
+        ${categories.slug} AS slug,
+        ${categories.name} AS category,
+        ${articles.id} AS "articleId",
+        ${articles.categories} AS "originalCategories",
+        COUNT(*) OVER (PARTITION BY ${categories.id})::int AS "articleCount"
+      FROM ${articles}
+      JOIN ${categories} ON ${categories.id} = ${articles.categoryId}
+      WHERE ${articles.sourceId} = ${params.id} AND ${articles.clustered} = true
+    ),
+    category_occurrences AS (
+      SELECT
+        source_articles."categoryId",
+        source_articles.slug,
+        source_articles.category,
+        source_articles."articleCount",
+        COALESCE(original_category.category, 'No original category') AS "originalCategory"
+      FROM source_articles
+      LEFT JOIN LATERAL (
+        SELECT DISTINCT TRIM(raw_category) AS category
+        FROM UNNEST(
+          COALESCE(source_articles."originalCategories", ARRAY[]::text[])
+        ) AS raw_category
+        WHERE TRIM(raw_category) <> ''
+      ) AS original_category ON true
+    )
     SELECT
-      ${categories.id}::text AS "categoryId",
-      ${categories.slug} AS slug,
-      ${categories.name} AS category,
-      COUNT(${articles.id})::int AS count,
-      COALESCE(
-        ROUND((COUNT(*)::numeric / NULLIF(SUM(COUNT(*)) OVER (), 0)) * 100, 2),
-        0
-      )::float AS percentage
-    FROM ${articles}
-    JOIN ${categories} ON ${categories.id} = ${articles.categoryId}
-    WHERE ${articles.sourceId} = ${params.id} AND ${articles.clustered} = true
-    GROUP BY ${categories.id}, ${categories.slug}, ${categories.name}
-    ORDER BY count DESC
-    LIMIT ${params.limit ?? DEFAULT_CATEGORY_SHARES_LIMIT}
+      "categoryId",
+      slug,
+      category,
+      "articleCount",
+      "originalCategory",
+      COUNT(*)::int AS count
+    FROM category_occurrences
+    GROUP BY "categoryId", slug, category, "articleCount", "originalCategory"
+    ORDER BY "articleCount" DESC, category ASC, count DESC, "originalCategory" ASC
   `);
 
-  return { items: data.rows, total: data.rowCount ?? 0 };
+  const itemsByCategory = new Map<string, CategoryDistributionItem>();
+
+  for (const row of data.rows) {
+    const item = itemsByCategory.get(row.categoryId) ?? {
+      articleCount: row.articleCount,
+      category: row.category,
+      categoryId: row.categoryId,
+      originalCategories: [],
+      slug: row.slug,
+    };
+
+    item.originalCategories.push({
+      category: row.originalCategory,
+      count: row.count,
+    });
+    itemsByCategory.set(row.categoryId, item);
+  }
+
+  const items = Array.from(itemsByCategory.values());
+  const total = items.reduce((sum, item) => sum + item.articleCount, 0);
+
+  return { items, total };
 }
 
 export async function getSourcePublicationBounds(
   db: Database,
-  source: string,
+  params: GetSourcePublicationBounds,
 ): Promise<SourcePublicationBounds> {
+  const conditions = [eq(sources.name, params.name)];
+
+  if (params.category) {
+    conditions.push(arrayContains(articles.categories, [params.category]));
+  }
+
   const [bounds] = await db
     .select({
       earliest: min(articles.publishedAt),
@@ -297,7 +360,7 @@ export async function getSourcePublicationBounds(
     })
     .from(articles)
     .innerJoin(sources, eq(articles.sourceId, sources.id))
-    .where(eq(sources.name, source));
+    .where(and(...conditions));
 
   return bounds ?? { earliest: null, latest: null };
 }

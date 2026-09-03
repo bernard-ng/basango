@@ -20,6 +20,7 @@ import { useTRPC } from "#dashboard/app/trpc/client";
 
 import { buildIngestionRunsQuery, resolveIngestionRunStates } from "../ingestion-runs-query";
 import type { IngestionRun } from "../types";
+import { IngestionLifecycleCleanup } from "./ingestion-lifecycle-cleanup";
 import { IngestionRunsBulkActions } from "./ingestion-runs-bulk-actions";
 import { createIngestionRunColumns } from "./ingestion-runs-columns";
 
@@ -34,6 +35,7 @@ const stateLabels: Record<IngestionRunState, string> = {
 
 type IngestionRunsTableProps = {
   agentId?: string;
+  allowLifecycleCleanup?: boolean;
   realtime?: boolean;
   refetchInterval?: false | number;
   sourceId?: string;
@@ -46,6 +48,7 @@ type RunStateFilterProps = {
 
 export function IngestionRunsTable({
   agentId,
+  allowLifecycleCleanup = false,
   realtime = true,
   refetchInterval = false,
   sourceId,
@@ -114,6 +117,14 @@ export function IngestionRunsTable({
                 .map((row) => row.id)}
               table={table}
             />
+            {allowLifecycleCleanup ? (
+              <IngestionLifecycleCleanup
+                onCleaned={() => {
+                  table.resetRowSelection();
+                  table.setPageIndex(0);
+                }}
+              />
+            ) : null}
           </DataTableToolbar>
         )}
       />

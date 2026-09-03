@@ -10,10 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@basango/ui/components/select";
-import { ToggleGroup, ToggleGroupItem } from "@basango/ui/components/toggle-group";
 import { differenceInCalendarDays, format, subDays } from "date-fns";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
-import { parseAsInteger, parseAsIsoDate, useQueryStates } from "nuqs";
+import { parseAsIsoDate, useQueryStates } from "nuqs";
 import { useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
 
@@ -36,19 +35,8 @@ const createRangeFromDays = (days: number): DateRange => {
   };
 };
 
-const DEFAULT_LIMIT_OPTIONS = [
-  { label: "Top 10", value: 10 },
-  { label: "Top 20", value: 20 },
-  { label: "Top 50", value: 50 },
-] as const;
-
 type ChartPeriodFilterOptions = {
   defaultDays?: number;
-  paramKey?: string;
-};
-
-type ChartLimitFilterOptions = {
-  defaultValue?: number;
   paramKey?: string;
 };
 
@@ -92,22 +80,6 @@ export function useChartPeriodFilter(options: ChartPeriodFilterOptions = {}) {
     range,
     selectedRange,
     setState,
-  };
-}
-
-export function useChartLimitFilter(options: ChartLimitFilterOptions = {}) {
-  const { defaultValue = 10, paramKey = "chartLimit" } = options;
-  const [state, setState] = useQueryStates({
-    [paramKey]: parseAsInteger.withDefault(defaultValue),
-  });
-
-  const limit = state[paramKey];
-
-  return {
-    limit,
-    setLimit: (value: number) => {
-      setState({ [paramKey]: value });
-    },
   };
 }
 
@@ -266,38 +238,6 @@ export function ChartPeriodPicker({
         </div>
       </PopoverContent>
     </Popover>
-  );
-}
-
-type ChartLimitToggleProps = ChartLimitFilterOptions & {
-  options?: ReadonlyArray<{ label: string; value: number }>;
-};
-
-export function ChartLimitToggle({
-  defaultValue = 10,
-  options = DEFAULT_LIMIT_OPTIONS,
-  paramKey = "chartLimit",
-}: ChartLimitToggleProps) {
-  const { limit, setLimit } = useChartLimitFilter({ defaultValue, paramKey });
-
-  return (
-    <ToggleGroup
-      onValueChange={(value) => {
-        const selectedValue = value[0];
-
-        if (selectedValue) {
-          setLimit(Number(selectedValue));
-        }
-      }}
-      value={[String(limit)]}
-      variant="outline"
-    >
-      {options.map((option) => (
-        <ToggleGroupItem key={option.value} value={String(option.value)}>
-          {option.label}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
   );
 }
 

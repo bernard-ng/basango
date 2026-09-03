@@ -8,8 +8,6 @@ import { NotFoundError } from "#db/errors";
 import { articles, categories } from "#db/schema";
 import { normalizeCategory } from "#db/services/category-classifier";
 
-const UNKNOWN_CANDIDATE_LIMIT = 12;
-
 export async function getCategories(db: Database) {
   return db
     .select({
@@ -139,13 +137,11 @@ export async function getClusteringStats(db: Database) {
         .filter((candidate): candidate is string => Boolean(candidate)),
     ),
   );
-  const unknownCandidates = rawCandidateRows.rows
-    .filter((row) => {
-      const normalized = normalizeCategory(row.candidate);
+  const unknownCandidates = rawCandidateRows.rows.filter((row) => {
+    const normalized = normalizeCategory(row.candidate);
 
-      return normalized !== null && !knownCandidates.has(normalized);
-    })
-    .slice(0, UNKNOWN_CANDIDATE_LIMIT);
+    return normalized !== null && !knownCandidates.has(normalized);
+  });
   const fallbackCategory = categoryRows.find((category) => category.slug === DEFAULT_CATEGORY);
   const clusteringPercent =
     summary.total === 0 ? 0 : Math.round((summary.clustered / summary.total) * 100);

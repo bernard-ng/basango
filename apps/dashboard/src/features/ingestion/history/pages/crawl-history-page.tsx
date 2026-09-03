@@ -59,7 +59,7 @@ export function CrawlHistoryPage() {
           Refresh
         </Button>
       }
-      className="h-[calc(100dvh-6rem)] min-h-[36rem] overflow-hidden"
+      className="h-[calc(100dvh-6rem)] min-h-144 overflow-hidden"
       description="Compare crawl duration and article workload across sources, then inspect when every job ran."
       title="Timeline"
     >

@@ -8,6 +8,7 @@ import {
   listIngestionAgentActivities,
   listIngestionRunActivities,
   listIngestionRuns,
+  resetIngestionLifecycle,
 } from "@basango/db/queries";
 import {
   closeIngestionRunsSchema,
@@ -68,4 +69,12 @@ export const operationsRouter = createTRPCRouter({
   listIngestionRuns: adminProcedure
     .input(ingestionRunsQuerySchema)
     .query(({ ctx, input }) => listIngestionRuns(ctx.db, input)),
+  resetIngestionLifecycle: adminProcedure.mutation(async ({ ctx }) => {
+    const result = await resetIngestionLifecycle(ctx.db);
+
+    invalidateIngestionThroughput();
+    announceIngestionChange(["agents", "runs", "summary", "throughput"]);
+
+    return result;
+  }),
 });

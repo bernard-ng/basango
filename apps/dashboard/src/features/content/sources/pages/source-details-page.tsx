@@ -10,9 +10,9 @@ import { PageLayout } from "#dashboard/app/components/page-layout";
 import { useTRPC } from "#dashboard/app/trpc/client";
 import { ArticlesFeed } from "#dashboard/features/content/articles/components/articles-feed";
 
-import { CategorySharesChart } from "../components/category-shares-chart";
+import { CategoryDistributionChart } from "../components/category-distribution-chart";
 import { PublicationGraphChart } from "../components/publication-graph-chart";
-import { SourceDetailsTab } from "../components/source-details-tab";
+import { SourceDetailsCard } from "../components/source-details-card";
 import { SourceIngestionRuns } from "../components/source-ingestion-runs";
 import { SourceDeleteDialog } from "../dialogs/source-delete-dialog";
 import { SourceEditDialog } from "../dialogs/source-edit-dialog";
@@ -70,10 +70,10 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="articles">Articles</TabsTrigger>
             <TabsTrigger value="ingestion">Ingestion</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
           </TabsList>
           <TabsContent className="space-y-4" value="overview">
-            <CategorySharesChart sourceId={source.id} />
+            <SourceDetailsCard source={source} />
+            <CategoryDistributionChart sourceId={source.id} />
             <PublicationGraphChart sourceId={source.id} />
           </TabsContent>
           <TabsContent value="articles">
@@ -81,9 +81,6 @@ export function SourceDetailsPage({ sourceId }: SourceDetailsPageProps) {
           </TabsContent>
           <TabsContent value="ingestion">
             <SourceIngestionRuns sourceId={source.id} sourceName={source.name} />
-          </TabsContent>
-          <TabsContent value="details">
-            <SourceDetailsTab source={source} />
           </TabsContent>
         </Tabs>
       </div>

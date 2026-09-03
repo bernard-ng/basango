@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
   calculateSourceCoveragePercent,
   getSourcePublicationBoundsResponseSchema,
+  getSourcePublicationBoundsSchema,
   getSourcesSchema,
   syncCrawlerSourcesSchema,
 } from "../../../packages/domain/src/models/sources";
@@ -65,6 +66,15 @@ describe("source coverage", () => {
 });
 
 describe("source publication bounds", () => {
+  test("preserves an optional crawler category", () => {
+    const request = getSourcePublicationBoundsSchema.parse({
+      category: "santé",
+      name: "actualite.cd",
+    });
+
+    expect(request).toEqual({ category: "santé", name: "actualite.cd" });
+  });
+
   test("accepts empty bounds for a source without articles", () => {
     const bounds = getSourcePublicationBoundsResponseSchema.parse({
       earliest: null,

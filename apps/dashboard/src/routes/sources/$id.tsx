@@ -9,7 +9,7 @@ export const Route = createFileRoute("/sources/$id")({
     const sourceQuery = context.trpc.sources.getById.queryOptions({ id: params.id });
 
     void context.queryClient.prefetchQuery(
-      context.trpc.sources.getCategoryShares.queryOptions({ id: params.id, limit: 10 }),
+      context.trpc.sources.getCategoryDistribution.queryOptions({ id: params.id }),
     );
     void context.queryClient.prefetchQuery(
       context.trpc.sources.getPublications.queryOptions({ id: params.id }),

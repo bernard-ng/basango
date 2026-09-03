@@ -2,7 +2,7 @@ import {
   createSource,
   deleteSource,
   getSourceById,
-  getSourceCategoryShares,
+  getSourceCategoryDistribution,
   getSourcePublicationGraph,
   getSources,
   updateSource,
@@ -10,7 +10,7 @@ import {
 import {
   createSourceSchema,
   deleteSourceSchema,
-  getCategorySharesSchema,
+  getCategoryDistributionSchema,
   getPublicationsSchema,
   getSourceSchema,
   getSourcesSchema,
@@ -32,9 +32,11 @@ export const sourcesRouter = createTRPCRouter({
     return getSourceById(ctx.db, input.id);
   }),
 
-  getCategoryShares: adminProcedure.input(getCategorySharesSchema).query(async ({ ctx, input }) => {
-    return getSourceCategoryShares(ctx.db, input);
-  }),
+  getCategoryDistribution: adminProcedure
+    .input(getCategoryDistributionSchema)
+    .query(async ({ ctx, input }) => {
+      return getSourceCategoryDistribution(ctx.db, input);
+    }),
 
   getPublications: adminProcedure.input(getPublicationsSchema).query(async ({ ctx, input }) => {
     return getSourcePublicationGraph(ctx.db, input);

@@ -1,7 +1,6 @@
 import z from "zod";
 
 export const SharedConfigurationSchema = z.object({
-  categorySharesLimit: z.number().int().min(1).default(10),
   dateFormat: z.string(),
   dateTimeFormat: z.string(),
   name: z.string().default("Basango"),

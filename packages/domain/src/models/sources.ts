@@ -1,12 +1,6 @@
 import z from "zod";
 
-import {
-  credibilitySchema,
-  idSchema,
-  limitSchema,
-  paginationRequestSchema,
-  publicationsSchema,
-} from "./shared";
+import { credibilitySchema, idSchema, paginationRequestSchema, publicationsSchema } from "./shared";
 
 export const CRAWLER_SOURCE_KINDS = ["html", "wordpress"] as const;
 
@@ -40,9 +34,8 @@ export const deleteSourceSchema = getSourceSchema;
 
 export const getSourcesSchema = paginationRequestSchema;
 
-export const getCategorySharesSchema = z.object({
+export const getCategoryDistributionSchema = z.object({
   id: idSchema,
-  limit: limitSchema.optional(),
 });
 
 export const updateSourceSchema = sourceSchema.pick({
@@ -55,6 +48,7 @@ export const updateSourceSchema = sourceSchema.pick({
 });
 
 export const getSourcePublicationBoundsSchema = z.object({
+  category: z.string().trim().min(1).max(255).optional(),
   name: z.string().min(1).max(255),
 });
 
@@ -81,6 +75,7 @@ export const syncCrawlerSourcesResponseSchema = z.object({
 
 // types
 export type CrawlerSourceSyncItem = z.infer<typeof crawlerSourceSyncItemSchema>;
+export type GetSourcePublicationBounds = z.infer<typeof getSourcePublicationBoundsSchema>;
 export type Source = z.infer<typeof sourceSchema>;
 export type SourcePublicationBounds = z.infer<typeof getSourcePublicationBoundsResponseSchema>;
 export type SyncCrawlerSources = z.infer<typeof syncCrawlerSourcesSchema>;

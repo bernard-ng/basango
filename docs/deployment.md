@@ -82,3 +82,23 @@ Put the API database, crawler token, MCP token, and Better Auth secret in root `
 That file is loaded after `.env.prod`, so it is the final file-based override and stays outside Git.
 Variables injected directly by PM2 or the host still take precedence. See the
 [environment configuration guide](environment.md) for the complete convention.
+
+## Ingestion data retention
+
+The ingestion operations projection is disposable monitoring data. Prune events, completed or
+failed runs, and stale inactive agents with:
+
+```bash
+NODE_ENV=production bun run ingestion:cleanup
+```
+
+The default retention period is five days. Override it when needed with
+`--retention-days <days>`. Articles, sources, categories, and reader data are never deleted by this
+command.
+
+Run the cleanup daily from the production checkout. Cron uses a minimal environment, so replace
+the Bun path below with the absolute path returned by `command -v bun` for the deployment user:
+
+```cron
+15 3 * * * cd /var/www/html/basango.ngandu.dev && NODE_ENV=production /absolute/path/to/bun run ingestion:cleanup >> /var/log/basango-ingestion-cleanup.log 2>&1
+```

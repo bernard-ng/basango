@@ -12,7 +12,8 @@ import { useTRPC } from "#dashboard/app/trpc/client";
 
 import { CategoriesTable } from "../components/categories-table";
 import type { CategoryRowAction } from "../components/category-row-actions";
-import { ClusteringStats } from "../components/clustering-stats";
+import { ClusteringStats, ClusteringStatsSkeleton } from "../components/clustering-stats";
+import { UnmatchedSourceLabelsDrawer } from "../components/unmatched-source-labels-drawer";
 import { CategoryDeleteDialog } from "../dialogs/category-delete-dialog";
 import { CategoryDialog } from "../dialogs/category-dialog";
 
@@ -39,10 +40,16 @@ export function CategoriesPage() {
   return (
     <PageLayout
       actions={
-        <Button onClick={() => setIsCreateOpen(true)}>
-          <PlusIcon data-icon="inline-start" />
-          Add category
-        </Button>
+        <>
+          <UnmatchedSourceLabelsDrawer
+            categories={categories.data ?? []}
+            unmatchedLabels={stats.data?.unknownCandidates ?? []}
+          />
+          <Button onClick={() => setIsCreateOpen(true)}>
+            <PlusIcon data-icon="inline-start" />
+            Add category
+          </Button>
+        </>
       }
       description="Manage article categories, tune matching candidates, and monitor clustering quality."
       title="Categories"
@@ -54,7 +61,11 @@ export function CategoriesPage() {
         </Alert>
       ) : null}
 
-      {stats.data ? <ClusteringStats stats={stats.data} /> : null}
+      {stats.data ? (
+        <ClusteringStats stats={stats.data} />
+      ) : stats.isPending ? (
+        <ClusteringStatsSkeleton />
+      ) : null}
 
       <section className="space-y-4">
         <div>

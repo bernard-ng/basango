@@ -69,7 +69,7 @@ export function IngestionOperations({
         <AgentHealthPanel agents={agents} />
       </div>
 
-      <IngestionRunsTable />
+      <IngestionRunsTable allowLifecycleCleanup />
     </div>
   );
 }

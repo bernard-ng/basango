@@ -21,6 +21,8 @@ dashboard ◄── tRPC snapshot + authenticated SSE invalidation ────�
 
 The crawler owns source adapters, Redis queues, workers, retries, its durable SQLite outbox, and the facts emitted by its agents. The domain package owns the signal wire contract. The API service validates and projects those facts into `ingestion_agent`, `ingestion_run`, and `ingestion_activity`. The dashboard reads that projection through an authenticated tRPC operations procedure, then listens for server-sent invalidations and periodically polls as a reconnect safety net.
 
+Operational ingestion data is disposable and remains separate from the canonical article dataset. The dashboard can reset the complete operations projection, while the database cleanup command removes expired events, terminal runs, and stale agent health in bounded batches. Neither cleanup path deletes articles, sources, categories, or reader data.
+
 Signals use stable `agent.*` and `run.*` names, UUID signal IDs, and absolute run metrics. This makes retries idempotent and keeps transport messages independent from the dashboard's read shape.
 
 Article ingestion uses an `Idempotency-Key` header equal to the MD5 identity of the article link. The API verifies that identity, then PostgreSQL's unique article-hash constraint and an atomic insert-on-conflict operation make retries return the canonical article instead of creating duplicates. The response states whether that request created the record.
@@ -72,5 +74,6 @@ the [TypeScript and React code-style guide](web/code-style.md) for the normative
 - `bun run crawler:worker` starts the Rust worker from a sibling `../basango-rs` checkout.
 - `bun run build:crawler` builds the Rust crawler in release mode.
 - Apply database migrations before using ingestion operations: `bun run migrate`.
+- `bun run ingestion:cleanup` prunes ingestion operations data older than five days by default.
 
 Production crawler processes are managed by the systemd units in the Rust repository rather than the Bun/PM2 application definition.

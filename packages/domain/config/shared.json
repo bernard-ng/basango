@@ -1,6 +1,5 @@
 {
   "shared": {
-    "categorySharesLimit": 10,
     "dateFormat": "yyyy-LL-dd",
     "dateTimeFormat": "yyyy-LL-dd'T'HH:mm:ss",
     "name": "Basango",

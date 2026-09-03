@@ -1,6 +1,11 @@
 export { listIngestionAgentActivities, listIngestionRunActivities } from "./activities";
 export { getIngestionAgentDetails, getIngestionAgents } from "./agents";
 export {
+  type IngestionLifecycleCleanupResult,
+  pruneIngestionLifecycle,
+  resetIngestionLifecycle,
+} from "./maintenance";
+export {
   closeIngestionRuns,
   deleteIngestionRuns,
   getIngestionRunDetails,

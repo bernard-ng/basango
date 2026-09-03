@@ -8,7 +8,6 @@ export const DEFAULT_PAGINATION_PAGE = 1;
 export const DEFAULT_PAGINATION_MAX_LIMIT = 100;
 
 export const DEFAULT_PUBLICATION_GRAPH_DAYS = 30;
-export const DEFAULT_CATEGORY_SHARES_LIMIT = 10;
 export const DEFAULT_TIMEZONE = "Africa/Lubumbashi";
 
 export const DEFAULT_CATEGORY = "divers-autres";
