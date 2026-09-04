@@ -4,7 +4,6 @@ import type { Database } from "#db/client";
 import {
   clearArticleSearchEntries,
   countArticleSearchDocuments,
-  countPendingArticleSearchEntries,
   failArticleSearchEntries,
   getArticleSearchDocumentBatch,
   getArticleSearchDocumentIds,
@@ -103,22 +102,12 @@ export class SearchSynchronizer {
     return entries.length;
   }
 
-  async drainDirty(reportProgress?: SearchProgressReporter): Promise<number> {
+  async drainDirty(): Promise<number> {
     let total = 0;
-    let expectedTotal = reportProgress
-      ? await countPendingArticleSearchEntries(this.db)
-      : undefined;
-
-    reportProgress?.({ completed: 0, total: expectedTotal ?? 0 });
 
     while (true) {
       const synchronized = await this.synchronizeDirty();
       total += synchronized;
-
-      if (expectedTotal !== undefined) {
-        expectedTotal = Math.max(expectedTotal, total);
-        reportProgress?.({ completed: total, total: expectedTotal });
-      }
 
       if (synchronized === 0) {
         return total;

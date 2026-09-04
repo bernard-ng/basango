@@ -9,15 +9,15 @@ describe("search command progress", () => {
     );
   });
 
-  test("caps progress when the amount of work grows during synchronization", () => {
-    expect(formatSearchProgress("Synchronizing search", { completed: 12, total: 10 }, 10)).toBe(
-      "Synchronizing search [##########] 100% (12/12)",
+  test("caps progress when the corpus grows during a rebuild", () => {
+    expect(formatSearchProgress("Rebuilding search", { completed: 12, total: 10 }, 10)).toBe(
+      "Rebuilding search [##########] 100% (12/12)",
     );
   });
 
-  test("treats an empty queue as complete", () => {
-    expect(formatSearchProgress("Synchronizing search", { completed: 0, total: 0 }, 10)).toBe(
-      "Synchronizing search [##########] 100% (0/0)",
+  test("treats an empty corpus as complete", () => {
+    expect(formatSearchProgress("Rebuilding search", { completed: 0, total: 0 }, 10)).toBe(
+      "Rebuilding search [##########] 100% (0/0)",
     );
   });
 });

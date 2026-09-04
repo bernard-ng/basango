@@ -24,8 +24,8 @@ delays and keep their latest error for diagnosis.
 byte-bounded indexing batches. It waits for every asynchronous Meilisearch task, checks count parity, atomically swaps
 the temporary index with `articles`, deletes the old index, and drains changes recorded during the rebuild.
 
-Interactive `search:rebuild` and `search:sync` runs show a document or queue progress bar. Non-interactive runs, such as
-cron jobs, omit the animated bar and retain the final structured summary so redirected logs stay readable.
+Interactive `search:rebuild` runs show a document progress bar. Non-interactive rebuilds omit the animated bar and
+retain the final structured summary so redirected logs stay readable. `search:sync` output is unchanged.
 
 If rebuild verification fails, the live index is unchanged and the temporary index is deleted. Investigate PostgreSQL
 write activity, malformed oversized documents, connectivity, and Meilisearch task errors before retrying.

@@ -25,9 +25,7 @@ async function main() {
 
   switch (command) {
     case "drain": {
-      const synchronized = await runWithSearchProgress("Synchronizing search", (reportProgress) =>
-        synchronizer.drainDirty(reportProgress),
-      );
+      const synchronized = await synchronizer.drainDirty();
       logger.info({ synchronized }, "Search repair queue drained");
       break;
     }
