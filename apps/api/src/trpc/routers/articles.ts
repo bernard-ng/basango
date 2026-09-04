@@ -5,19 +5,31 @@ import {
   getArticlesPublicationGraph,
   getArticlesSourceDistribution,
 } from "@basango/db/queries";
+import { config } from "@basango/domain/config";
 import {
   createArticleSchema,
   getArticleSchema,
   getArticlesSchema,
   getDistributionsSchema,
   getPublicationsSchema,
+  searchArticlesSchema,
 } from "@basango/domain/models";
+import { logger } from "@basango/logger";
 
+import { searchSynchronizer } from "#api/search";
 import { adminProcedure, createTRPCRouter } from "#api/trpc/init";
 
 export const articlesRouter = createTRPCRouter({
   create: adminProcedure.input(createArticleSchema).mutation(async ({ ctx, input }) => {
-    return createArticle(ctx.db, input);
+    const result = await createArticle(ctx.db, input);
+
+    if (result.created) {
+      void searchSynchronizer.synchronizeArticle(result.id).catch((error) => {
+        logger.warn({ articleId: result.id, error }, "Article search indexing deferred");
+      });
+    }
+
+    return result;
   }),
 
   getById: adminProcedure.input(getArticleSchema).query(async ({ ctx, input }) => {
@@ -36,5 +48,13 @@ export const articlesRouter = createTRPCRouter({
 
   list: adminProcedure.input(getArticlesSchema).query(async ({ ctx, input }) => {
     return getArticles(ctx.db, input);
+  }),
+
+  search: adminProcedure.input(searchArticlesSchema).query(async ({ ctx, input }) => {
+    return ctx.searchEngine.search({
+      ...input,
+      limit: input.limit ?? config.shared.pagination.defaultLimit,
+      page: input.page ?? config.shared.pagination.page,
+    });
   }),
 });

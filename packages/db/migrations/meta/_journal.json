@@ -28,6 +28,13 @@
       "tag": "0003_remove_account_scope",
       "version": "7",
       "when": 1788273524975
+    },
+    {
+      "breakpoints": true,
+      "idx": 4,
+      "tag": "0004_article_search",
+      "version": "7",
+      "when": 1788444831334
     }
   ],
   "version": "7"

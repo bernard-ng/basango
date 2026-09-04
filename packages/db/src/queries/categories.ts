@@ -5,6 +5,7 @@ import * as uuid from "uuid";
 
 import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
+import { markCategoryArticleSearchDirty } from "#db/queries/search-documents";
 import { articles, categories } from "#db/schema";
 import { normalizeCategory } from "#db/services/category-classifier";
 
@@ -65,6 +66,8 @@ export async function updateCategory(db: Database, params: UpdateCategory) {
       .where(eq(categories.id, params.id))
       .returning();
 
+    await markCategoryArticleSearchDirty(tx, params.id);
+
     const classificationChanged =
       existing.slug !== params.slug ||
       existing.weight !== params.weight ||
@@ -86,6 +89,7 @@ export async function deleteCategory(db: Database, id: ID) {
       throw new Error("The last category cannot be deleted.");
     }
 
+    await markCategoryArticleSearchDirty(tx, id);
     const [deleted] = await tx.delete(categories).where(eq(categories.id, id)).returning();
 
     if (!deleted) {

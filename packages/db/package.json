@@ -4,6 +4,7 @@
     "@ai-sdk/openai": "^2.0.75",
     "@basango/domain": "workspace:*",
     "@basango/logger": "workspace:*",
+    "@basango/search": "workspace:*",
     "@date-fns/utc": "^2.1.1",
     "ai": "^5.0.105",
     "date-fns": "catalog:",
@@ -24,6 +25,7 @@
     "./queries": "./src/queries/index.ts",
     "./queries/public": "./src/queries/public/index.ts",
     "./schema": "./src/schema.ts",
+    "./synchronizers/search": "./src/synchronizers/search.ts",
     "./utils": "./src/utils/index.ts"
   },
   "imports": {
@@ -35,6 +37,7 @@
     "clean": "rm -rf .turbo node_modules",
     "cleanup:ingestion": "bun ./src/commands/cleanup-ingestion.ts",
     "sync:categories": "bun ./src/synchronizers/categories.ts",
+    "sync:search": "bun ./src/commands/sync-search.ts",
     "sync:tokens": "bun ./src/synchronizers/tokens.ts",
     "typecheck": "tsc --noEmit"
   }

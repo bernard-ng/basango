@@ -16,6 +16,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IngestionRouteImport } from './routes/ingestion'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as AgentsAgentIdRouteImport } from './routes/agents/$agentId'
@@ -58,6 +59,11 @@ const LoginRoute = LoginRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TimelineRoute = TimelineRouteImport.update({
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/timeline': typeof TimelineRoute
   '/users': typeof UsersRoute
   '/agents/$agentId': typeof AgentsAgentIdRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/timeline': typeof TimelineRoute
   '/users': typeof UsersRoute
   '/agents/$agentId': typeof AgentsAgentIdRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/ingestion': typeof IngestionRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/timeline': typeof TimelineRoute
   '/users': typeof UsersRoute
   '/agents/$agentId': typeof AgentsAgentIdRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/ingestion'
     | '/login'
     | '/reset-password'
+    | '/search'
     | '/timeline'
     | '/users'
     | '/agents/$agentId'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/ingestion'
     | '/login'
     | '/reset-password'
+    | '/search'
     | '/timeline'
     | '/users'
     | '/agents/$agentId'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/ingestion'
     | '/login'
     | '/reset-password'
+    | '/search'
     | '/timeline'
     | '/users'
     | '/agents/$agentId'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   IngestionRoute: typeof IngestionRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   TimelineRoute: typeof TimelineRoute
   UsersRoute: typeof UsersRoute
   AgentsAgentIdRoute: typeof AgentsAgentIdRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/timeline': {
@@ -343,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   IngestionRoute: IngestionRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   TimelineRoute: TimelineRoute,
   UsersRoute: UsersRoute,
   AgentsAgentIdRoute: AgentsAgentIdRoute,

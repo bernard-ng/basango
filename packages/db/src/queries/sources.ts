@@ -24,6 +24,7 @@ import * as uuid from "uuid";
 
 import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
+import { markSourceArticleSearchDirty } from "#db/queries/search-documents";
 import { articles, categories, sources } from "#db/schema";
 import type {
   CategoryDistribution,
@@ -111,6 +112,7 @@ export async function syncCrawlerSources(db: Database, params: SyncCrawlerSource
             url: source.url,
           })
           .where(eq(sources.id, existing.id));
+        await markSourceArticleSearchDirty(tx, existing.id);
         updated += 1;
         continue;
       }
@@ -158,6 +160,7 @@ export async function syncCrawlerSources(db: Database, params: SyncCrawlerSource
           url: source.url,
         })
         .where(eq(sources.id, raced.id));
+      await markSourceArticleSearchDirty(tx, raced.id);
       updated += 1;
     }
 
@@ -166,18 +169,26 @@ export async function syncCrawlerSources(db: Database, params: SyncCrawlerSource
 }
 
 export async function updateSource(db: Database, params: UpdateSourceParams) {
-  const [result] = await db
-    .update(sources)
-    .set({
-      credibility: params.credibility,
-      description: params.description,
-      displayName: params.displayName,
-      name: params.name,
-      updatedAt: new Date(),
-      url: params.url,
-    })
-    .where(eq(sources.id, params.id))
-    .returning();
+  const result = await db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(sources)
+      .set({
+        credibility: params.credibility,
+        description: params.description,
+        displayName: params.displayName,
+        name: params.name,
+        updatedAt: new Date(),
+        url: params.url,
+      })
+      .where(eq(sources.id, params.id))
+      .returning();
+
+    if (updated) {
+      await markSourceArticleSearchDirty(tx, params.id);
+    }
+
+    return updated;
+  });
 
   if (result === undefined) {
     throw new NotFoundError(`Source not found`);
@@ -187,7 +198,12 @@ export async function updateSource(db: Database, params: UpdateSourceParams) {
 }
 
 export async function deleteSource(db: Database, id: ID) {
-  const [result] = await db.delete(sources).where(eq(sources.id, id)).returning();
+  const result = await db.transaction(async (tx) => {
+    await markSourceArticleSearchDirty(tx, id, "delete");
+    const [deleted] = await tx.delete(sources).where(eq(sources.id, id)).returning();
+
+    return deleted;
+  });
 
   return result;
 }

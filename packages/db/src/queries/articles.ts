@@ -16,7 +16,7 @@ import * as uuid from "uuid";
 import { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
 import { getOrCreateSourceIdByName } from "#db/queries/sources";
-import { articles, categories, sources } from "#db/schema";
+import { articleSearchOutbox, articles, categories, sources } from "#db/schema";
 import { classifyArticleCategory } from "#db/services/category-classifier";
 import { CreateArticleParams, GetArticlesParams } from "#db/types/articles";
 import { GetDistributionsParams, GetPublicationsParams } from "#db/types/shared";
@@ -26,7 +26,6 @@ import {
   buildPaginatedResult,
   buildPaginationState,
   buildPreviousRange,
-  buildSearchQuery,
   computeDelta,
   computeReadingTime,
   computeTokenStatistics,
@@ -53,14 +52,25 @@ export async function createArticle(db: Database, params: CreateArticleParams) {
   data.categoryId = category.id;
   data.clustered = true;
 
-  const [result] = await db
-    .insert(articles)
-    .values({ ...data })
-    .onConflictDoNothing({ target: articles.hash })
-    .returning({
-      id: articles.id,
-      sourceId: articles.sourceId,
-    });
+  const result = await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(articles)
+      .values({ ...data })
+      .onConflictDoNothing({ target: articles.hash })
+      .returning({
+        id: articles.id,
+        sourceId: articles.sourceId,
+      });
+
+    if (created) {
+      await tx.insert(articleSearchOutbox).values({
+        articleId: created.id,
+        operation: "upsert",
+      });
+    }
+
+    return created;
+  });
 
   if (result !== undefined) {
     return { ...result, created: true };
@@ -121,13 +131,6 @@ function buildFilters(params: GetArticlesParams) {
 
   if (params.category) {
     filters.push(eq(articles.categoryId, params.category));
-  }
-
-  if (params.search?.trim()) {
-    const query = buildSearchQuery(params.search);
-    if (query) {
-      filters.push(sql`${articles.tsv} @@ to_tsquery('french', ${query})`);
-    }
   }
 
   return filters;

@@ -1,15 +1,10 @@
 import type { ArticleList } from "@basango/domain/models/public";
-import { type SQL, count, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { type SQL, count, desc, eq, gte, lte } from "drizzle-orm";
 
 import type { Database } from "#db/client";
 import { NotFoundError } from "#db/errors";
 import { articles, categories, sources } from "#db/schema";
-import {
-  applyFilters,
-  buildPaginatedResult,
-  buildPaginationState,
-  buildSearchQuery,
-} from "#db/utils";
+import { applyFilters, buildPaginatedResult, buildPaginationState } from "#db/utils";
 
 export const articleOverviewSelection = {
   categories: articles.categories,
@@ -92,14 +87,6 @@ function buildArticleFilters(params: ArticleList): SQL<unknown>[] {
 
   if (params.publishedBefore) {
     filters.push(lte(articles.publishedAt, params.publishedBefore));
-  }
-
-  if (params.search) {
-    const query = buildSearchQuery(params.search);
-
-    if (query) {
-      filters.push(sql`${articles.tsv} @@ to_tsquery('french', ${query})`);
-    }
   }
 
   return filters;

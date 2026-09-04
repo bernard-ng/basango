@@ -1,9 +1,11 @@
 import { type Database, db } from "@basango/db/client";
+import type { SearchEngine } from "@basango/search/engine";
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { Context } from "hono";
 import superjson from "superjson";
 
 import { type AuthSession, auth, isAdmin } from "#api/auth";
+import { searchEngine } from "#api/search";
 import { withDatabase } from "#api/trpc/middlewares/db";
 import { getGeoContext } from "#api/utils/geo";
 
@@ -11,6 +13,7 @@ type TRPCContext = {
   session: AuthSession | null;
   db: Database;
   geo: ReturnType<typeof getGeoContext>;
+  searchEngine: SearchEngine;
 };
 
 export const createTRPCContext = async (_: unknown, c: Context): Promise<TRPCContext> => {
@@ -20,6 +23,7 @@ export const createTRPCContext = async (_: unknown, c: Context): Promise<TRPCCon
   return {
     db,
     geo,
+    searchEngine,
     session,
   };
 };

@@ -110,7 +110,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </Link>
         </CardTitle>
         <p className="text-sm text-muted-foreground line-clamp-3">
-          {article.metadata?.description ??
+          {("metadata" in article ? article.metadata?.description : undefined) ??
             article.excerpt ??
             "No description was provided for this article."}
         </p>

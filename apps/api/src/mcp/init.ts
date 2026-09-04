@@ -1,6 +1,8 @@
 import { logger } from "@basango/logger";
+import type { SearchEngine } from "@basango/search/engine";
 import { McpServer, createMcpHandler } from "@modelcontextprotocol/server";
 
+import { searchEngine } from "#api/search";
 import type { Database } from "#db/client";
 import { db } from "#db/client";
 
@@ -9,16 +11,16 @@ import { registerArticleTools } from "./tools/articles";
 import { registerCategoryTools } from "./tools/categories";
 import { registerSourceTools } from "./tools/sources";
 
-export function createMcpServer(database: Database) {
+export function createMcpServer(database: Database, engine: SearchEngine = searchEngine) {
   const server = new McpServer(
     { name: "Basango", version: "1.0.0" },
     {
       instructions:
-        "Basango provides read-only access to articles from Congolese media sources. Use list_sources to resolve a source ID when the user names a publisher, then use list_articles with sourceId. Use search for words expected in article titles. Use publishedAfter and publishedBefore for time periods, interpreting relative dates in Africa/Lubumbashi. List results contain summaries; call get_article only when the full body is needed. Include the article title, source, publication time, and original link when answering factual questions.",
+        "Basango provides read-only access to articles from Congolese media sources. Use list_sources to resolve a source ID when the user names a publisher, use search_articles for text search, and use list_articles for newest-first browsing. Use publishedAfter and publishedBefore for time periods, interpreting relative dates in Africa/Lubumbashi. Results contain summaries; call get_article only when the full body is needed. Include the article title, source, publication time, and original link when answering factual questions.",
     },
   );
 
-  registerArticleTools(server, database);
+  registerArticleTools(server, database, engine);
   registerSourceTools(server, database);
   registerCategoryTools(server, database);
 

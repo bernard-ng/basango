@@ -7,11 +7,13 @@ import { ApiConfigurationSchema } from "./api";
 import { DatabaseConfigurationSchema } from "./database";
 import { resolveEnvFiles } from "./environment";
 import { LoggerConfigurationSchema } from "./logger";
+import { SearchConfigurationSchema } from "./search";
 import { SharedConfigurationSchema } from "./shared";
 
 export * from "./api";
 export * from "./database";
 export * from "./logger";
+export * from "./search";
 export * from "./shared";
 
 const nodeEnvironmentSchema = z.enum(["development", "test", "production"]).default("development");
@@ -24,6 +26,7 @@ export const { env, config } = await defineConfig({
       "BASANGO_API_CRAWLER_TOKEN",
       "BASANGO_API_KEY",
       "BASANGO_DATABASE_URL",
+      "BASANGO_MEILISEARCH_API_KEY",
       "BASANGO_MCP_TOKEN",
       "BASANGO_RESEND_API_KEY",
       "BETTER_AUTH_SECRET",
@@ -55,6 +58,12 @@ export const { env, config } = await defineConfig({
       BASANGO_LOGGER_LEVEL: z.string().default("info"),
       BASANGO_LOGGER_PRETTY: z.string().optional(),
       BASANGO_MCP_TOKEN: z.string().min(32),
+      BASANGO_MEILISEARCH_API_KEY: z.string().min(16),
+      BASANGO_MEILISEARCH_BATCH_MAX_BYTES: z.coerce.number().int().min(1_000),
+      BASANGO_MEILISEARCH_BATCH_SIZE: z.coerce.number().int().min(1).max(10_000),
+      BASANGO_MEILISEARCH_INDEX: z.string().min(1),
+      BASANGO_MEILISEARCH_TASK_TIMEOUT_MS: z.coerce.number().int().min(100),
+      BASANGO_MEILISEARCH_URL: z.url(),
       BASANGO_RESEND_API_KEY: z.string().optional(),
       BASANGO_RESEND_FROM_EMAIL: z.string().optional(),
       BETTER_AUTH_COOKIE_DOMAIN: z.string().optional(),
@@ -67,12 +76,14 @@ export const { env, config } = await defineConfig({
     api: ApiConfigurationSchema,
     database: DatabaseConfigurationSchema,
     logger: LoggerConfigurationSchema,
+    search: SearchConfigurationSchema,
     shared: SharedConfigurationSchema,
   }),
   sources: [
     jsonFile("config/api.json", { name: "api" }),
     jsonFile("config/database.json", { name: "database" }),
     jsonFile("config/logger.json", { name: "logger" }),
+    jsonFile("config/search.json", { name: "search" }),
     jsonFile("config/shared.json", { name: "shared" }),
   ],
 });

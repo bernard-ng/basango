@@ -10,7 +10,6 @@ import {
   bigint,
   boolean,
   check,
-  customType,
   foreignKey,
   index,
   integer,
@@ -28,12 +27,6 @@ import {
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
 /* -------------------------------------------------------------------------- */
-
-const tsvector = customType<{ data: string; driverData: string }>({
-  dataType() {
-    return "tsvector";
-  },
-});
 
 export const biasEnum = pgEnum("bias", BIAS);
 export const reliabilityEnum = pgEnum("reliability", RELIABILITY);
@@ -201,9 +194,6 @@ export const articles = pgTable(
     sourceId: uuid("source_id").notNull(),
     title: varchar({ length: 1024 }).notNull(),
     tokenStatistics: jsonb("token_statistics").$type<TokenStatistics>(),
-    tsv: tsvector("tsv").generatedAlwaysAs(
-      sql`setweight(to_tsvector('french'::regconfig, COALESCE(title, '')::text), 'A'::"char")`,
-    ),
     updatedAt: timestamp("updated_at"),
   },
   (table) => [
@@ -215,7 +205,6 @@ export const articles = pgTable(
     index("idx_article_clustered").using("btree", table.clustered.asc().nullsLast()),
     index("gin_article_link_trgm").using("gin", table.link.asc().nullsLast().op("gin_trgm_ops")),
     index("gin_article_title_trgm").using("gin", table.title.asc().nullsLast().op("gin_trgm_ops")),
-    index("gin_article_tsv").using("gin", table.tsv.asc().nullsLast().op("tsvector_ops")),
     index("idx_article_source_published_id").using(
       "btree",
       table.sourceId.asc().nullsLast(),
@@ -242,6 +231,23 @@ export const articles = pgTable(
       "chk_article_metadata_json",
       sql`((metadata IS NULL) OR (jsonb_typeof(metadata) IN ('object'::text,'array'::text)))`,
     ),
+  ],
+);
+
+export const articleSearchOutbox = pgTable(
+  "article_search_outbox",
+  {
+    articleId: uuid("article_id").primaryKey().notNull(),
+    attempts: integer().default(0).notNull(),
+    availableAt: timestamp("available_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    lastError: text("last_error"),
+    operation: varchar({ length: 16 }).$type<"delete" | "upsert">().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_article_search_outbox_available").on(table.availableAt, table.articleId),
+    check("chk_article_search_outbox_operation", sql`operation IN ('delete', 'upsert')`),
   ],
 );
 

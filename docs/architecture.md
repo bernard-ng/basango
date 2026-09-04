@@ -41,11 +41,33 @@ credential; it does not duplicate article business logic or introduce a separate
 Publication boundaries are absolute instants, while relative-date requests are interpreted in the
 configured `Africa/Lubumbashi` timezone.
 
+## Article search
+
+PostgreSQL remains the canonical article store and serves article lists and details. Explicit text searches use a
+separate Meilisearch index:
+
+```text
+list/get article -> @basango/db -> PostgreSQL
+search article   -> @basango/search -> Meilisearch
+index article    -> @basango/db SearchSynchronizer -> @basango/search -> Meilisearch
+```
+
+The search index contains denormalized article, category, and source overview data so search does not fan out into one
+PostgreSQL lookup per hit. Article ingestion records a durable `article_search_outbox` entry in the same database
+transaction as the article. The API then attempts indexing after commit; failures do not fail crawler ingestion and
+remain available for `bun run search:sync` to repair.
+
+Full rebuilds traverse PostgreSQL by article-ID keyset, write byte-bounded batches to a versioned temporary index,
+verify the document count, and atomically swap that index into the stable name. The live index is never emptied during
+a rebuild. Source and category display changes mark affected article documents dirty because those values are
+denormalized.
+
 ## Packages
 
 - `@basango/domain`: shared API schemas and models, including the ingestion signal protocol.
 - `@basango/db`: Drizzle ORM, PostgreSQL migrations, signal projection, and operations queries.
 - `@basango/logger`: structured application logging.
+- `@basango/search`: article-specific search/indexing interfaces and Meilisearch infrastructure.
 - `@basango/ui`: shared React components.
 - `@basango/tsconfig`: shared TypeScript configuration.
 
@@ -75,5 +97,8 @@ the [TypeScript and React code-style guide](web/code-style.md) for the normative
 - `bun run build:crawler` builds the Rust crawler in release mode.
 - Apply database migrations before using ingestion operations: `bun run migrate`.
 - `bun run ingestion:cleanup` prunes ingestion operations data older than five days by default.
+- `bun run search:sync` drains deferred article index updates.
+- `bun run search:rebuild` rebuilds and atomically swaps the complete article index.
+- `bun run search:verify` compares PostgreSQL and Meilisearch article counts.
 
 Production crawler processes are managed by the systemd units in the Rust repository rather than the Bun/PM2 application definition.

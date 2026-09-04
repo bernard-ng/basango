@@ -26,6 +26,7 @@
         "@basango/db": "workspace:*",
         "@basango/domain": "workspace:*",
         "@basango/logger": "workspace:*",
+        "@basango/search": "workspace:*",
         "@better-auth/drizzle-adapter": "1.7.2",
         "@better-auth/expo": "1.7.2",
         "@hono/node-server": "^1.19.6",
@@ -138,6 +139,7 @@
         "@ai-sdk/openai": "^2.0.75",
         "@basango/domain": "workspace:*",
         "@basango/logger": "workspace:*",
+        "@basango/search": "workspace:*",
         "@date-fns/utc": "^2.1.1",
         "ai": "^5.0.105",
         "date-fns": "catalog:",
@@ -170,6 +172,16 @@
         "@basango/domain": "workspace:*",
         "pino": "^10.1.0",
         "pino-pretty": "^13.1.2",
+      },
+    },
+    "packages/search": {
+      "name": "@basango/search",
+      "dependencies": {
+        "meilisearch": "^0.60.0",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@basango/tsconfig": "workspace:*",
       },
     },
     "packages/tsconfig": {
@@ -397,6 +409,8 @@
     "@basango/logger": ["@basango/logger@workspace:packages/logger"],
 
     "@basango/mobile": ["@basango/mobile@workspace:apps/mobile"],
+
+    "@basango/search": ["@basango/search@workspace:packages/search"],
 
     "@basango/tsconfig": ["@basango/tsconfig@workspace:packages/tsconfig"],
 
@@ -2075,6 +2089,8 @@
     "mdn-data": ["mdn-data@2.0.14", "", {}, "sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow=="],
 
     "media-typer": ["media-typer@1.1.1", "", {}, "sha512-yz3xRaG20c6/BOzvYoDaGtPmGscs7YivItZEEqe6GbwNfHuxu9YNmvnEkMzKldAGY4/80pRcQRZSEnhquk9XuQ=="],
+
+    "meilisearch": ["meilisearch@0.60.0", "", {}, "sha512-z32KgxE6/7hRzbVfzUgzlmNl2OS7TwGE6wSWs2tVEuAY9DWrX6zAmt0s7wTyelH36orIaZ3/t1mQsCsExGtVDQ=="],
 
     "memoize-one": ["memoize-one@5.2.1", "", {}, "sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q=="],
 

@@ -4,6 +4,7 @@ import {
   articleHashSchema,
   createArticleResponseSchema,
   getArticlesSchema,
+  searchArticlesSchema,
 } from "../../../packages/domain/src/models/articles";
 
 describe("article ingestion contracts", () => {
@@ -43,5 +44,11 @@ describe("article list contracts", () => {
   test("rejects zero-based pages and cursor pagination", () => {
     expect(getArticlesSchema.safeParse({ page: 0 }).success).toBeFalse();
     expect(getArticlesSchema.safeParse({ cursor: "legacy-cursor" }).success).toBeFalse();
+  });
+
+  test("keeps text search on its dedicated contract", () => {
+    expect(getArticlesSchema.safeParse({ search: "Goma" }).success).toBeFalse();
+    expect(searchArticlesSchema.parse({ query: "  Goma  " }).query).toBe("Goma");
+    expect(searchArticlesSchema.safeParse({ query: "   " }).success).toBeFalse();
   });
 });

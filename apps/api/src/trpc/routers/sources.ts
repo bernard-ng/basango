@@ -16,7 +16,9 @@ import {
   getSourcesSchema,
   updateSourceSchema,
 } from "@basango/domain/models";
+import { logger } from "@basango/logger";
 
+import { searchSynchronizer } from "#api/search";
 import { adminProcedure, createTRPCRouter } from "#api/trpc/init";
 
 export const sourcesRouter = createTRPCRouter({
@@ -25,7 +27,12 @@ export const sourcesRouter = createTRPCRouter({
   }),
 
   delete: adminProcedure.input(deleteSourceSchema).mutation(async ({ ctx, input }) => {
-    return deleteSource(ctx.db, input.id);
+    const result = await deleteSource(ctx.db, input.id);
+    void searchSynchronizer.drainDirty().catch((error) => {
+      logger.warn({ error, sourceId: input.id }, "Source search deletion deferred");
+    });
+
+    return result;
   }),
 
   getById: adminProcedure.input(getSourceSchema).query(async ({ ctx, input }) => {
@@ -47,6 +54,11 @@ export const sourcesRouter = createTRPCRouter({
   }),
 
   update: adminProcedure.input(updateSourceSchema).mutation(async ({ ctx, input }) => {
-    return updateSource(ctx.db, input);
+    const result = await updateSource(ctx.db, input);
+    void searchSynchronizer.synchronizeSource(input.id).catch((error) => {
+      logger.warn({ error, sourceId: input.id }, "Source search refresh deferred");
+    });
+
+    return result;
   }),
 });

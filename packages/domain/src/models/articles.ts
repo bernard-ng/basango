@@ -71,7 +71,19 @@ export const getArticleSchema = z.object({
 
 export const getArticlesSchema = paginationRequestSchema.extend({
   category: z.string().min(1).max(255).optional(),
-  search: z.string().max(512).optional(),
+  sentiment: sentimentSchema.optional(),
+  sourceId: idSchema.optional(),
+});
+
+export const searchArticlesSchema = paginationRequestSchema.extend({
+  categoryId: idSchema.optional(),
+  facets: z
+    .array(z.enum(["sourceId", "categoryId", "sentiment"]))
+    .max(3)
+    .optional(),
+  publishedAfter: z.coerce.date().optional(),
+  publishedBefore: z.coerce.date().optional(),
+  query: z.string().trim().min(1).max(512),
   sentiment: sentimentSchema.optional(),
   sourceId: idSchema.optional(),
 });
@@ -80,3 +92,4 @@ export const getArticlesSchema = paginationRequestSchema.extend({
 export type Article = z.infer<typeof articleSchema>;
 export type ArticleMetadata = z.infer<typeof articleMetadataSchema>;
 export type TokenStatistics = z.infer<typeof tokenStatisticsSchema>;
+export type SearchArticles = z.infer<typeof searchArticlesSchema>;

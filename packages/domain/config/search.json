@@ -1,0 +1,10 @@
+{
+  "search": {
+    "apiKey": "%env(BASANGO_MEILISEARCH_API_KEY)%",
+    "batchMaxBytes": "%env(BASANGO_MEILISEARCH_BATCH_MAX_BYTES)%",
+    "batchSize": "%env(BASANGO_MEILISEARCH_BATCH_SIZE)%",
+    "indexName": "%env(BASANGO_MEILISEARCH_INDEX)%",
+    "taskTimeoutMs": "%env(BASANGO_MEILISEARCH_TASK_TIMEOUT_MS)%",
+    "url": "%env(BASANGO_MEILISEARCH_URL)%"
+  }
+}

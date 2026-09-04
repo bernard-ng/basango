@@ -7,7 +7,9 @@ import { getNextPage } from "#mobile/features/content/shared/get-next-page";
 
 export const ARTICLES_PAGE_SIZE = 20;
 
-type ArticleFilters = Omit<RouterInputs["public"]["articles"]["list"], "limit" | "page">;
+type ArticleFilters = Omit<RouterInputs["public"]["articles"]["list"], "limit" | "page"> & {
+  search?: string;
+};
 type ArticlePage = RouterOutputs["public"]["articles"]["list"];
 
 type UseInfiniteArticlesOptions = ArticleFilters & {
@@ -22,11 +24,18 @@ export function useInfiniteArticles({
 }: UseInfiniteArticlesOptions = {}) {
   const trpc = useTRPC();
   const trpcClient = useTRPCClient();
-  const filters = { categoryId, search, sourceId };
-  const queryKey = trpc.public.articles.list.queryKey({
-    ...filters,
-    limit: ARTICLES_PAGE_SIZE,
-  });
+  const normalizedSearch = search?.trim();
+  const filters = { categoryId, sourceId };
+  const queryKey = normalizedSearch
+    ? trpc.public.articles.search.queryKey({
+        ...filters,
+        limit: ARTICLES_PAGE_SIZE,
+        query: normalizedSearch,
+      })
+    : trpc.public.articles.list.queryKey({
+        ...filters,
+        limit: ARTICLES_PAGE_SIZE,
+      });
   const query = useInfiniteQuery<
     ArticlePage,
     Error,
@@ -37,11 +46,24 @@ export function useInfiniteArticles({
     enabled,
     getNextPageParam: (lastPage) => getNextPage(lastPage.meta),
     initialPageParam: 1,
-    queryFn: async ({ pageParam, signal }): Promise<ArticlePage> =>
-      trpcClient.public.articles.list.query(
+    queryFn: async ({ pageParam, signal }): Promise<ArticlePage> => {
+      if (normalizedSearch) {
+        return trpcClient.public.articles.search.query(
+          {
+            ...filters,
+            limit: ARTICLES_PAGE_SIZE,
+            page: pageParam,
+            query: normalizedSearch,
+          },
+          { signal },
+        );
+      }
+
+      return trpcClient.public.articles.list.query(
         { ...filters, limit: ARTICLES_PAGE_SIZE, page: pageParam },
         { signal },
-      ),
+      );
+    },
     queryKey: [...queryKey, "infinite-pages"],
   });
   const articles = useMemo(() => {

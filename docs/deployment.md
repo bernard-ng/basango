@@ -83,6 +83,35 @@ That file is loaded after `.env.prod`, so it is the final file-based override an
 Variables injected directly by PM2 or the host still take precedence. See the
 [environment configuration guide](environment.md) for the complete convention.
 
+## Article search
+
+Meilisearch is an internal API dependency and must not be exposed through Nginx. Start the pinned service and confirm
+that it is healthy before restarting the API:
+
+```bash
+docker compose up -d meilisearch
+docker compose ps meilisearch
+```
+
+Set a long random `BASANGO_MEILISEARCH_API_KEY` in `.env.local`; keep
+`BASANGO_MEILISEARCH_URL=http://127.0.0.1:7700`. The Compose port is bound only to loopback.
+
+After the first search migration, backfill and verify the existing corpus:
+
+```bash
+NODE_ENV=production bun run search:rebuild
+NODE_ENV=production bun run search:verify
+```
+
+Drain durable deferred updates every minute. Use a non-overlapping scheduler because one run may process multiple
+batches:
+
+```cron
+* * * * * cd /var/www/html/basango.ngandu.dev && flock -n /tmp/basango-search-sync.lock env NODE_ENV=production /absolute/path/to/bun run search:sync >> /var/log/basango-search-sync.log 2>&1
+```
+
+See [article search operations](search.md) for rebuild and recovery details.
+
 ## Ingestion data retention
 
 The ingestion operations projection is disposable monitoring data. Prune events, completed or

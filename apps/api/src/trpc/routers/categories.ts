@@ -10,7 +10,9 @@ import {
   deleteCategorySchema,
   updateCategorySchema,
 } from "@basango/domain/models";
+import { logger } from "@basango/logger";
 
+import { searchSynchronizer } from "#api/search";
 import { adminProcedure, createTRPCRouter } from "#api/trpc/init";
 
 export const categoriesRouter = createTRPCRouter({
@@ -19,7 +21,12 @@ export const categoriesRouter = createTRPCRouter({
   }),
 
   delete: adminProcedure.input(deleteCategorySchema).mutation(async ({ ctx, input }) => {
-    return deleteCategory(ctx.db, input.id);
+    const result = await deleteCategory(ctx.db, input.id);
+    void searchSynchronizer.drainDirty().catch((error) => {
+      logger.warn({ categoryId: input.id, error }, "Category search refresh deferred");
+    });
+
+    return result;
   }),
 
   list: adminProcedure.query(async ({ ctx }) => getCategories(ctx.db)),
@@ -27,6 +34,11 @@ export const categoriesRouter = createTRPCRouter({
   stats: adminProcedure.query(async ({ ctx }) => getClusteringStats(ctx.db)),
 
   update: adminProcedure.input(updateCategorySchema).mutation(async ({ ctx, input }) => {
-    return updateCategory(ctx.db, input);
+    const result = await updateCategory(ctx.db, input);
+    void searchSynchronizer.synchronizeCategory(input.id).catch((error) => {
+      logger.warn({ categoryId: input.id, error }, "Category search refresh deferred");
+    });
+
+    return result;
   }),
 });

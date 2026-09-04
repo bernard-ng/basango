@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "meilisearch": "^0.60.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@basango/tsconfig": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./engine": "./src/engine.ts",
+    "./indexer": "./src/indexer.ts",
+    "./meilisearch": "./src/meilisearch/index.ts"
+  },
+  "name": "@basango/search",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module"
+}

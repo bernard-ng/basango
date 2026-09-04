@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 
 import type { Database } from "@basango/db/client";
 import { ArticleListSchema } from "@basango/domain/models/public";
+import type { SearchEngine, SearchRequest } from "@basango/search/engine";
 import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 
 import { createMcpServer } from "#api/mcp/init";
@@ -59,9 +60,9 @@ const activeConnections: Array<{
   server: ReturnType<typeof createMcpServer>;
 }> = [];
 
-async function connect() {
+async function connect(engine: SearchEngine = unavailableSearchEngine) {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
-  const server = createMcpServer({} as Database);
+  const server = createMcpServer({} as Database, engine);
   const client = new Client({ name: "basango-mcp-test", version: "1.0.0" });
 
   await server.connect(serverTransport);
@@ -70,6 +71,12 @@ async function connect() {
 
   return client;
 }
+
+const unavailableSearchEngine: SearchEngine = {
+  async search() {
+    throw new Error("Search was not expected in this test");
+  },
+};
 
 afterEach(async () => {
   await Promise.all(
@@ -87,6 +94,7 @@ describe("Basango MCP server", () => {
 
     expect(response.tools.map((tool) => tool.name)).toEqual([
       "list_articles",
+      "search_articles",
       "get_article",
       "list_sources",
       "get_source",
@@ -109,14 +117,12 @@ describe("Basango MCP server", () => {
       page: 1,
       publishedAfter: "2026-09-01T00:00:00+02:00",
       publishedBefore: "2026-09-01T23:59:59.999+02:00",
-      search: "Goma",
       sourceId: SOURCE_ID,
     });
 
     expect(input).toMatchObject({
       publishedAfter: new Date("2026-08-31T22:00:00.000Z"),
       publishedBefore: new Date("2026-09-01T21:59:59.999Z"),
-      search: "Goma",
       sourceId: SOURCE_ID,
     });
   });
@@ -135,6 +141,24 @@ describe("Basango MCP server", () => {
       ],
       meta,
     });
+  });
+
+  test("routes text search through the search engine", async () => {
+    let received: SearchRequest | undefined;
+    const client = await connect({
+      async search(request) {
+        received = request;
+
+        return { facets: {}, items: [], meta };
+      },
+    });
+    const response = await client.callTool({
+      arguments: { query: "Goma", sourceId: SOURCE_ID },
+      name: "search_articles",
+    });
+
+    expect(response.isError).not.toBe(true);
+    expect(received).toMatchObject({ limit: 20, page: 1, query: "Goma", sourceId: SOURCE_ID });
   });
 
   test("rejects malformed identifiers before querying the database", async () => {

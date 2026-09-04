@@ -6,6 +6,7 @@ import {
   createArticleResponseSchema,
   createArticleSchema,
 } from "@basango/domain/models";
+import { logger } from "@basango/logger";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import { z } from "zod";
 import type { Context } from "#api/rest/init";
 import { withDatabase } from "#api/rest/middlewares/db";
 import { withIngestionAuth } from "#api/rest/middlewares/ingestion";
+import { searchSynchronizer } from "#api/search";
 import { validateResponse } from "#api/utils/response";
 
 const app = new OpenAPIHono<Context>();
@@ -66,6 +68,13 @@ app.openapi(
     }
 
     const result = await createArticle(c.get("db"), payload);
+
+    if (result.created) {
+      void searchSynchronizer.synchronizeArticle(result.id).catch((error) => {
+        logger.warn({ articleId: result.id, error }, "Article search indexing deferred");
+      });
+    }
+
     return c.json(validateResponse(result, createArticleResponseSchema), 201);
   },
 );

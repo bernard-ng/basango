@@ -35,6 +35,7 @@ module. Keep native dependency versions aligned with the installed Expo SDK befo
 - `@basango/db` owns Drizzle schemas, PostgreSQL access, queries, and persistence services. Client applications must
   not import it.
 - `@basango/logger` owns structured server logging.
+- `@basango/search` owns article search and indexing contracts plus the Meilisearch adapters.
 - `@basango/tsconfig` owns shared TypeScript compiler defaults.
 
 A shared package is justified when it has at least two real consumers or one clear package-owned responsibility. A
@@ -48,9 +49,10 @@ Each arrow points from the importer to the dependency:
 ```text
 dashboard -> api (exported tRPC types only), domain, ui
 mobile    -> api (exported tRPC types only), domain
-api       -> db, domain, logger
-db        -> domain, logger
+api       -> db, domain, logger, search
+db        -> domain, logger, search
 logger     -> domain
+search     -> third-party services through HTTP
 ui         -> third-party UI libraries only
 domain     -> platform-neutral libraries only
 ```
@@ -62,6 +64,7 @@ The following constraints preserve those boundaries:
 - dashboard and mobile import API router types only through the explicit `@basango/api/trpc/routers/_app` export;
 - mobile does not import `@basango/ui` or browser-only modules;
 - packages do not re-export another package's domain symbols as their own;
+- the search package does not import persistence code; the DB package maps canonical rows into search documents;
 - a new lateral package dependency needs a real ownership relationship and an update to this graph.
 
 ## Application organization

@@ -23,7 +23,6 @@ export type GetArticleByIdParams = {
 export type GetArticlesParams = {
   limit?: number;
   page?: number;
-  search?: string;
   sentiment?: Sentiment;
   sourceId?: string;
   category?: string;

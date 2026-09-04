@@ -12,6 +12,24 @@ services:
     networks:
       - basango_network
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.51.0
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: ${BASANGO_MEILISEARCH_API_KEY}
+      MEILI_NO_ANALYTICS: true
+    ports:
+      - "127.0.0.1:7700:7700"
+    volumes:
+      - ./var/volumes/meilisearch:/meili_data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - basango_network
+
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]

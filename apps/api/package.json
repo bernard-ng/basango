@@ -3,6 +3,7 @@
     "@basango/db": "workspace:*",
     "@basango/domain": "workspace:*",
     "@basango/logger": "workspace:*",
+    "@basango/search": "workspace:*",
     "@better-auth/drizzle-adapter": "1.7.2",
     "@better-auth/expo": "1.7.2",
     "@hono/node-server": "^1.19.6",

@@ -32,6 +32,7 @@ The committed `.env` is enough for the default local Docker services. Put person
 ```dotenv
 BASANGO_API_CRAWLER_TOKEN=my-local-token
 BASANGO_MCP_TOKEN=replace-with-a-local-secret-of-at-least-32-characters
+BASANGO_MEILISEARCH_API_KEY=replace-with-a-long-random-master-key
 EXPO_PUBLIC_API_URL=http://192.168.1.20:3080
 ```
 
@@ -57,8 +58,31 @@ BASANGO_API_CRAWLER_TOKEN=replace-with-a-long-random-secret
 BASANGO_DATABASE_URL=postgresql://...
 BASANGO_MCP_TOKEN=replace-with-a-separate-long-random-secret
 BETTER_AUTH_SECRET=replace-with-a-long-random-secret
+BASANGO_MEILISEARCH_API_KEY=replace-with-a-long-random-master-key
 ```
 
 The crawler uses the same ingestion token as the API but is configured in the crawler deployment,
 not in this TypeScript repository. The MCP token is a separate read-only credential and must never
 be reused as the crawler token.
+
+## Search
+
+Local Compose runs Meilisearch on port `7700` with persisted data under `var/volumes/meilisearch`. Search uses these
+root environment variables:
+
+```dotenv
+BASANGO_MEILISEARCH_URL=http://127.0.0.1:7700
+BASANGO_MEILISEARCH_API_KEY=replace-with-a-long-random-master-key
+BASANGO_MEILISEARCH_INDEX=articles
+BASANGO_MEILISEARCH_TASK_TIMEOUT_MS=120000
+BASANGO_MEILISEARCH_BATCH_SIZE=500
+BASANGO_MEILISEARCH_BATCH_MAX_BYTES=8000000
+```
+
+The API key is redacted from configuration diagnostics. Production should use a restricted key for API search and a
+separate administrative key for synchronization when key provisioning is introduced; the current single setting must
+have search, index-settings, document, task, stats, and index-swap permissions.
+
+After applying database migrations and starting Meilisearch, initialize an existing corpus with
+`bun run search:rebuild`. Schedule `bun run search:sync` periodically to repair deferred updates and use
+`bun run search:verify` as an operational consistency check.

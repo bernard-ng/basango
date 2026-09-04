@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
   ArticleListSchema,
+  ArticleSearchSchema,
   SourceListSchema,
   createBookmarkSchema,
   createCommentSchema,
@@ -21,7 +22,6 @@ describe("public schemas", () => {
         page: 1,
         publishedAfter,
         publishedBefore,
-        search: "  économie  ",
         sourceId: id,
       }),
     ).toMatchObject({
@@ -29,7 +29,6 @@ describe("public schemas", () => {
       page: 1,
       publishedAfter: new Date(publishedAfter),
       publishedBefore: new Date(publishedBefore),
-      search: "économie",
       sourceId: id,
     });
     expect(SourceListSchema.parse({ followedOnly: true, limit: 20, page: 1 })).toMatchObject({
@@ -37,6 +36,12 @@ describe("public schemas", () => {
       limit: 20,
       page: 1,
     });
+  });
+
+  test("requires a non-empty query for article search", () => {
+    expect(ArticleSearchSchema.parse({ query: "  économie  " }).query).toBe("économie");
+    expect(ArticleSearchSchema.safeParse({ query: "  " }).success).toBeFalse();
+    expect(ArticleListSchema.safeParse({ search: "legacy" }).success).toBeFalse();
   });
 
   test("defaults new bookmark collections to private", () => {

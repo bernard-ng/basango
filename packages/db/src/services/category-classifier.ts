@@ -2,6 +2,7 @@ import { logger } from "@basango/logger";
 import { asc, desc, eq, sql } from "drizzle-orm";
 
 import type { Database } from "#db/client";
+import { markArticleSearchDirty } from "#db/queries/search-documents";
 import { articles, categories } from "#db/schema";
 import { DEFAULT_CATEGORY } from "#domain/constants";
 import { Categories } from "#domain/models";
@@ -53,14 +54,17 @@ export class CategoryClassifier {
       const best = classifyCategory(article, configured);
       const targetRow = categoryMap.get(best.category.slug);
 
-      await this.db
-        .update(articles)
-        .set({
-          categoryId: targetRow?.id ?? null,
-          clustered: true,
-          updatedAt: sql`now()`,
-        })
-        .where(eq(articles.id, article.id));
+      await this.db.transaction(async (tx) => {
+        await tx
+          .update(articles)
+          .set({
+            categoryId: targetRow?.id ?? null,
+            clustered: true,
+            updatedAt: sql`now()`,
+          })
+          .where(eq(articles.id, article.id));
+        await markArticleSearchDirty(tx, [article.id]);
+      });
 
       if (targetRow) {
         matched++;

@@ -23,6 +23,7 @@ const navigationGroups = [
   },
   {
     items: [
+      { title: "Search", url: "/search" },
       { title: "Sources", url: "/sources" },
       { title: "Articles", url: "/articles" },
       { title: "Categories", url: "/categories" },
