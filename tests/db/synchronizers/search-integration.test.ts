@@ -6,7 +6,10 @@ import { Pool } from "pg";
 
 import type { Database } from "../../../packages/db/src/client";
 import * as schema from "../../../packages/db/src/schema";
-import { SearchSynchronizer } from "../../../packages/db/src/synchronizers/search";
+import {
+  type SearchSynchronizationProgress,
+  SearchSynchronizer,
+} from "../../../packages/db/src/synchronizers/search";
 import type {
   IndexVerification,
   SearchDocument,
@@ -79,8 +82,9 @@ describe.skipIf(!database)("SearchSynchronizer integration", () => {
       seedArticle(db, "0198f0e2-5c2d-7bba-ae95-3d7eae12b2be"),
     ]);
     const synchronizer = createSynchronizer(db, indexer, 2);
+    const progress: SearchSynchronizationProgress[] = [];
 
-    const verification = await synchronizer.rebuild();
+    const verification = await synchronizer.rebuild((update) => progress.push(update));
 
     expect(verification).toEqual({
       databaseDocumentCount: 3,
@@ -89,6 +93,11 @@ describe.skipIf(!database)("SearchSynchronizer integration", () => {
     });
     expect(indexer.largestUpsert).toBe(2);
     expect(indexer.swapCount).toBe(1);
+    expect(progress).toEqual([
+      { completed: 0, total: 3 },
+      { completed: 2, total: 3 },
+      { completed: 3, total: 3 },
+    ]);
   });
 });
 

@@ -112,6 +112,15 @@ export async function countArticleSearchDocuments(db: Database): Promise<number>
   return result?.value ?? 0;
 }
 
+export async function countPendingArticleSearchEntries(db: Database): Promise<number> {
+  const [result] = await db
+    .select({ value: count(articleSearchOutbox.articleId) })
+    .from(articleSearchOutbox)
+    .where(lte(articleSearchOutbox.availableAt, new Date()));
+
+  return result?.value ?? 0;
+}
+
 export async function getPendingArticleSearchEntries(
   db: Database,
   limit: number,

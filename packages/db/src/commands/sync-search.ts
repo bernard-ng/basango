@@ -7,6 +7,8 @@ import { createMeilisearchAdapters } from "@basango/search/meilisearch";
 import { db } from "#db/client";
 import { SearchSynchronizer } from "#db/synchronizers/search";
 
+import { runWithSearchProgress } from "./search-progress";
+
 async function main() {
   const command = process.argv[2] ?? "drain";
   const { indexer } = createMeilisearchAdapters({
@@ -23,12 +25,16 @@ async function main() {
 
   switch (command) {
     case "drain": {
-      const synchronized = await synchronizer.drainDirty();
+      const synchronized = await runWithSearchProgress("Synchronizing search", (reportProgress) =>
+        synchronizer.drainDirty(reportProgress),
+      );
       logger.info({ synchronized }, "Search repair queue drained");
       break;
     }
     case "rebuild": {
-      const verification = await synchronizer.rebuild();
+      const verification = await runWithSearchProgress("Rebuilding search", (reportProgress) =>
+        synchronizer.rebuild(reportProgress),
+      );
       logger.info({ verification }, "Search index rebuilt");
       break;
     }

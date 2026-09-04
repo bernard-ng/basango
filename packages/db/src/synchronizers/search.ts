@@ -4,6 +4,7 @@ import type { Database } from "#db/client";
 import {
   clearArticleSearchEntries,
   countArticleSearchDocuments,
+  countPendingArticleSearchEntries,
   failArticleSearchEntries,
   getArticleSearchDocumentBatch,
   getArticleSearchDocumentIds,
@@ -23,6 +24,13 @@ export type SearchVerification = {
   indexDocumentCount: number;
   isSynchronized: boolean;
 };
+
+export type SearchSynchronizationProgress = {
+  completed: number;
+  total: number;
+};
+
+export type SearchProgressReporter = (progress: SearchSynchronizationProgress) => void;
 
 export class SearchSynchronizer {
   private configuration: Promise<void> | undefined;
@@ -95,12 +103,22 @@ export class SearchSynchronizer {
     return entries.length;
   }
 
-  async drainDirty(): Promise<number> {
+  async drainDirty(reportProgress?: SearchProgressReporter): Promise<number> {
     let total = 0;
+    let expectedTotal = reportProgress
+      ? await countPendingArticleSearchEntries(this.db)
+      : undefined;
+
+    reportProgress?.({ completed: 0, total: expectedTotal ?? 0 });
 
     while (true) {
       const synchronized = await this.synchronizeDirty();
       total += synchronized;
+
+      if (expectedTotal !== undefined) {
+        expectedTotal = Math.max(expectedTotal, total);
+        reportProgress?.({ completed: total, total: expectedTotal });
+      }
 
       if (synchronized === 0) {
         return total;
@@ -108,8 +126,14 @@ export class SearchSynchronizer {
     }
   }
 
-  async rebuild(): Promise<SearchVerification> {
+  async rebuild(reportProgress?: SearchProgressReporter): Promise<SearchVerification> {
     const temporaryIndex = `${this.options.indexName}_rebuild_${Date.now()}`;
+    let indexedDocumentCount = 0;
+    let expectedDocumentCount = reportProgress
+      ? await countArticleSearchDocuments(this.db)
+      : undefined;
+
+    reportProgress?.({ completed: 0, total: expectedDocumentCount ?? 0 });
     await this.indexer.createIndex(temporaryIndex);
 
     try {
@@ -127,6 +151,16 @@ export class SearchSynchronizer {
         }
 
         await this.upsertBatches(documents, temporaryIndex);
+        indexedDocumentCount += documents.length;
+
+        if (expectedDocumentCount !== undefined) {
+          expectedDocumentCount = Math.max(expectedDocumentCount, indexedDocumentCount);
+          reportProgress?.({
+            completed: indexedDocumentCount,
+            total: expectedDocumentCount,
+          });
+        }
+
         afterId = documents.at(-1)?.id;
       }
 
