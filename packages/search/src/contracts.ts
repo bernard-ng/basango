@@ -10,6 +10,14 @@ export const searchSentimentSchema = z.enum(["negative", "neutral", "positive"])
 
 export type SearchSentiment = z.infer<typeof searchSentimentSchema>;
 
+export const searchScopeSchema = z.enum(["all", "title"]);
+
+export type SearchScope = z.infer<typeof searchScopeSchema>;
+
+export const searchSortSchema = z.enum(["relevance", "newest"]);
+
+export type SearchSort = z.infer<typeof searchSortSchema>;
+
 export const searchFiltersSchema = z.object({
   categoryId: z.string().optional(),
   publishedAfter: z.date().optional(),
@@ -25,6 +33,8 @@ export const searchRequestSchema = searchFiltersSchema.extend({
   limit: z.number().int().positive(),
   page: z.number().int().positive(),
   query: z.string(),
+  scope: searchScopeSchema.optional(),
+  sort: searchSortSchema.optional(),
 });
 
 export type SearchRequest = z.infer<typeof searchRequestSchema>;

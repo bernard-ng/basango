@@ -13,6 +13,10 @@ never depend on Meilisearch.
 The public and admin tRPC APIs expose `articles.search`; MCP exposes `search_articles`. All require a non-empty query.
 Blank client searches continue to call the corresponding PostgreSQL list procedure.
 
+The dashboard search experience supports title autocomplete, full-content or title-only scope, relevance or newest
+sorting, source/category/sentiment facets, and inclusive publication-date bounds. Search state stays in the URL so a
+filtered result set can be bookmarked or shared.
+
 ## Repair and rebuild
 
 Every newly inserted article and every affected source/category denormalization change creates or refreshes an outbox

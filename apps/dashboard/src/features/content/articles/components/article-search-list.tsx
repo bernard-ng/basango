@@ -64,17 +64,11 @@ export function ArticleSearchList({
   }
 
   return (
-    <div className="max-w-4xl space-y-5">
-      {pagination ? (
-        <p className="text-muted-foreground text-sm">
-          {pagination.total.toLocaleString()} {pagination.total === 1 ? "result" : "results"}
-        </p>
-      ) : null}
-
-      <div className="space-y-2">
+    <div className="space-y-5">
+      <div className="divide-y">
         {articles.map((article) => (
           <article
-            className="group -mx-3 rounded-xl px-3 py-4 transition-colors hover:bg-muted/40"
+            className="group -mx-3 px-3 py-5 transition-colors hover:bg-muted/40"
             key={article.id}
           >
             <div className="flex items-start gap-5">
@@ -184,7 +178,7 @@ function HighlightedText({ highlights }: HighlightedTextProps) {
 
 function ArticleSearchListSkeleton() {
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="space-y-8">
       {Array.from({ length: 5 }).map((_, index) => (
         <div className="space-y-3" key={index}>
           <div className="flex items-center gap-3">

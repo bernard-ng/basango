@@ -31,6 +31,7 @@ export const ARTICLE_INDEX_SETTINGS = {
     maxTotalHits: 100_000,
   },
   rankingRules: [
+    "sort",
     "words",
     "typo",
     "proximity",

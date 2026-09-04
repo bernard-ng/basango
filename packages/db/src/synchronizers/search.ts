@@ -70,6 +70,7 @@ export class SearchSynchronizer {
   }
 
   async synchronizeDirty(): Promise<number> {
+    await this.ensureConfigured();
     const entries = await getPendingArticleSearchEntries(this.db, this.options.batchSize);
 
     if (entries.length === 0) {
@@ -85,7 +86,6 @@ export class SearchSynchronizer {
     const synchronizationWatermark = await getArticleSearchSynchronizationWatermark(this.db);
 
     try {
-      await this.ensureConfigured();
       await this.synchronizeArticlesUnchecked(upsertIds, synchronizationWatermark);
       await this.indexer.deleteDocuments(deleteIds);
       await clearArticleSearchEntries(this.db, deleteIds, synchronizationWatermark);

@@ -79,6 +79,7 @@ export class MeilisearchEngine implements SearchEngine {
         attributesToCrop: ["excerpt"],
         attributesToHighlight: ["title", "excerpt"],
         attributesToRetrieve: [...ARTICLE_RETRIEVED_ATTRIBUTES],
+        attributesToSearchOn: validatedRequest.scope === "title" ? ["title"] : undefined,
         cropLength: 36,
         facets: [...facets],
         filter: buildSearchFilters(validatedRequest),
@@ -87,6 +88,7 @@ export class MeilisearchEngine implements SearchEngine {
         hitsPerPage: validatedRequest.limit,
         page: validatedRequest.page,
         showRankingScore: true,
+        sort: validatedRequest.sort === "newest" ? ["publishedAtTimestamp:desc"] : undefined,
       }),
     );
     const total = response.totalHits;

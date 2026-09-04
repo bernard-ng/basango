@@ -7,7 +7,9 @@ export type {
   SearchHit,
   SearchRequest,
   SearchResult,
+  SearchScope,
   SearchSentiment,
+  SearchSort,
 } from "./contracts";
 export {
   SEARCH_FACETS,
@@ -17,7 +19,9 @@ export {
   searchHitSchema,
   searchRequestSchema,
   searchResultSchema,
+  searchScopeSchema,
   searchSentimentSchema,
+  searchSortSchema,
 } from "./contracts";
 
 export type SearchEngine = {

@@ -16,6 +16,8 @@ describe("Meilisearch article search", () => {
       "publishedAtTimestamp",
     ]);
     expect(ARTICLE_INDEX_SETTINGS.displayedAttributes).not.toContain("body");
+    expect(ARTICLE_INDEX_SETTINGS.rankingRules).toContain("sort");
+    expect(ARTICLE_INDEX_SETTINGS.rankingRules.indexOf("sort")).toBe(0);
     expect(ARTICLE_INDEX_SETTINGS.rankingRules.at(-1)).toBe("publishedAtTimestamp:desc");
   });
 
@@ -78,12 +80,15 @@ describe("Meilisearch article search", () => {
         page: 2,
         publishedAfter: new Date("2026-09-01T00:00:00.000Z"),
         query: "Goma",
+        scope: "title",
         sentiment: "neutral",
+        sort: "newest",
       });
 
       expect(requestBody).toMatchObject({
         attributesToCrop: ["excerpt"],
         attributesToHighlight: ["title", "excerpt"],
+        attributesToSearchOn: ["title"],
         cropLength: 36,
         facets: ["sentiment"],
         filter: ['sentiment = "neutral"', "publishedAtTimestamp >= 1788220800"],
@@ -92,6 +97,7 @@ describe("Meilisearch article search", () => {
         hitsPerPage: 10,
         page: 2,
         q: "Goma",
+        sort: ["publishedAtTimestamp:desc"],
       });
       expect(result.items[0]).toMatchObject({
         category: { name: "Politique" },

@@ -84,7 +84,9 @@ export const searchArticlesSchema = paginationRequestSchema.extend({
   publishedAfter: z.coerce.date().optional(),
   publishedBefore: z.coerce.date().optional(),
   query: z.string().trim().min(1).max(512),
+  scope: z.enum(["all", "title"]).optional(),
   sentiment: sentimentSchema.optional(),
+  sort: z.enum(["relevance", "newest"]).optional(),
   sourceId: idSchema.optional(),
 });
 

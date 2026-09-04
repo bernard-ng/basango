@@ -48,7 +48,10 @@ describe("article list contracts", () => {
 
   test("keeps text search on its dedicated contract", () => {
     expect(getArticlesSchema.safeParse({ search: "Goma" }).success).toBeFalse();
-    expect(searchArticlesSchema.parse({ query: "  Goma  " }).query).toBe("Goma");
+    expect(
+      searchArticlesSchema.parse({ query: "  Goma  ", scope: "title", sort: "newest" }),
+    ).toMatchObject({ query: "Goma", scope: "title", sort: "newest" });
     expect(searchArticlesSchema.safeParse({ query: "   " }).success).toBeFalse();
+    expect(searchArticlesSchema.safeParse({ query: "Goma", scope: "excerpt" }).success).toBeFalse();
   });
 });
