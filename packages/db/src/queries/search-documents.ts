@@ -1,8 +1,8 @@
 import type { SearchDocument } from "@basango/search/indexer";
 import { and, asc, count, eq, gt, inArray, lte, sql } from "drizzle-orm";
 
-import type { Database } from "#db/client";
-import { articleSearchOutbox, articles, categories, sources } from "#db/schema";
+import type { Database } from "../client";
+import { articleSearchOutbox, articles, categories, sources } from "../schema";
 
 type SearchDocumentRow = {
   body: string;
@@ -195,7 +195,7 @@ export async function markArticleSearchDirty(
   await db.execute(sql`
     INSERT INTO ${articleSearchOutbox} (article_id, operation)
     SELECT article_id, ${operation}
-    FROM UNNEST(${[...articleIds]}::uuid[]) AS dirty(article_id)
+    FROM UNNEST(${sql.param([...articleIds])}::uuid[]) AS dirty(article_id)
     ON CONFLICT (article_id) DO UPDATE SET
       operation = EXCLUDED.operation,
       attempts = 0,
