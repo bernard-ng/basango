@@ -39,6 +39,13 @@ describe.skipIf(!runIntegration)("Meilisearch integration", () => {
     expect(result.items.map((item) => item.title)).toEqual(["Goma accueille un sommet"]);
     expect(result.facets.sentiment).toEqual({ neutral: 1 });
 
+    expect(
+      await indexer.getExistingDocumentIds([
+        "0198f0e2-5c2d-7bba-ae95-3d7eae12b2bc",
+        "0198f0e2-5c2d-7bba-ae95-3d7eae12b2bf",
+      ]),
+    ).toEqual(["0198f0e2-5c2d-7bba-ae95-3d7eae12b2bc"]);
+
     await indexer.deleteDocuments(["0198f0e2-5c2d-7bba-ae95-3d7eae12b2bc"]);
     expect((await indexer.verify()).documentCount).toBe(1);
   });

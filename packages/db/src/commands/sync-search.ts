@@ -18,8 +18,12 @@ async function main() {
     url: config.search.url,
   });
   const synchronizer = new SearchSynchronizer(db, indexer, {
-    batchMaxBytes: config.search.batchMaxBytes,
-    batchSize: config.search.batchSize,
+    batchMaxBytes:
+      command === "resume"
+        ? Math.min(config.search.batchMaxBytes, 1_000_000)
+        : config.search.batchMaxBytes,
+    batchSize:
+      command === "resume" ? Math.min(config.search.batchSize, 100) : config.search.batchSize,
     indexName: config.search.indexName,
   });
 
@@ -43,6 +47,18 @@ async function main() {
       if (!verification.isSynchronized) {
         process.exitCode = 1;
       }
+      break;
+    }
+    case "resume": {
+      const verification = await runWithSearchProgress("Resuming search", (reportProgress) =>
+        synchronizer.resume(reportProgress),
+      );
+      logger.info({ verification }, "Search index resumed");
+
+      if (!verification.isSynchronized) {
+        process.exitCode = 1;
+      }
+
       break;
     }
     default:

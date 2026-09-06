@@ -8,6 +8,7 @@ export type SearchIndexer = {
   createIndex(indexName: string): Promise<void>;
   deleteDocuments(ids: readonly string[], indexName?: string): Promise<void>;
   deleteIndex(indexName: string): Promise<void>;
+  getExistingDocumentIds(ids: readonly string[], indexName?: string): Promise<string[]>;
   swapIndexes(firstIndexName: string, secondIndexName: string): Promise<void>;
   upsertDocuments(documents: readonly SearchDocument[], indexName?: string): Promise<void>;
   verify(indexName?: string): Promise<IndexVerification>;

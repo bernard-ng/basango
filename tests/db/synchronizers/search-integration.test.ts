@@ -99,12 +99,46 @@ describe.skipIf(!database)("SearchSynchronizer integration", () => {
       { completed: 3, total: 3 },
     ]);
   });
+
+  test("resumes after failure, skips indexed articles, and repairs metadata", async () => {
+    const db = requiredDatabase();
+    const indexer = new MemorySearchIndexer("articles");
+    const firstId = "0198f0e2-5c2d-7bba-ae95-3d7eae12b2bc";
+    const secondId = "0198f0e2-5c2d-7bba-ae95-3d7eae12b2bd";
+    await seedArticle(db, firstId);
+    await seedArticle(db, secondId);
+    const synchronizer = createSynchronizer(db, indexer, 1);
+
+    await expect(
+      synchronizer.resume(({ completed }) => {
+        if (completed === 1) {
+          indexer.failNextUpsert = true;
+        }
+      }),
+    ).rejects.toThrow("simulated failure");
+    expect([...indexer.documents("articles").keys()]).toEqual([firstId]);
+    indexer.upsertedIds = [];
+
+    expect((await synchronizer.resume()).isSynchronized).toBe(true);
+    expect(indexer.upsertedIds).toEqual([secondId]);
+    expect(indexer.swapCount).toBe(0);
+
+    indexer.upsertedIds = [];
+    await db.update(sources).set({ displayName: "Updated source" });
+    await db.insert(articleSearchOutbox).values({ articleId: firstId, operation: "upsert" });
+    await synchronizer.resume();
+
+    expect(indexer.upsertedIds).toEqual([firstId]);
+    expect(indexer.documents("articles").get(firstId)?.sourceDisplayName).toBe("Updated source");
+    expect(await db.select().from(articleSearchOutbox)).toEqual([]);
+  });
 });
 
 class MemorySearchIndexer implements SearchIndexer {
   failNextUpsert = false;
   largestUpsert = 0;
   swapCount = 0;
+  upsertedIds: string[] = [];
   private readonly indexes = new Map<string, Map<string, SearchDocument>>();
 
   constructor(private readonly stableIndexName: string) {
@@ -131,6 +165,10 @@ class MemorySearchIndexer implements SearchIndexer {
     this.indexes.delete(indexName);
   }
 
+  async getExistingDocumentIds(ids: readonly string[], indexName = this.stableIndexName) {
+    return ids.filter((id) => this.documents(indexName).has(id));
+  }
+
   async swapIndexes(firstIndexName: string, secondIndexName: string): Promise<void> {
     const first = this.documents(firstIndexName);
     const second = this.documents(secondIndexName);
@@ -153,6 +191,7 @@ class MemorySearchIndexer implements SearchIndexer {
 
     for (const item of documents) {
       index.set(item.id, item);
+      this.upsertedIds.push(item.id);
     }
   }
 

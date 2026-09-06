@@ -88,6 +88,21 @@ export class MeilisearchIndexer implements SearchIndexer {
     );
   }
 
+  async getExistingDocumentIds(ids: readonly string[], indexName?: string): Promise<string[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const response = await this.client.index(indexName ?? this.indexName).getDocuments({
+      fields: ["id"],
+      ids: [...ids],
+      limit: ids.length,
+    });
+    const documents = searchDocumentSchema.pick({ id: true }).array().parse(response.results);
+
+    return documents.map((document) => document.id);
+  }
+
   async upsertDocuments(documents: readonly SearchDocument[], indexName?: string): Promise<void> {
     if (documents.length === 0) {
       return;

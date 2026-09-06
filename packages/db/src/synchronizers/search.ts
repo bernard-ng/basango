@@ -187,6 +187,41 @@ export class SearchSynchronizer {
     };
   }
 
+  async resume(reportProgress?: SearchProgressReporter): Promise<SearchVerification> {
+    await this.ensureConfigured();
+    let afterId: string | undefined;
+    let completed = 0;
+    let total = await countArticleSearchDocuments(this.db);
+
+    reportProgress?.({ completed, total });
+
+    while (true) {
+      const ids = await getArticleSearchDocumentIds(this.db, {
+        afterId,
+        limit: this.options.batchSize,
+      });
+
+      if (ids.length === 0) {
+        break;
+      }
+
+      const existingIds = new Set(await this.indexer.getExistingDocumentIds(ids));
+      const missingIds = ids.filter((id) => !existingIds.has(id));
+
+      // Only clear entries for documents actually read and acknowledged by the indexer.
+      // Existing documents may have newer metadata waiting in the repair queue.
+      await this.synchronizeArticles(missingIds);
+      completed += ids.length;
+      total = Math.max(total, completed);
+      reportProgress?.({ completed, total });
+      afterId = ids.at(-1);
+    }
+
+    await this.drainDirty();
+
+    return this.verify();
+  }
+
   private async ensureConfigured(): Promise<void> {
     if (!this.configuration) {
       this.configuration = this.indexer.configure().catch((error) => {

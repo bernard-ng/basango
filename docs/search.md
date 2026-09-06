@@ -19,6 +19,28 @@ filtered result set can be bookmarked or shared.
 
 ## Repair and rebuild
 
+### Resumable backfill for small servers
+
+Run `bun run search:resume` to fill missing articles directly into the live index. It checks each UUID page against
+Meilisearch before loading article bodies from PostgreSQL, skips indexed articles, and waits for each indexing batch
+to succeed. Rerun the same command after an interruption: acknowledged documents remain indexed and are skipped.
+There is no checkpoint file or second index. Search results become available incrementally during the backfill.
+
+This command caps batches at 100 articles and 1 MB of JSON; lower `BASANGO_MEILISEARCH_BATCH_SIZE` and
+`BASANGO_MEILISEARCH_BATCH_MAX_BYTES` values are respected. An individual document exceeding the byte cap fails
+explicitly. These limits bound client batches, not the Meilisearch server's total memory usage.
+
+The progress bar counts articles checked, including skipped articles. After the scan, the command drains the repair
+queue so indexed articles with queued metadata changes are refreshed and queued deletions are applied. Retry-delayed
+entries remain for a later `search:sync`. Final verification compares counts and exits nonzero on a mismatch.
+
+Use this for immutable article content with metadata updates tracked through the outbox. It does not detect untracked
+metadata changes or stale documents without queued deletions. Use `search:rebuild` for a full projection replacement
+or document-shape changes. Resume uses the live index and cannot recover work from an old rebuild's temporary index.
+Run only one backfill/rebuild command at a time.
+
+### Full replacement and ongoing repair
+
 Every newly inserted article and every affected source/category denormalization change creates or refreshes an outbox
 entry. The API makes an immediate best-effort synchronization after the PostgreSQL commit. Run `bun run search:sync`
 periodically to drain any entries left by service failures or restarts. Failed entries use bounded exponential retry
