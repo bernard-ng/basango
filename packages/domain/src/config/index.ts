@@ -28,7 +28,7 @@ export const { env, config } = await defineConfig({
       "BASANGO_DATABASE_URL",
       "BASANGO_MEILISEARCH_API_KEY",
       "BASANGO_MCP_TOKEN",
-      "BASANGO_RESEND_API_KEY",
+      "BASANGO_SMTP_PASSWORD",
       "BETTER_AUTH_SECRET",
     ],
     schema: z.object({
@@ -64,8 +64,15 @@ export const { env, config } = await defineConfig({
       BASANGO_MEILISEARCH_INDEX: z.string().min(1),
       BASANGO_MEILISEARCH_TASK_TIMEOUT_MS: z.coerce.number().int().min(100),
       BASANGO_MEILISEARCH_URL: z.url(),
-      BASANGO_RESEND_API_KEY: z.string().optional(),
-      BASANGO_RESEND_FROM_EMAIL: z.string().optional(),
+      BASANGO_SMTP_FROM_EMAIL: z.string().min(1).default("Basango <noreply@basango.local>"),
+      BASANGO_SMTP_HOST: z.string().min(1).default("127.0.0.1"),
+      BASANGO_SMTP_PASSWORD: z.string().optional(),
+      BASANGO_SMTP_PORT: z.coerce.number().int().min(1).max(65_535).default(1025),
+      BASANGO_SMTP_SECURE: z
+        .enum(["true", "false"])
+        .default("false")
+        .transform((value) => value === "true"),
+      BASANGO_SMTP_USER: z.string().optional(),
       BETTER_AUTH_COOKIE_DOMAIN: z.string().optional(),
       BETTER_AUTH_SECRET: z.string().optional(),
       BETTER_AUTH_URL: z.string().optional(),

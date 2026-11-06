@@ -48,6 +48,7 @@
   "packageManager": "bun@1.3.1",
   "private": true,
   "scripts": {
+    "auth:reset-password": "cd apps/api && bun run auth:reset-password",
     "build": "turbo run build",
     "build:dashboard": "turbo build --filter=@basango/dashboard",
     "clean": "git clean -xdf node_modules",

@@ -50,6 +50,10 @@ VITE_PUBLIC_API_URL=https://api.basango.ngandu.dev
 VITE_PUBLIC_URL=https://dashboard.basango.ngandu.dev
 BETTER_AUTH_URL=https://api.basango.ngandu.dev
 BETTER_AUTH_COOKIE_DOMAIN=.basango.ngandu.dev
+BASANGO_SMTP_HOST=smtp.example.com
+BASANGO_SMTP_PORT=587
+BASANGO_SMTP_SECURE=false
+BASANGO_SMTP_FROM_EMAIL="Basango <noreply@basango.ngandu.dev>"
 ```
 
 ```dotenv
@@ -59,11 +63,17 @@ BASANGO_DATABASE_URL=postgresql://...
 BASANGO_MCP_TOKEN=replace-with-a-separate-long-random-secret
 BETTER_AUTH_SECRET=replace-with-a-long-random-secret
 BASANGO_MEILISEARCH_API_KEY=replace-with-a-long-random-master-key
+BASANGO_SMTP_USER=replace-with-the-smtp-username
+BASANGO_SMTP_PASSWORD=replace-with-the-smtp-password
 ```
 
 The crawler uses the same ingestion token as the API but is configured in the crawler deployment,
 not in this TypeScript repository. The MCP token is a separate read-only credential and must never
 be reused as the crawler token.
+
+SMTP credentials are optional for servers that allow unauthenticated delivery, such as the local Mailpit service, but
+`BASANGO_SMTP_USER` and `BASANGO_SMTP_PASSWORD` must be configured together. Set `BASANGO_SMTP_SECURE=true` for
+implicit TLS, normally on port `465`; keep it `false` for STARTTLS, normally on port `587`.
 
 ## Search
 

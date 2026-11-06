@@ -87,6 +87,9 @@ The reader surface is authenticated end to end while registration remains open. 
 and session tables; the Expo client persists native session cookies through SecureStore. Protected reader tRPC
 procedures scope bookmarks, followed sources, and comments to the authenticated user.
 
+The API application also owns the operator password-reset command. It runs as a short-lived process with direct
+database access, resolves the target by email, and delegates credential changes and session revocation to Better Auth.
+
 See the [TypeScript application architecture](web/README.md) for the dependency graph and package recommendations, and
 the [TypeScript and React code-style guide](web/code-style.md) for the normative module-design rules.
 
@@ -96,6 +99,7 @@ the [TypeScript and React code-style guide](web/code-style.md) for the normative
 - `bun run crawler:worker` starts the Rust worker from a sibling `../basango-rs` checkout.
 - `bun run build:crawler` builds the Rust crawler in release mode.
 - Apply database migrations before using ingestion operations: `bun run migrate`.
+- `bun run auth:reset-password --email user@example.com` resets an existing user's password and sessions.
 - `bun run ingestion:cleanup` prunes ingestion operations data older than five days by default.
 - `bun run search:sync` drains deferred article index updates.
 - `bun run search:rebuild` rebuilds and atomically swaps the complete article index.

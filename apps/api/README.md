@@ -42,11 +42,18 @@ The dashboard supplies its own origin as the password-reset destination; Better 
 
 ## Password reset email delivery
 
-Password reset uses Better Auth's single-use verification flow and Resend's HTTPS API in production. Configure:
+Operators can also [reset a user's password by email from the command line](../../docs/password-reset-command.md)
+using `bun run auth:reset-password --email user@example.com` from the repository root.
 
-- `BASANGO_RESEND_API_KEY`: Resend API key (required in production).
-- `BASANGO_RESEND_FROM_EMAIL`: verified sender, for example `Basango <noreply@basango.io>`.
-In development, when no Resend API key is configured, the API writes the Better Auth reset URL to the development log. Reset tokens expire after 30 minutes, can only be used once, and reset completion revokes all existing sessions.
+Password reset uses Better Auth's single-use verification flow and a provider-neutral SMTP transport. Configure:
+
+- `BASANGO_SMTP_HOST`: SMTP server hostname.
+- `BASANGO_SMTP_PORT`: SMTP server port, usually `587` for STARTTLS or `465` for implicit TLS.
+- `BASANGO_SMTP_SECURE`: `true` for implicit TLS on connection (normally port `465`); otherwise `false`.
+- `BASANGO_SMTP_USER` and `BASANGO_SMTP_PASSWORD`: optional SMTP credentials. Configure both or neither.
+- `BASANGO_SMTP_FROM_EMAIL`: sender name and address, for example `Basango <noreply@basango.io>`.
+
+Local Docker Compose runs Mailpit on SMTP port `1025`; its inbox is available at `http://localhost:8025`. The committed development environment points the API to that SMTP server without authentication. Override the SMTP settings with your provider's values in production. Reset tokens expire after 30 minutes, can only be used once, and reset completion revokes all existing sessions.
 
 Apply the database migrations before enabling password reset or ingestion signals:
 

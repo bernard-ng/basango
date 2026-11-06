@@ -60,11 +60,10 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     resetPasswordTokenExpiresIn: 30 * 60,
     revokeSessionsOnPasswordReset: true,
-    sendResetPassword: async ({ token, url, user }) => {
+    sendResetPassword: async ({ url, user }) => {
       void sendPasswordResetEmail({
         email: user.email,
         name: user.name,
-        token,
         url,
       }).catch((error: unknown) => {
         logger.error({ email: user.email, error }, "Unable to deliver password reset email");
